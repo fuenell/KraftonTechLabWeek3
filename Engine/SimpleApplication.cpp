@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "UApplication.h"
 #include "SimpleApplication.h"
@@ -32,8 +32,7 @@ void SimpleApplication::Update(float deltaTime)
     // 카메라(궤도 이동 예시)
     float radius = 5.0f;
     FVector target(0.0f, 0.0f, 0.0f);
-    //FVector up(0, 0, 1);                 // Z-up
-    FVector eye(10.0f, 0.0f , 0.0f);
+    FVector up(0, 0, 1);                 // Z-up
     // X축 방향 직선 이동
     //FVector eye(t, 0, 0.0f);
     // 타겟 = 현재 위치 + 바라보는 방향
