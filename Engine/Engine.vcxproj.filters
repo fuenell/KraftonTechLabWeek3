@@ -78,9 +78,6 @@
     <ClCompile Include="UApplication.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleApplication.cpp">
-      <Filter>Application\리소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="USphere.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -89,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="UMeshFactory.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleApplication.cpp">
+      <Filter>Application\소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
