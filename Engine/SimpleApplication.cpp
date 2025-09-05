@@ -24,7 +24,6 @@ void SimpleApplication::Update(float deltaTime)
 
     // 구 위치를 시간에 따라 변경
     sphere->SetPosition({ 0.0f, 0.0f, 0.0f });
-    sphere2->SetPosition({ 0.0f, 0.0f, 0.0f });
 }
 
 void SimpleApplication::Render() 
@@ -38,7 +37,7 @@ void SimpleApplication::Render()
     // 카메라(궤도 이동 예시)
     static float t = 0.0f; t += 0.016f;
     float radius = 5.0f;
-    FVector target(cosf(t) * radius, sinf(t) * radius, 0.0f);
+    FVector target(0.0f, 0.0f, 0.0f);
     //FVector up(0, 0, 1);                 // Z-up
     FVector eye(10.0f, 0.0f , 0.0f);
     // X축 방향 직선 이동
@@ -63,6 +62,25 @@ void SimpleApplication::Render()
     sphere->Draw(GetRenderer());
 }
 
+void SimpleApplication::RenderGUI()
+{
+    ImGui::Begin("Game Controls");
+
+    // 구 제어
+    static float rotationSpeed = 1.0f;
+    ImGui::SliderFloat("Rotation Speed", &rotationSpeed, 0.0f, 5.0f);
+
+    // 구 위치 직접 조작
+    if (sphere) {
+        FVector pos = sphere->GetPosition();
+        if (ImGui::DragFloat3("Sphere Position", &pos.X, 0.1f)) {
+            sphere->SetPosition(pos);
+        }
+    }
+
+    ImGui::End();
+}
+
 bool SimpleApplication::OnInitialize()
 {
     // Factory에서 공유 Mesh 생성
@@ -70,7 +88,6 @@ bool SimpleApplication::OnInitialize()
 
     // Sphere 인스턴스 생성
     sphere = new USphere({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
-    sphere2 = new USphere({ 0.3f, 0.3f, 0.3f }, { 0.2f, 0.2f, 0.2f }, sharedSphereMesh);
 
     return true;
 }

@@ -66,5 +66,6 @@ protected:
 
 	// Override points for derived classes
 	virtual bool OnInitialize() { return true; }
+	virtual void RenderGUI() {}
 	virtual void OnShutdown() {}
 };

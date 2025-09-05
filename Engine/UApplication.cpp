@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UApplication.h"
 
 // Static member definitions
@@ -226,6 +226,7 @@ void UApplication::InternalRender()
     // Render GUI
     gui.BeginFrame();
     gui.Render();
+    RenderGUI();
     gui.EndFrame();
 
     // Present the frame
