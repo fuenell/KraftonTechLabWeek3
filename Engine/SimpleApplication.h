@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "UApplication.h"
 #include "USphere.h"
@@ -6,7 +6,7 @@
 class SimpleApplication : public UApplication
 {
 private:
-    USphere* sphere, *sphere2;
+    USphere* sphere;
     ID3D11Buffer* sphereVertexBuffer;
 public:
     SimpleApplication() = default;
@@ -15,5 +15,6 @@ public:
 protected:
     void Update(float deltaTime) override;
     void Render() override;
+    void RenderGUI() override;
     bool OnInitialize() override;
 };
