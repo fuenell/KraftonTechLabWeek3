@@ -10,17 +10,15 @@ struct VS_OUTPUT {
 
 cbuffer ConstantBuffer : register(b0)
 {
-    row_major float4x4 M; // Model   (row-vector 규약)
-    row_major float4x4 V; // View
-    row_major float4x4 P; // Projection
+    row_major float4x4 MVP; // Model   (row-vector 규약)
 };
 
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT o;
     float4 wpos = float4(input.Position.xyz, 1.0f);
-    // row 규약: v' = v * M * V * P
-    o.Position = mul( mul( mul(wpos, M), V ), P );
+    // row 규약: v' = v * MVP
+    o.Position = mul( wpos, MVP );
     o.Color = input.Color.rgb;
     return o;
 }

@@ -330,7 +330,31 @@ struct FMatrix
         V.M[3][0] = 0;   V.M[3][1] = 0;   V.M[3][2] = 0;   V.M[3][3] = 1;
         return V;
     }
+    static FMatrix LookAtLHRow(const FVector& eye, const FVector& target, const FVector& up) {
+        // f: 카메라 앞 방향 (LH: target - eye)
+        FVector f(target.X - eye.X, target.Y - eye.Y, target.Z - eye.Z);
+        f.Normalize();
 
+        // s: 오른쪽 (right) = normalize(up × f)  ← LH에서 표준
+        FVector s = up.Cross(f);
+        s.Normalize();
+
+        // u: 위 (up') = s × f
+        FVector u = f.Cross(s);
+
+        FMatrix V = IdentityMatrix();
+        // 회전 성분 (row-vector 규약: 카메라 축을 각 열에 배치)
+        V.M[0][0] = s.X; V.M[0][1] = u.X; V.M[0][2] = f.X; V.M[0][3] = 0.0f;
+        V.M[1][0] = s.Y; V.M[1][1] = u.Y; V.M[1][2] = f.Y; V.M[1][3] = 0.0f;
+        V.M[2][0] = s.Z; V.M[2][1] = u.Z; V.M[2][2] = f.Z; V.M[2][3] = 0.0f;
+
+        // 평행이동 (row-vector: 마지막 행)
+        V.M[3][0] = -(eye.X * s.X + eye.Y * s.Y + eye.Z * s.Z);
+        V.M[3][1] = -(eye.X * u.X + eye.Y * u.Y + eye.Z * u.Z);
+        V.M[3][2] = -(eye.X * f.X + eye.Y * f.Y + eye.Z * f.Z);
+        V.M[3][3] = 1.0f;
+        return V;
+    }
     // ===== Projection =====
     static FMatrix PerspectiveFovRH(float fovY, float aspect, float zNear, float zFar) {
         float f = 1.0f / tanf(fovY * 0.5f);
@@ -365,6 +389,17 @@ struct FMatrix
         P.M[3][2] = 1.0f;
         return P;
     }
+    static FMatrix PerspectiveFovLHRow(float fovY, float aspect, float zn, float zf) {
+        float f = 1.0f / tanf(fovY * 0.5f);
+        FMatrix P(0.0f);
+        P.M[0][0] = f / aspect;
+        P.M[1][1] = f;
+        P.M[2][2] = zf / (zf - zn);
+        P.M[2][3] = 1.0f;                          // row-vector에서는 여기가 1
+        P.M[3][2] = (-zn * zf) / (zf - zn);
+        // P.M[3][3] = 0 (이미 0)
+        return P;
+    }
     static FMatrix OrthoRH(float w, float h, float zNear, float zFar) {
         FMatrix O(0.0f);
         O.M[0][0] = 2.0f / w;
@@ -374,12 +409,12 @@ struct FMatrix
         O.M[3][3] = 1.0f;
         return O;
     }
-    static FMatrix OrthoLH(float w, float h, float zNear, float zFar) {
+    static FMatrix OrthoLHRow(float w, float h, float zn, float zf) {
         FMatrix O(0.0f);
         O.M[0][0] = 2.0f / w;
         O.M[1][1] = 2.0f / h;
-        O.M[2][2] = 1.0f / (zFar - zNear);
-        O.M[2][3] = -zNear / (zFar - zNear);
+        O.M[2][2] = 1.0f / (zf - zn);
+        O.M[2][3] = -zn / (zf - zn);   // row-vector에선 [2][3]
         O.M[3][3] = 1.0f;
         return O;
     }
@@ -394,5 +429,15 @@ struct FMatrix
         FMatrix R = Rz * (Ry * Rx); // Z*Y*X (엔진 취향에 맞게 조절)
         FMatrix S = Scale(s.X, s.Y, s.Z);
         return T * (R * S);
+    }
+    // v' = v * (S * R * T)
+    static FMatrix TRSRow(const FVector& t, const FVector& rRadXYZ, const FVector& s) {
+        FMatrix S = Scale(s.X, s.Y, s.Z);
+        FMatrix Rx = RotationXRow(rRadXYZ.X);
+        FMatrix Ry = RotationYRow(rRadXYZ.Y);
+        FMatrix Rz = RotationZRow(rRadXYZ.Z);
+        FMatrix R = Rx * Ry * Rz;               // 필요에 따라 오일러 순서 변경 가능
+        FMatrix T = TranslationRow(t.X, t.Y, t.Z);
+        return S * R * T;                        // row 규약 핵심
     }
 };
