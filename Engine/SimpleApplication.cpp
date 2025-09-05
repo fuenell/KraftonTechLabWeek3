@@ -64,19 +64,83 @@ void SimpleApplication::Render()
 
 void SimpleApplication::RenderGUI()
 {
-    ImGui::Begin("Game Controls");
+    ImGui::Begin("Jungle Control Panel");
 
-    // 구 제어
-    static float rotationSpeed = 1.0f;
-    ImGui::SliderFloat("Rotation Speed", &rotationSpeed, 0.0f, 5.0f);
+    ImGui::Text("Hello Jungle World!");
 
-    // 구 위치 직접 조작
-    if (sphere) {
-        FVector pos = sphere->GetPosition();
-        if (ImGui::DragFloat3("Sphere Position", &pos.X, 0.1f)) {
-            sphere->SetPosition(pos);
+    float frameRate = ImGui::GetIO().Framerate;
+    ImGui::Text("FPS %.0f (%.0f ms)", frameRate,1000.0f/frameRate);
+
+    ImGui::Separator();
+
+    static int currentItem = 0;
+    int value = 10;
+    const char* choices[] = {
+        "a", "b"
+    };
+
+
+    ImGui::Combo("Primitive", &currentItem, choices, sizeof(choices) / sizeof(const char*));
+    ImGui::Button("Spawn");
+    ImGui::SameLine();
+
+    ImGui::BeginDisabled();
+    ImGui::SameLine();
+    ImGui::InputInt("Number of spawned primitives", &value, 0);
+    ImGui::EndDisabled();
+
+    ImGui::Separator();
+
+    char sceneName[100] = "";
+    ImGui::InputText("Scene Name", sceneName, sizeof(sceneName));
+    ImGui::Button("New scene");
+    ImGui::Button("Save scene");
+    ImGui::Button("Load scene");
+
+    ImGui::Separator();
+
+    bool isOrthogonal = false;
+    ImGui::Checkbox("Orthogonal", &isOrthogonal);
+
+    // 데이터
+    float fov = 53.000f;
+    float cameraLocation[3] = { 1.575f, 2.509f, -1.599f };
+    float cameraRotation[3] = { 0.820f, -0.458f, 0.000f };
+
+    // FOV 행 - 테이블 밖에서 처리
+    float tableWidth = ImGui::GetContentRegionAvail().x;
+    ImGui::SetNextItemWidth(tableWidth * 0.75f); // 3/4 너비
+    ImGui::InputFloat("##fov", &fov, 0.0f, 0.0f, "%.3f");
+    ImGui::SameLine();
+    ImGui::Text("FOV");
+
+    // 나머지는 테이블로
+    if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None)) {
+        // Camera Location 행
+        ImGui::TableNextRow();
+        for (int i = 0; i < 3; i++) {
+            ImGui::TableSetColumnIndex(i);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
+                &cameraLocation[i], 0.0f, 0.0f, "%.3f");
         }
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("Camera Location");
+
+        // Camera Rotation 행
+        ImGui::TableNextRow();
+        for (int i = 0; i < 3; i++) {
+            ImGui::TableSetColumnIndex(i);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
+                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
+        }
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("Camera Rotation");
+
+        ImGui::EndTable();
     }
+
 
     ImGui::End();
 }
