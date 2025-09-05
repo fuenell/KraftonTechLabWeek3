@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UInputManager.h"
 
 UInputManager::UInputManager()
@@ -27,18 +27,18 @@ void UInputManager::Update()
 
 }
 
-void UInputManager::ProcessMessage(const MSG& msg)
+bool UInputManager::ProcessMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    switch (msg.message)
+    switch (msg)
     {
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
-        HandleKeyDown(msg.wParam);
+        HandleKeyDown(wParam);
         break;
 
     case WM_KEYUP:
     case WM_SYSKEYUP:
-        HandleKeyUp(msg.wParam);
+        HandleKeyUp(wParam);
         break;
 
     case WM_LBUTTONDOWN:
@@ -47,16 +47,17 @@ void UInputManager::ProcessMessage(const MSG& msg)
     case WM_LBUTTONUP:
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
-        HandleMouseButton(msg.message, msg.wParam);
+        HandleMouseButton(msg, wParam);
         // Fall through to handle mouse position
     case WM_MOUSEMOVE:
-        HandleMouseMove(msg.lParam);
+        HandleMouseMove(lParam);
         break;
 
     case WM_MOUSEWHEEL:
-        HandleMouseWheel(msg.wParam);
+        HandleMouseWheel(wParam);
         break;
     }
+    return false; // 보통 0 반환(핸들드)해도 되지만, 기본 처리가 필요 없으면 true/0 선택
 }
 
 bool UInputManager::IsKeyDown(int keyCode) const

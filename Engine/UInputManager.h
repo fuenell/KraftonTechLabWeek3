@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 
 class UInputManager
@@ -19,7 +19,7 @@ public:
 
     // Frame management
     void Update();
-    void ProcessMessage(const MSG& msg);
+    bool ProcessMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     // Keyboard input
     bool IsKeyDown(int keyCode) const;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UApplication.h"
 
 // Static member definitions
@@ -240,6 +240,12 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
         return true;
     }
 
+    if (g_pApplication)
+    {
+                // Let input manager process input messages
+		g_pApplication->inputManager.ProcessMessage(hWnd, message, wParam, lParam);
+    }
+
     switch (message)
     {
     case WM_DESTROY:
@@ -272,6 +278,8 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
+
+    
 
     return 0;
 }
