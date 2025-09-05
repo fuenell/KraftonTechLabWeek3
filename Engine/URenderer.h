@@ -7,11 +7,8 @@
 struct CBTransform
 {
     // HLSL의 row_major float4x4와 메모리 호환을 위해 float[16]로 보냄
-    float M[16];
-    float V[16];
-    float P[16];
+    float MVP[16];
 };
-extern CBTransform Transforms;  // 현재 프레임/오브젝트 행렬 캐시
 
 class URenderer
 {
@@ -41,6 +38,8 @@ private:
     // Render state
     bool bIsInitialized;
 
+    FMatrix mVP;                 // 프레임 캐시
+    CBTransform   mCBData;
 public:
     URenderer();
     ~URenderer();
@@ -114,25 +113,13 @@ private:
     bool CheckResult(HRESULT hr, const char* function);
 
     // 행렬 복사 핼퍼
-    static void CopyRowMajor(const FMatrix& S, float out16[16])
-    {
-        int k = 0;
+    static inline void CopyRowMajor(float dst[16], const FMatrix& src) {
         for (int r = 0; r < 4; ++r)
             for (int c = 0; c < 4; ++c)
-                out16[k++] = S.M[r][c];
+                dst[r * 4 + c] = src.M[r][c];
     }
 
 public:
-    void SetViewProj(const FMatrix& V, const FMatrix& P)
-    {
-        CopyRowMajor(V, Transforms.V);
-        CopyRowMajor(P, Transforms.P);
-        // 한 번에 보내지 않아도 되지만, 편의상 여기선 안 보냄 (Model 설정 때 같이 보냄)
-    }
-
-    void SetModel(const FMatrix& M)
-    {
-        CopyRowMajor(M, Transforms.M);
-        UpdateConstantBuffer(&Transforms, sizeof(Transforms)); // M,V,P 모두 전송
-    }
+    void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
+    void SetModel(const FMatrix& M);                      // M*VP → b0 업로드
 };

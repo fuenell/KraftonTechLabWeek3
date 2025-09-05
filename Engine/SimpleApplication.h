@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 #include "UApplication.h"
 #include "USphereComp.h"
@@ -15,5 +15,6 @@ public:
 protected:
     void Update(float deltaTime) override;
     void Render() override;
+    void RenderGUI() override;
     bool OnInitialize() override;
 };

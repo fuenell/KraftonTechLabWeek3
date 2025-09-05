@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UGUI.h"
 #include "UTimeManager.h"
 
@@ -101,13 +101,6 @@ void UGUI::Render()
 {
     if (!bInitialized)
         return;
-
-    // Basic demo window - can be removed later
-    ImGui::Begin("Engine");
-    ImGui::Text("Hello Engine World!");
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-        1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::End();
 }
 
 bool UGUI::WantCaptureMouse() const
