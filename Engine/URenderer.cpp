@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "URenderer.h"
 
+CBTransform Transforms;   // 여기서만 메모리 할당
+
 URenderer::URenderer()
 	: device(nullptr)
 	, deviceContext(nullptr)
@@ -190,7 +192,7 @@ bool URenderer::CreateRasterizerState()
 bool URenderer::CreateConstantBuffer()
 {
 	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.ByteWidth = 32;
+	bufferDesc.ByteWidth = sizeof(CBTransform);   // ← 변경
 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -708,3 +710,6 @@ bool URenderer::SetupViewport(int width, int height)
 
 	return true;
 }
+
+
+

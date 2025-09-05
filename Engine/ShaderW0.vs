@@ -1,30 +1,26 @@
-struct VS_INPUT
-{
+// ShaderW0.vs
+struct VS_INPUT {
     float4 Position : POSITION;
-    float4 Color : COLOR;
+    float4 Color    : COLOR;
 };
-
-struct VS_OUTPUT
-{
+struct VS_OUTPUT {
     float4 Position : SV_POSITION;
-    float3 Color : COLOR;
+    float3 Color    : COLOR;
 };
 
 cbuffer ConstantBuffer : register(b0)
 {
-    float4 Offset;      // float3 → float4
-    float4 Scale;       // float3 → float4
-    // Padding 제거됨
+    row_major float4x4 M; // Model   (row-vector 규약)
+    row_major float4x4 V; // View
+    row_major float4x4 P; // Projection
 };
 
 VS_OUTPUT main(VS_INPUT input)
 {
-    VS_OUTPUT output;
-    
-    // 이제 Scale과 Offset이 올바르게 전달됨
-    float4 transformed = float4(input.Position.xyz * Scale.xyz + Offset.xyz, 1.0f);
-    //float4 transformed = float4(input.Position.xyz, 1.0f);
-    output.Position = transformed;
-    output.Color = input.Color.rgb;
-    return output;
+    VS_OUTPUT o;
+    float4 wpos = float4(input.Position.xyz, 1.0f);
+    // row 규약: v' = v * M * V * P
+    o.Position = mul( mul( mul(wpos, M), V ), P );
+    o.Color = input.Color.rgb;
+    return o;
 }

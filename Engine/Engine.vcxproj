@@ -181,6 +181,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Math.cpp" />
+    <ClCompile Include="Matrix.h" />
     <ClCompile Include="SimpleApplication.cpp" />
     <ClCompile Include="UApplication.cpp" />
     <ClCompile Include="UMesh.cpp" />
@@ -191,6 +193,7 @@
     <ClCompile Include="UInputManager.cpp" />
     <ClCompile Include="UPrimitive.cpp" />
     <ClCompile Include="URenderer.cpp" />
+    <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FVertexSimple.h" />
@@ -215,6 +218,7 @@
     <ClInclude Include="UInputManager.h" />
     <ClInclude Include="UPrimitive.h" />
     <ClInclude Include="URenderer.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
