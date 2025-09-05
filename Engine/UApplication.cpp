@@ -1,0 +1,277 @@
+#include "stdafx.h"
+#include "UApplication.h"
+
+// Static member definitions
+WCHAR UApplication::WindowClass[] = L"EngineWindowClass";
+WCHAR UApplication::DefaultTitle[] = L"Engine Application";
+
+// Global application pointer for window procedure
+UApplication* g_pApplication = nullptr;
+
+// Forward declaration for ImGui
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+UApplication::UApplication()
+    : hWnd(nullptr)
+    , bIsRunning(false)
+    , bIsInitialized(false)
+    , windowTitle(DefaultTitle)
+    , windowWidth(1024)
+    , windowHeight(768)
+{
+    g_pApplication = this;
+}
+
+UApplication::~UApplication()
+{
+    if (bIsInitialized)
+    {
+        Shutdown();
+    }
+    g_pApplication = nullptr;
+}
+
+bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, int width, int height)
+{
+    if (bIsInitialized)
+        return false;
+
+    windowTitle = title;
+    windowWidth = width;
+    windowHeight = height;
+
+    // Create main window
+    if (!CreateMainWindow(hInstance))
+    {
+        return false;
+    }
+
+    // Initialize core systems
+    if (!timeManager.Initialize(60))
+    {
+        MessageBox(hWnd, L"Failed to initialize TimeManager", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+
+    if (!renderer.Create(hWnd))
+    {
+        MessageBox(hWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+
+    if (!renderer.CreateShader())
+    {
+        MessageBox(hWnd, L"Failed to create shaders", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+
+    if (!renderer.CreateConstantBuffer())
+    {
+        MessageBox(hWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+
+    if (!gui.Initialize(hWnd, renderer.GetDevice(), renderer.GetDeviceContext()))
+    {
+        return false;
+    }
+
+    // Allow derived classes to initialize
+    if (!OnInitialize())
+    {
+        return false;
+    }
+
+    bIsInitialized = true;
+    bIsRunning = true;
+
+    return true;
+}
+
+void UApplication::Run()
+{
+    if (!bIsInitialized)
+        return;
+
+    while (bIsRunning)
+    {
+        timeManager.BeginFrame();
+
+        ProcessMessages();
+
+        if (!bIsRunning)
+            break;
+
+        InternalUpdate();
+        InternalRender();
+
+        timeManager.EndFrame();
+        timeManager.WaitForTargetFrameTime();
+    }
+}
+
+void UApplication::Shutdown()
+{
+    if (!bIsInitialized)
+        return;
+
+    bIsRunning = false;
+
+    // Allow derived classes to cleanup
+    OnShutdown();
+
+    // Shutdown core systems
+    gui.Shutdown();
+    renderer.ReleaseConstantBuffer();
+    renderer.ReleaseShader();
+    renderer.Release();
+
+    bIsInitialized = false;
+}
+
+void UApplication::Update(float deltaTime)
+{
+    // Base class update - can be overridden by derived classes
+    // Update core engine systems here if needed
+}
+
+void UApplication::Render()
+{
+    // Base class render - handles GUI rendering
+    // Derived classes should call this after their rendering
+
+    // Render engine GUI
+}
+
+bool UApplication::CreateMainWindow(HINSTANCE hInstance)
+{
+    // Register window class
+    WNDCLASSW wndclass = {};
+    wndclass.lpfnWndProc = WndProc;
+    wndclass.hInstance = hInstance;
+    wndclass.lpszClassName = WindowClass;
+    wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+
+    if (!RegisterClassW(&wndclass))
+    {
+        return false;
+    }
+
+    // Calculate window size including borders
+    RECT windowRect = { 0, 0, windowWidth, windowHeight };
+    AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+
+    int adjustedWidth = windowRect.right - windowRect.left;
+    int adjustedHeight = windowRect.bottom - windowRect.top;
+
+    // Create window
+    hWnd = CreateWindowExW(
+        0,
+        WindowClass,
+        windowTitle.c_str(),
+        WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        adjustedWidth, adjustedHeight,
+        nullptr, nullptr, hInstance, nullptr
+    );
+
+    if (!hWnd)
+    {
+        return false;
+    }
+
+    ShowWindow(hWnd, SW_SHOW);
+    UpdateWindow(hWnd);
+
+    return true;
+}
+
+void UApplication::ProcessMessages()
+{
+    MSG msg;
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+
+        if (msg.message == WM_QUIT)
+        {
+            bIsRunning = false;
+            return;
+        }
+    }
+}
+
+void UApplication::InternalUpdate()
+{
+    float deltaTime = static_cast<float>(timeManager.GetDeltaTime());
+
+    // Update input manager
+    inputManager.Update();
+
+    // Call derived class update
+    Update(deltaTime);
+}
+
+void UApplication::InternalRender()
+{
+    // Prepare rendering
+    renderer.Prepare();
+    renderer.PrepareShader();
+
+    // Call derived class render
+    Render();
+
+    // Render GUI
+    gui.BeginFrame();
+    gui.Render();
+    gui.EndFrame();
+
+    // Present the frame
+    renderer.SwapBuffer();
+}
+
+LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    // Let ImGui handle the message first
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+    {
+        return true;
+    }
+
+    switch (message)
+    {
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+
+    case WM_SIZE:
+        if (g_pApplication && wParam != SIZE_MINIMIZED)
+        {
+            int width = LOWORD(lParam);
+            int height = HIWORD(lParam);
+        }
+        break;
+
+    case WM_KEYDOWN:
+    case WM_KEYUP:
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONUP:
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+    case WM_MOUSEMOVE:
+    case WM_MOUSEWHEEL:
+        // Input messages will be processed in ProcessMessages
+        break;
+
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+
+    return 0;
+}
