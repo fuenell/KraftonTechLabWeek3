@@ -1,12 +1,12 @@
-#pragma once
+ï»¿#pragma once
 
-// Windows °ü·Ã (°¡Àå ¸ÕÀú)
+// Windows ê´€ë ¨ (ê°€ì¥ ë¨¼ì €)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
 
-// C++ Ç¥ÁØ ¶óÀÌºê·¯¸®
+// C++ í‘œì¤€ ë¼ì´ë¸ŒëŸ¬ë¦¬
 #include <iostream>
 #include <string>
 #include <vector>
@@ -17,17 +17,17 @@
 #include <cassert>
 #include <cmath>
 
-// DirectX °ü·Ã
+// DirectX ê´€ë ¨
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>
 
-// ImGui °ü·Ã (DirectX ÀÌÈÄ¿¡)
+// ImGui ê´€ë ¨ (DirectX ì´í›„ì—)
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include "ImGui/imgui_impl_win32.h"
 
-// ¶óÀÌºê·¯¸® ¸µÅ·
+// ë¼ì´ë¸ŒëŸ¬ë¦¬ ë§í‚¹
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -47,5 +47,5 @@ class UTimeManager;
 // Engine namespace (optional)
 namespace Engine
 {
-    // Common engine types and utilities can go here
+	// Common engine types and utilities can go here
 }

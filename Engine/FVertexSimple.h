@@ -1,47 +1,47 @@
-#pragma once
+ï»¿#pragma once
 #include <math.h>
 
 struct FVertexSimpleOld
 {
-    float x, y, z;       // Position (3°³)
-    float r, g, b, a;    // Color (4°³)
+	float x, y, z;       // Position (3ê°œ)
+	float r, g, b, a;    // Color (4ê°œ)
 };
 
-//Á¤Á¡ ±¸Á¶Ã¼ ¼±¾ğ, »ï°¢Çü ¹è¿­ Á¤ÀÇ
+//ì •ì  êµ¬ì¡°ì²´ ì„ ì–¸, ì‚¼ê°í˜• ë°°ì—´ ì •ì˜
 // 1. Define the triangle vertices
 struct FVertexSimple
 {
-    float x, y, z, w;       // Position (float4) - w Ãß°¡
-    float r, g, b, a;       // Color (float4)
+	float x, y, z, w;       // Position (float4) - w ì¶”ê°€
+	float r, g, b, a;       // Color (float4)
 
 
-    // º¯È¯ ÇÔ¼ö
-    static std::vector<FVertexSimple> ConvertVertexData(const FVertexSimpleOld* oldVertices, int count)
-    {
-        std::vector<FVertexSimple> newVertices;
-        newVertices.reserve(count);
+	// ë³€í™˜ í•¨ìˆ˜
+	static std::vector<FVertexSimple> ConvertVertexData(const FVertexSimpleOld* oldVertices, int count)
+	{
+		std::vector<FVertexSimple> newVertices;
+		newVertices.reserve(count);
 
-        for (int i = 0; i < count; i++)
-        {
-            FVertexSimple newVertex;
+		for (int i = 0; i < count; i++)
+		{
+			FVertexSimple newVertex;
 
-            // Position: w = 1.0f Ãß°¡
-            newVertex.x = oldVertices[i].x;
-            newVertex.y = oldVertices[i].y;
-            newVertex.z = oldVertices[i].z;
-            newVertex.w = 1.0f;  // µ¿Â÷ÁÂÇ¥ w ÄÄÆ÷³ÍÆ®
+			// Position: w = 1.0f ì¶”ê°€
+			newVertex.x = oldVertices[i].x;
+			newVertex.y = oldVertices[i].y;
+			newVertex.z = oldVertices[i].z;
+			newVertex.w = 1.0f;  // ë™ì°¨ì¢Œí‘œ w ì»´í¬ë„ŒíŠ¸
 
-            // Color: ±×´ë·Î º¹»ç
-            newVertex.r = oldVertices[i].r;
-            newVertex.g = oldVertices[i].g;
-            newVertex.b = oldVertices[i].b;
-            newVertex.a = oldVertices[i].a;
+			// Color: ê·¸ëŒ€ë¡œ ë³µì‚¬
+			newVertex.r = oldVertices[i].r;
+			newVertex.g = oldVertices[i].g;
+			newVertex.b = oldVertices[i].b;
+			newVertex.a = oldVertices[i].a;
 
-            newVertices.push_back(newVertex);
-        }
+			newVertices.push_back(newVertex);
+		}
 
-        return newVertices;
-    }
+		return newVertices;
+	}
 
 };
 
@@ -51,35 +51,42 @@ struct FVector
 	float x, y, z;
 	FVector(float _x = 0, float _y = 0, float _z = 0) : x(_x), y(_y), z(_z) {}
 
-    FVector operator+(const FVector& other) const {
-        return { x + other.x, y + other.y, z + other.z };
-    }
+	FVector operator+(const FVector& other) const
+	{
+		return { x + other.x, y + other.y, z + other.z };
+	}
 
-    FVector operator-(const FVector& other) const {
-        return { x - other.x, y - other.y, z - other.z };
-    }
+	FVector operator-(const FVector& other) const
+	{
+		return { x - other.x, y - other.y, z - other.z };
+	}
 
-    FVector operator*(float scalar) const {
-        return { x * scalar, y * scalar, z * scalar };
-    }
+	FVector operator*(float scalar) const
+	{
+		return { x * scalar, y * scalar, z * scalar };
+	}
 
-    FVector operator/ (float scalar) const {
-        return { x / scalar, y / scalar, z / scalar };
-    }
-    
-    float dot(const FVector& other) const {
-        return x * other.x + y * other.y + z * other.z;
-    }
+	FVector operator/ (float scalar) const
+	{
+		return { x / scalar, y / scalar, z / scalar };
+	}
 
-    float length() const {
-        return sqrtf(dot(*this));
-    }
+	float dot(const FVector& other) const
+	{
+		return x * other.x + y * other.y + z * other.z;
+	}
 
-    FVector normalized() const {
-        float len = length();
-        return len > 0 ? (*this) * (1.0f / len) : FVector{ 0, 0, 0 };
-    }
+	float length() const
+	{
+		return sqrtf(dot(*this));
+	}
+
+	FVector normalized() const
+	{
+		float len = length();
+		return len > 0 ? (*this) * (1.0f / len) : FVector{ 0, 0, 0 };
+	}
 };
 
-//¿©±â¿¡ Ãß°¡ÇÏ¼¼¿ä.
+//ì—¬ê¸°ì— ì¶”ê°€í•˜ì„¸ìš”.
 #include "Sphere.h"

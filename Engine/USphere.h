@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "stdafx.h"
 #include "URenderer.h"
 #include "UPrimitive.h"
@@ -7,67 +7,68 @@
 class USphere : public UPrimitive
 {
 private:
-    FVector position;
-    FVector scale;
+	FVector position;
+	FVector scale;
 
-    // »ó¼ö ¹öÆÛ µ¥ÀÌÅÍ ±¸Á¶
-    struct ConstantBufferData
-    {
-        float Offset[4];    // float4·Î º¯°æ (w´Â 0.0f)
-        float Scale[4];     // float4·Î º¯°æ (w´Â 1.0f)
-    };
+	// ìƒìˆ˜ ë²„í¼ ë°ì´í„° êµ¬ì¡°
+	struct ConstantBufferData
+	{
+		float Offset[4];    // float4ë¡œ ë³€ê²½ (wëŠ” 0.0f)
+		float Scale[4];     // float4ë¡œ ë³€ê²½ (wëŠ” 1.0f)
+	};
 
 public:
-    USphere(FVector pos = { 0, 0, 0 }, FVector scl = { 1, 1, 1 }, UMesh* sphereMesh = nullptr)
-        : position(pos), scale(scl)
-    {
-        mesh = sphereMesh;
-    }
+	USphere(FVector pos = { 0, 0, 0 }, FVector scl = { 1, 1, 1 }, UMesh* sphereMesh = nullptr)
+		: position(pos), scale(scl)
+	{
+		mesh = sphereMesh;
+	}
 
-    void UpdatePhysics(float t, bool bUsingGravity, float restitution) override
-    {
-        // ¹°¸® ¾÷µ¥ÀÌÆ® ·ÎÁ÷ (³ªÁß¿¡ ±¸Çö)
-    }
+	void UpdatePhysics(float t, bool bUsingGravity, float restitution) override
+	{
+		// ë¬¼ë¦¬ ì—…ë°ì´íŠ¸ ë¡œì§ (ë‚˜ì¤‘ì— êµ¬í˜„)
+	}
 
-    bool OnCollision(UPrimitive* other, float restitution) override
-    {
-        // Ãæµ¹ Ã³¸® (³ªÁß¿¡ ±¸Çö)
-        return false;
-    }
+	bool OnCollision(UPrimitive* other, float restitution) override
+	{
+		// ì¶©ëŒ ì²˜ë¦¬ (ë‚˜ì¤‘ì— êµ¬í˜„)
+		return false;
+	}
 
-    void UpdateConstantBuffer(URenderer& renderer) override
-    {
-        ConstantBufferData cbData;
+	void UpdateConstantBuffer(URenderer& renderer) override
+	{
+		ConstantBufferData cbData;
 
-        // Offset ¼³Á¤ (float4)
-        cbData.Offset[0] = position.x;
-        cbData.Offset[1] = position.y;
-        cbData.Offset[2] = position.z;
-        cbData.Offset[3] = 0.0f;  // w ÄÄÆ÷³ÍÆ®
+		// Offset ì„¤ì • (float4)
+		cbData.Offset[0] = position.x;
+		cbData.Offset[1] = position.y;
+		cbData.Offset[2] = position.z;
+		cbData.Offset[3] = 0.0f;  // w ì»´í¬ë„ŒíŠ¸
 
-        // Scale ¼³Á¤ (float4)
-        cbData.Scale[0] = scale.x;
-        cbData.Scale[1] = scale.y;
-        cbData.Scale[2] = scale.z;
-        cbData.Scale[3] = 1.0f;   // w ÄÄÆ÷³ÍÆ®
+		// Scale ì„¤ì • (float4)
+		cbData.Scale[0] = scale.x;
+		cbData.Scale[1] = scale.y;
+		cbData.Scale[2] = scale.z;
+		cbData.Scale[3] = 1.0f;   // w ì»´í¬ë„ŒíŠ¸
 
-        // »ó¼ö ¹öÆÛ ¾÷µ¥ÀÌÆ®
-        renderer.UpdateConstantBuffer(&cbData, sizeof(cbData));
-    }
+		// ìƒìˆ˜ ë²„í¼ ì—…ë°ì´íŠ¸
+		renderer.UpdateConstantBuffer(&cbData, sizeof(cbData));
+	}
 
-    void Draw(URenderer& renderer) override
-    {
-        if (!mesh || !mesh->VertexBuffer) {
-            return;
-        }
-        // ÀÌ ÁÙÀÌ ´©¶ôµÇ¾ú½À´Ï´Ù!
-        UpdateConstantBuffer(renderer);
-        renderer.DrawMesh(mesh);
-    }
+	void Draw(URenderer& renderer) override
+	{
+		if (!mesh || !mesh->VertexBuffer)
+		{
+			return;
+		}
+		// ì´ ì¤„ì´ ëˆ„ë½ë˜ì—ˆìŠµë‹ˆë‹¤!
+		UpdateConstantBuffer(renderer);
+		renderer.DrawMesh(mesh);
+	}
 
-    // À§Ä¡¿Í ½ºÄÉÀÏ ¼³Á¤ ÇÔ¼öµé
-    void SetPosition(const FVector& pos) { position = pos; }
-    void SetScale(const FVector& scl) { scale = scl; }
-    FVector GetPosition() const { return position; }
-    FVector GetScale() const { return scale; }
+	// ìœ„ì¹˜ì™€ ìŠ¤ì¼€ì¼ ì„¤ì • í•¨ìˆ˜ë“¤
+	void SetPosition(const FVector& pos) { position = pos; }
+	void SetScale(const FVector& scl) { scale = scl; }
+	FVector GetPosition() const { return position; }
+	FVector GetScale() const { return scale; }
 };

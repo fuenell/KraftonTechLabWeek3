@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "UMesh.h"
 #include "URenderer.h"
 #include <vector>
@@ -6,18 +6,18 @@
 class UMeshFactory
 {
 public:
-    // Sphere Mesh »ý¼º
-    static UMesh* CreateSphereMesh(URenderer& renderer)
-    {
-        // ±âÁ¸ µ¥ÀÌÅÍ¸¦ »õ Çü½ÄÀ¸·Î º¯È¯
-        int numVertices = sizeof(sphere_vertices) / sizeof(FVertexSimpleOld);
-        auto convertedVertices = FVertexSimple::ConvertVertexData(
-            sphere_vertices,
-            numVertices
-        );
+	// Sphere Mesh ìƒì„±
+	static UMesh* CreateSphereMesh(URenderer& renderer)
+	{
+		// ê¸°ì¡´ ë°ì´í„°ë¥¼ ìƒˆ í˜•ì‹ìœ¼ë¡œ ë³€í™˜
+		int numVertices = sizeof(sphere_vertices) / sizeof(FVertexSimpleOld);
+		auto convertedVertices = FVertexSimple::ConvertVertexData(
+			sphere_vertices,
+			numVertices
+		);
 
-        UMesh* mesh = new UMesh();
-        mesh->Initialize(renderer.GetDevice(), convertedVertices); // Renderer¸¦ ÅëÇØ Device Á¢±Ù
-        return mesh;
-    }
+		UMesh* mesh = new UMesh();
+		mesh->Initialize(renderer.GetDevice(), convertedVertices); // Rendererë¥¼ í†µí•´ Device ì ‘ê·¼
+		return mesh;
+	}
 };
