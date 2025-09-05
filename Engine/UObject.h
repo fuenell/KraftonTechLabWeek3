@@ -1,17 +1,14 @@
 #pragma once
 #include "UEngineStatics.h"
+#include "Globals.h"
 typedef int int32;
 typedef unsigned int uint32;
-template <typename T>
-using TArray = std::vector<T>;
-
-// class UObject;
-// TArray<UObject*> GUObjectArray;
 
 class UObject
 {
 public:
-    static TArray<UObject*> GUObjectArray; // TEMP
+    uint32 UUID;
+    uint32 InternalIndex;
     
     UObject()
     {
@@ -39,7 +36,4 @@ public:
         UEngineStatics::RemoveAllocation(size);
         ::operator delete(ptr);
     }
-    
-    uint32 UUID;
-    uint32 InternalIndex;
 };
