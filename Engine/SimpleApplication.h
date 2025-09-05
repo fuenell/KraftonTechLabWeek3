@@ -1,12 +1,12 @@
 #pragma once
 #include "stdafx.h"
 #include "UApplication.h"
-#include "USphere.h"
+#include "USphereComp.h"
 // Simple application that inherits from UApplication
 class SimpleApplication : public UApplication
 {
 private:
-    USphere* sphere, *sphere2;
+    USphereComp* sphere, *sphere2;
     ID3D11Buffer* sphereVertexBuffer;
 public:
     SimpleApplication() = default;

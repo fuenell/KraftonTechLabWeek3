@@ -185,13 +185,16 @@
     <ClCompile Include="Matrix.h" />
     <ClCompile Include="SimpleApplication.cpp" />
     <ClCompile Include="UApplication.cpp" />
+    <ClCompile Include="UEngineStatics.cpp" />
     <ClCompile Include="UMesh.cpp" />
     <ClCompile Include="UMeshFactory.cpp" />
-    <ClCompile Include="USphere.cpp" />
+    <ClCompile Include="UObject.cpp" />
+    <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="UTImeManager.cpp" />
     <ClCompile Include="UGUI.cpp" />
     <ClCompile Include="UInputManager.cpp" />
-    <ClCompile Include="UPrimitive.cpp" />
+    <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="URenderer.cpp" />
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
@@ -210,13 +213,16 @@
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UApplication.h" />
+    <ClInclude Include="UEngineStatics.h" />
     <ClInclude Include="UMesh.h" />
     <ClInclude Include="UMeshFactory.h" />
-    <ClInclude Include="USphere.h" />
+    <ClInclude Include="UObject.h" />
+    <ClInclude Include="USceneComponent.h" />
+    <ClInclude Include="USphereComp.h" />
     <ClInclude Include="UTimeManager.h" />
     <ClInclude Include="UGUI.h" />
     <ClInclude Include="UInputManager.h" />
-    <ClInclude Include="UPrimitive.h" />
+    <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="URenderer.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>

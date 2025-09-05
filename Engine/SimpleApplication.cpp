@@ -19,12 +19,12 @@ void SimpleApplication::Update(float deltaTime)
     }
 
     // 구 회전 애니메이션 (선택사항)
-    static float rotation = 0.0f;
-    rotation += deltaTime * 1.0f; // 1 radian per second
+    // static float rotation = 0.0f;
+    // rotation += deltaTime * 1.0f; // 1 radian per second
 
     // 구 위치를 시간에 따라 변경
     sphere->SetPosition({ 0.0f, 0.0f, 0.0f });
-    sphere2->SetPosition({ 0.0f, 0.0f, 0.0f });
+    sphere2->SetPosition({ 0.25f, 0.15f, 0.5f });
 }
 
 void SimpleApplication::Render() 
@@ -36,7 +36,7 @@ void SimpleApplication::Render()
     FMatrix P = FMatrix::PerspectiveFovRHRow((float)(PIDIV4 / 4.0), aspect, 0.1f, 100.0f);
 
     // 카메라(궤도 이동 예시)
-    static float t = 0.0f; t += 0.016f;
+    static float t = 0.0f;
     float radius = 5.0f;
     FVector target(cosf(t) * radius, sinf(t) * radius, 0.0f);
     //FVector up(0, 0, 1);                 // Z-up
@@ -61,6 +61,7 @@ void SimpleApplication::Render()
         // 구 그리기
     GetRenderer().SetViewProj(V, P);  // 카메라 행렬 세팅
     sphere->Draw(GetRenderer());
+    sphere2->Draw(GetRenderer());
 }
 
 bool SimpleApplication::OnInitialize()
@@ -69,8 +70,8 @@ bool SimpleApplication::OnInitialize()
     UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh(GetRenderer());
 
     // Sphere 인스턴스 생성
-    sphere = new USphere({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
-    sphere2 = new USphere({ 0.3f, 0.3f, 0.3f }, { 0.2f, 0.2f, 0.2f }, sharedSphereMesh);
+    sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
+    sphere2 = new USphereComp({ 0.3f, 0.3f, 0.3f }, { 0.2f, 0.2f, 0.2f }, sharedSphereMesh);
 
     return true;
 }
