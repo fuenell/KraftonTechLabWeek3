@@ -3,19 +3,16 @@
 #include "URenderer.h"
 #include "UPrimitive.h"
 #include "FVertexSimple.h"
-
+#include "Vector.h"
 class USphere : public UPrimitive
 {
 private:
 	FVector position;
 	FVector scale;
 
-	// 상수 버퍼 데이터 구조
-	struct ConstantBufferData
-	{
-		float Offset[4];    // float4로 변경 (w는 0.0f)
-		float Scale[4];     // float4로 변경 (w는 1.0f)
-	};
+    // 회전도 원하면 유지
+    float   yaw = 0, pitch = 0, roll = 0;
+
 
 public:
 	USphere(FVector pos = { 0, 0, 0 }, FVector scl = { 1, 1, 1 }, UMesh* sphereMesh = nullptr)
@@ -35,25 +32,20 @@ public:
 		return false;
 	}
 
-	void UpdateConstantBuffer(URenderer& renderer) override
-	{
-		ConstantBufferData cbData;
+    void UpdateConstantBuffer(URenderer& renderer) override
+    {
+        // row 규약: M = S * R * T
+        FMatrix S = FMatrix::Scale(scale.X, scale.Y, scale.Z); // 대각행렬 동일
+        FMatrix Rx = FMatrix::RotationXRow(pitch);
+        FMatrix Ry = FMatrix::RotationYRow(yaw);
+        FMatrix Rz = FMatrix::RotationZRow(roll);
+        FMatrix R = Rz * (Ry * Rx);   // 원하는 회전 순서로
+        FMatrix T = FMatrix::TranslationRow(position.X, position.Y, position.Z);
 
-		// Offset 설정 (float4)
-		cbData.Offset[0] = position.x;
-		cbData.Offset[1] = position.y;
-		cbData.Offset[2] = position.z;
-		cbData.Offset[3] = 0.0f;  // w 컴포넌트
+        FMatrix M = S * R * T;
+        renderer.SetModel(M);          // M,V,P를 통째로 상수버퍼에 업로드
 
-		// Scale 설정 (float4)
-		cbData.Scale[0] = scale.x;
-		cbData.Scale[1] = scale.y;
-		cbData.Scale[2] = scale.z;
-		cbData.Scale[3] = 1.0f;   // w 컴포넌트
-
-		// 상수 버퍼 업데이트
-		renderer.UpdateConstantBuffer(&cbData, sizeof(cbData));
-	}
+    }
 
 	void Draw(URenderer& renderer) override
 	{
