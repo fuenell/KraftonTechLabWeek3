@@ -3,6 +3,7 @@
 #include "UApplication.h"
 #include "SimpleApplication.h"
 #include "UMeshFactory.h"
+#include "ImguiConsole.h"
 
 const float PI = 3.14159265358979323846f;
 const float PIDIV4 = PI / 4.0f;   // XM_PIDIV4 대체
@@ -143,6 +144,49 @@ void SimpleApplication::RenderGUI()
 
 
     ImGui::End();
+
+    ImGui::Begin("Jungle Property Window");
+
+    // 나머지는 테이블로
+    if (ImGui::BeginTable("EditablePropertyTable", 4, ImGuiTableFlags_None)) {
+        ImGui::TableNextRow();
+        for (int i = 0; i < 3; i++) {
+            ImGui::TableSetColumnIndex(i);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat(("##tra" + std::to_string(i)).c_str(),
+                &cameraLocation[i], 0.0f, 0.0f, "%.3f");
+        }
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("Translation");
+
+        ImGui::TableNextRow();
+        for (int i = 0; i < 3; i++) {
+            ImGui::TableSetColumnIndex(i);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
+                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
+        }
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("Rotation");
+
+        ImGui::TableNextRow();
+        for (int i = 0; i < 3; i++) {
+            ImGui::TableSetColumnIndex(i);
+            ImGui::SetNextItemWidth(-1);
+            ImGui::InputFloat(("##scl" + std::to_string(i)).c_str(),
+                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
+        }
+        ImGui::TableSetColumnIndex(3);
+        ImGui::Text("Scale");
+
+        ImGui::EndTable();
+    }
+
+    ImGui::End();
+
+    bool isConsoleOpen = false;
+    static ImguiConsole imguiConsole;
+    imguiConsole.Draw("Console", &isConsoleOpen);
 }
 
 bool SimpleApplication::OnInitialize()
