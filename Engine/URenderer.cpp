@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "URenderer.h"
 
-CBTransform Transforms;   // 여기서만 메모리 할당
 
 URenderer::URenderer()
 	: device(nullptr)
@@ -709,6 +708,23 @@ bool URenderer::SetupViewport(int width, int height)
 	viewport.TopLeftY = 0.0f;
 
 	return true;
+}
+
+void URenderer::SetViewProj(const FMatrix& V, const FMatrix& P)
+{
+	// row-vector 규약이면 곱셈 순서는 V*P가 아니라, 최종적으로 v*M*V*P가 되도록
+	// 프레임 캐시엔 VP = V * P 저장
+	mVP = V * P;
+	// 여기서는 상수버퍼 업로드 안 함 (오브젝트에서 M과 합쳐서 업로드)
+}
+
+void URenderer::SetModel(const FMatrix& M)
+{
+	// per-object: MVP = M * VP
+	FMatrix MVP = M * mVP;
+
+	CopyRowMajor(mCBData.MVP, MVP);
+	UpdateConstantBuffer(&mCBData, sizeof(mCBData));
 }
 
 

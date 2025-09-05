@@ -34,15 +34,7 @@ public:
 
     void UpdateConstantBuffer(URenderer& renderer) override
     {
-        // row 규약: M = S * R * T
-        FMatrix S = FMatrix::Scale(scale.X, scale.Y, scale.Z); // 대각행렬 동일
-        FMatrix Rx = FMatrix::RotationXRow(pitch);
-        FMatrix Ry = FMatrix::RotationYRow(yaw);
-        FMatrix Rz = FMatrix::RotationZRow(roll);
-        FMatrix R = Rz * (Ry * Rx);   // 원하는 회전 순서로
-        FMatrix T = FMatrix::TranslationRow(position.X, position.Y, position.Z);
-
-        FMatrix M = S * R * T;
+		FMatrix M = FMatrix::TRSRow(position, FVector(pitch, yaw, roll), scale);
         renderer.SetModel(M);          // M,V,P를 통째로 상수버퍼에 업로드
 
     }
