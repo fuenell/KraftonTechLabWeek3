@@ -1,22 +1,24 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UMesh.h"
+#include "FVertexSimple.h"
 
-void UMesh::Initialize(ID3D11Device* device, const std::vector<FVertexSimple>& vertices)
+UMesh::UMesh(ID3D11Device* device, const std::vector<FVertexSimple>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+	: PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexSimple))
 {
-    NumVertices = static_cast<int>(vertices.size());
+	D3D11_BUFFER_DESC vbd = {};
+	vbd.Usage = D3D11_USAGE_IMMUTABLE;
+	vbd.ByteWidth = sizeof(FVertexSimple) * NumVertices;
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.CPUAccessFlags = 0;
+	vbd.MiscFlags = 0;
+	vbd.StructureByteStride = 0;
 
-    D3D11_BUFFER_DESC bd{};
-    bd.Usage = D3D11_USAGE_DEFAULT;
-    bd.ByteWidth = sizeof(FVertexSimple) * NumVertices;
-    bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-    bd.CPUAccessFlags = 0;
+	D3D11_SUBRESOURCE_DATA vertexData = {};
+	vertexData.pSysMem = vertices.data();
 
-    D3D11_SUBRESOURCE_DATA initData{};
-    initData.pSysMem = vertices.data();
-
-    HRESULT hr = device->CreateBuffer(&bd, &initData, &VertexBuffer);
-    if (FAILED(hr))
-    {
-        throw std::runtime_error("Failed to create vertex buffer for mesh");
-    }
+	HRESULT hr = device->CreateBuffer(&vbd, &vertexData, &VertexBuffer);
+	if (FAILED(hr))
+	{
+		throw std::runtime_error("Failed to create vertex buffer for mesh");
+	}
 }

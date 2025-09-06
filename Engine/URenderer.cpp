@@ -506,11 +506,10 @@ void URenderer::Draw(UINT vertexCount, UINT startVertexLocation)
 
 void URenderer::DrawMesh(UMesh* mesh)
 {
-	UINT stride = sizeof(FVertexSimple);
 	UINT offset = 0;
 
-	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &stride, &offset);
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
+	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
 
 	deviceContext->Draw(mesh->NumVertices, 0);
 }
