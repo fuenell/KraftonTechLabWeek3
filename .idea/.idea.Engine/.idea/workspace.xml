@@ -8,13 +8,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d25cf3b6-1a3f-4915-a173-8b5a04c5c004" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Engine/Engine.vcxproj" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/Engine.vcxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/SimpleApplication.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/SimpleApplication.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/SimpleApplication.h" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/SimpleApplication.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/UPrimitive.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/UPrimitiveComponent.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/UPrimitive.h" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/UPrimitiveComponent.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/USphere.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/USphereComp.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Engine/USphere.h" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/USphereComp.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Engine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Engine/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/ShaderW0.vs" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/ShaderW0.vs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/UMesh.h" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/UMesh.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/UPrimitiveComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/UPrimitiveComponent.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/URaycastManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/URaycastManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/URaycastManager.h" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/URaycastManager.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/URenderer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/URenderer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/URenderer.h" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/URenderer.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/USphereComp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/USphereComp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Engine/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Engine/imgui.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,17 +31,43 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="cidr-memory-view://19" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/Matrix.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/Matrix.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/SimpleApplication.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Jungle/Documents/DX3DStart/Engine/SimpleApplication.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Jungle/Documents/DX3DStart/Engine/SimpleApplication.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/SimpleApplication.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/Sphere.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/UApplication.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/UApplication.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Engine/UEngineStatics.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Engine/UEngineStatics.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Engine/UObject.cpp" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Engine/UObject.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/UPrimitiveComponent.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/UPrimitiveComponent.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/URenderer.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/URenderer.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Jungle/Documents/DX3DStart/Engine/USceneComponent.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Jungle/Documents/DX3DStart/Engine/USceneComponent.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Engine/USceneComponent.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Jungle/Documents/DX3DStart/Engine/USceneComponent.h" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/Jungle/Documents/DX3DStart/Engine/USceneComponent.h" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Engine/USceneComponent.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/USphereComp.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/USphereComp.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/UTriangleComp.cpp" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/UTriangleComp.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/Vector.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/Vector4.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Engine/main.cpp" root0="FORCE_HIGHLIGHTING" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 4
-}]]></component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="32HOXOxAghlgaU5XShVWwFhZBQV" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -50,7 +79,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "feature/raycasting",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -89,12 +118,15 @@
       <option name="presentableId" value="Default" />
       <updated>1757074069620</updated>
       <workItem from="1757074070904" duration="3396000" />
+      <workItem from="1757120313822" duration="16588000" />
+      <workItem from="1757143110896" duration="11427000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

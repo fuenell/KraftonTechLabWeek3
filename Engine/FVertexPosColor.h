@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <math.h>
+#include "Vector.h"
 #include "Globals.h"
 
 struct FVertexPosColor
@@ -60,6 +61,11 @@ struct FVertexPosColor4
 		}
 
 		return newVertices;
+	}
+
+	FVector GetPosition()
+	{
+		return {x, y, z};
 	}
 
 };

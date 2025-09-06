@@ -191,6 +191,8 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="Matrix.h" />
+    <ClCompile Include="URaycastManager.cpp" />
     <ClCompile Include="SimpleApplication.cpp" />
     <ClCompile Include="UApplication.cpp" />
     <ClCompile Include="UEngineStatics.cpp" />
@@ -205,6 +207,7 @@
     <ClCompile Include="UInputManager.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="URenderer.cpp" />
+    <ClCompile Include="UTriangleComp.cpp" />
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +228,7 @@
     <ClInclude Include="ISerializable.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="URaycastManager.h" />
     <ClInclude Include="SimpleApplication.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="stdafx.h" />
@@ -241,6 +245,7 @@
     <ClInclude Include="UInputManager.h" />
     <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="URenderer.h" />
+    <ClInclude Include="UTriangleComp.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
