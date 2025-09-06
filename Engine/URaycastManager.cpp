@@ -56,7 +56,7 @@ FVector URaycastManager::GetRaycastDirection()
     FVector rayViewDir;
     rayViewDir.X = ndcX * tan(CameraFOV / 2.0f) * aspect;
     rayViewDir.Y = ndcY * tan(CameraFOV / 2.0f);
-    rayViewDir.Z = 1.0f; // points forward in Camera space
+    rayViewDir.Z = -1.0f; // points forward in Camera space
     rayViewDir.Normalize();
 
     // convert the camera-space ray direction to world direction
@@ -64,6 +64,7 @@ FVector URaycastManager::GetRaycastDirection()
     V = FMatrix::Inverse(V);
     FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
 
+    // std::cout << "ray direction: " << rayDirection.X << " " << rayDirection.Y << " " << rayDirection.Z << std::endl;
     return {rayDirection.X, rayDirection.Y, rayDirection.Z};
 }
 
@@ -100,41 +101,47 @@ FVector URaycastManager::GetRaycastDirection()
 
 bool URaycastManager::RayIntersectsMesh(USphereComp& sphere, float& tHit)
 {
-    if (sphere.GetMesh().NumVertices < 3)
+    UMesh mesh = sphere.GetMesh();
+    if (mesh.NumVertices < 3)
         return false;
-
-    // Map vertex buffer
-    D3D11_MAPPED_SUBRESOURCE mappedData;
-    HRESULT hr = Renderer.GetDeviceContext()->Map(sphere.GetMesh().VertexBuffer, 0, D3D11_MAP_READ, 0, &mappedData);
-    if (FAILED(hr)) return false;
-
-    FVertexPosColor* vertices = reinterpret_cast<FVertexPosColor*>(mappedData.pData);
+    
     bool hit = false;
     float closestT = FLT_MAX;
 
     FMatrix worldTransform = sphere.GetWorldTransform();
 
-    for (int i = 0; i < sphere.GetMesh().NumVertices; i += 3)
-    {
-        FVector triangleVertices[3] = {
-            TransformVertexToWorld(vertices[i], worldTransform),
-            TransformVertexToWorld(vertices[i + 1], worldTransform),
-            TransformVertexToWorld(vertices[i + 2], worldTransform)
-        };
+    std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
+    std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
+    std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
 
-        auto result = RayIntersectsTriangle(triangleVertices);
-        if (result.has_value())
-        {
-            float t = (*result - RayOrigin).Length(); // distance along ray
-            if (t < closestT)
-            {
-                closestT = t;
-                hit = true;
-            }
-        }
-    }
-
-    Renderer.GetDeviceContext()->Unmap(sphere.GetMesh().VertexBuffer, 0);
+    // for (int i = 0; i < mesh.CPUVertices.size(); i += 3)
+    // {
+    //     FVector triangleVertices[3] = {
+    //         TransformVertexToWorld(mesh.CPUVertices[i], worldTransform),
+    //         TransformVertexToWorld(mesh.CPUVertices[i + 1], worldTransform),
+    //         TransformVertexToWorld(mesh.CPUVertices[i + 2], worldTransform)
+    //     };
+    //
+    //     std::cout << "\nTriangle " << i / 3 << ":" << std::endl;
+    //     std::cout << "  v0: " << triangleVertices[0].X << " " << triangleVertices[0].Y << " " << triangleVertices[0].Z << std::endl;
+    //     std::cout << "  v1: " << triangleVertices[1].X << " " << triangleVertices[1].Y << " " << triangleVertices[1].Z << std::endl;
+    //     std::cout << "  v2: " << triangleVertices[2].X << " " << triangleVertices[2].Y << " " << triangleVertices[2].Z << std::endl;
+    //
+    //     auto result = RayIntersectsTriangle(triangleVertices);
+    //     if (result.has_value())
+    //     {
+    //         float t = (*result - RayOrigin).Length(); // distance along ray
+    //         if (t < closestT)
+    //         {
+    //             closestT = t;
+    //             hit = true;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         std::cout << "  --> No intersection with this triangle" << std::endl;
+    //     }
+    // }
 
     if (hit)
     {

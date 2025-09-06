@@ -30,10 +30,4 @@ public:
 	void SetScale(const FVector& scl) { RelativeScale3D = scl; }
 	FVector GetPosition() const { return RelativeLocation; }
 	FVector GetScale() const { return RelativeScale3D; }
-
-	float GetRadius()
-	{
-		// TODO: account for non-uniform scaling
-		return RelativeScale3D.X;
-	}
 };
