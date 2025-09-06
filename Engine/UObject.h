@@ -43,4 +43,9 @@ public:
     {
         return json::JSON();
     }
+
+    bool Deserialize(const json::JSON& data) override
+    {
+        return true;
+    }
 };

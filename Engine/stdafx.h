@@ -16,6 +16,7 @@
 #include <functional>
 #include <cassert>
 #include <cmath>
+#include <optional>
 
 // DirectX 관련
 #include <d3d11.h>

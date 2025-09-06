@@ -1,7 +1,9 @@
 ﻿// UScene.cpp
 #include "stdafx.h"
+#include "json.hpp"
 #include "UScene.h"
 #include "UObject.h"
+#include "USceneComponent.h"
 
 json::JSON UScene::Serialize() const {
     json::JSON result;
@@ -19,4 +21,26 @@ json::JSON UScene::Serialize() const {
         }
     }
     return result;
+}
+
+bool UScene::Deserialize(const json::JSON& data)
+{
+    version = data.at("Version").ToInt();
+    // nextUUID = data.at("NextUUID").ToInt();
+
+    objects.clear();
+    json::JSON primitivesJson = data.at("Primitives");
+
+    for (auto& primitiveJson : primitivesJson.ObjectRange())
+    {
+        
+        int index = stoi(primitiveJson.first);
+        json::JSON _data = primitiveJson.second;
+
+        USceneComponent* component = USceneComponentFactory::Create(_data.at("Type").ToString(), _data);
+
+        objects.push_back(component);
+    }
+
+    return true;
 }

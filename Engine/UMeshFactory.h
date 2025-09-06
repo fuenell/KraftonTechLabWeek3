@@ -7,7 +7,7 @@ class UMeshFactory
 {
 public:
 	// Sphere Mesh 생성
-	static UMesh* CreateSphereMesh(URenderer& renderer)
+	static UMesh* CreateSphereMesh()
 	{
 		// 기존 데이터를 새 형식으로 변환
 		int numVertices = sizeof(sphere_vertices) / sizeof(FVertexSimpleOld);
@@ -16,8 +16,8 @@ public:
 			numVertices
 		);
 
-		UMesh* mesh = new UMesh();
-		mesh->Initialize(renderer.GetDevice(), convertedVertices); // Renderer를 통해 Device 접근
+		UMesh* mesh = new UMesh(convertedVertices);
+		//mesh->Initialize(renderer.GetDevice(), convertedVertices); 사용할 때만 mesh를 init하도록 변경
 		return mesh;
 	}
 };

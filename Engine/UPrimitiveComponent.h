@@ -3,7 +3,6 @@
 #include "UMesh.h"
 #include "USceneComponent.h"
 
-
 class UPrimitiveComponent : public USceneComponent
 {
 public:
@@ -12,7 +11,7 @@ public:
 	virtual bool OnCollision(UPrimitiveComponent* other, float restitution) = 0;
 	virtual void UpdateConstantBuffer(URenderer& renderer) = 0;
 	virtual ~UPrimitiveComponent() {}
-	virtual std::string GetType() const = 0;
+	std::string GetType() const override { return "UPrimitiveComponent"; }
 
 protected:
 	UMesh* mesh;

@@ -10,6 +10,7 @@ class UScene : ISerializable
     TArray<UObject*> objects;
 public:
     json::JSON Serialize() const override;
+    bool Deserialize(const json::JSON& data) override;
     void AddObject(UObject* obj)
     {
         objects.push_back(obj);

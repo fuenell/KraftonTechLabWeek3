@@ -1,7 +1,7 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UMesh.h"
 
-void UMesh::Initialize(ID3D11Device* device, const std::vector<FVertexSimple>& vertices)
+void UMesh::Initialize(ID3D11Device* device)
 {
     NumVertices = static_cast<int>(vertices.size());
 
@@ -19,4 +19,6 @@ void UMesh::Initialize(ID3D11Device* device, const std::vector<FVertexSimple>& v
     {
         throw std::runtime_error("Failed to create vertex buffer for mesh");
     }
+
+    else isInitialized = true;
 }

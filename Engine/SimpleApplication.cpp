@@ -197,7 +197,8 @@ void SimpleApplication::RenderGUI()
 bool SimpleApplication::OnInitialize()
 {
     // Factory에서 공유 Mesh 생성
-    UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh(GetRenderer());
+    UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh();
+    sharedSphereMesh->Initialize(GetRenderer().GetDevice());
 
     // Sphere 인스턴스 생성
     sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
