@@ -71,6 +71,12 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
         return false;
     }
 
+    if (!meshManager.Initialize(&renderer))
+    {
+        MessageBox(hWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+
     if (!gui.Initialize(hWnd, renderer.GetDevice(), renderer.GetDeviceContext()))
     {
         return false;

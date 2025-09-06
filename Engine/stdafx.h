@@ -16,11 +16,13 @@
 #include <functional>
 #include <cassert>
 #include <cmath>
+#include <optional>
 
 // DirectX 관련
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include <DirectXMath.h>
+
+//#include <DirectXMath.h>
 
 // ImGui 관련 (DirectX 이후에)
 #include "ImGui/imgui.h"
