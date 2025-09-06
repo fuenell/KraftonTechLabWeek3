@@ -108,7 +108,7 @@ bool URaycastManager::RayIntersectsMesh(USphereComp& sphere, float& tHit)
     HRESULT hr = Renderer.GetDeviceContext()->Map(sphere.GetMesh().VertexBuffer, 0, D3D11_MAP_READ, 0, &mappedData);
     if (FAILED(hr)) return false;
 
-    FVertexSimple* vertices = reinterpret_cast<FVertexSimple*>(mappedData.pData);
+    FVertexPosColor* vertices = reinterpret_cast<FVertexPosColor*>(mappedData.pData);
     bool hit = false;
     float closestT = FLT_MAX;
 
@@ -182,7 +182,7 @@ std::optional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVe
         return {};
 }
 
-FVector URaycastManager::TransformVertexToWorld(const FVertexSimple& vertex, const FMatrix& world)
+FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor& vertex, const FMatrix& world)
 {
     FVector4 pos4(vertex.x, vertex.y, vertex.z, 1.0f);
     FVector4 worldPos4 = FMatrix::MultiplyVector(world, pos4);

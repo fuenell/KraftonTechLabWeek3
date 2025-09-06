@@ -5,6 +5,7 @@
 #include "UPrimitiveComponent.h"
 #include "USphereComp.h"
 #include "UTriangleComp.h"
+#include "FVertexPosColor.h"
 
 class URaycastManager
 {
@@ -28,5 +29,5 @@ private:
     float MouseX, MouseY;
     FVector RayOrigin, RayDirection;
 
-    FVector TransformVertexToWorld(const FVertexSimple& vertex, const FMatrix& world);
+    FVector TransformVertexToWorld(const FVertexPosColor& vertex, const FMatrix& world);
 };
