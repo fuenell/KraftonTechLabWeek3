@@ -27,7 +27,7 @@ public:
 	std::string GetType() const override { return "UPrimitiveComponent"; }
 	bool CountOnInspector() override { return true; } 
 
-	UMesh& GetMesh() { return *mesh; }
+	UMesh* GetMesh() { return mesh; }
 
 protected:
 	UMesh* mesh;

@@ -52,4 +52,6 @@ public:
     bool Deserialize(const json::JSON& data) override;
 
     UCamera* GetCamera() { return camera; }
+    URenderer* GetRenderer() { return renderer; }
+    UInputManager* GetInputManager() { return inputManager; }
 };
