@@ -97,6 +97,7 @@ void UApplication::Run()
     {
         timeManager.BeginFrame();
 
+		inputManager.Update();
         ProcessMessages();
 
         if (!bIsRunning)
@@ -207,8 +208,6 @@ void UApplication::InternalUpdate()
 {
     float deltaTime = static_cast<float>(timeManager.GetDeltaTime());
 
-    // Update input manager
-    inputManager.Update();
 
     // Call derived class update
     Update(deltaTime);
@@ -241,6 +240,12 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
         return true;
     }
 
+    if (g_pApplication)
+    {
+                // Let input manager process input messages
+		g_pApplication->inputManager.ProcessMessage(hWnd, message, wParam, lParam);
+    }
+
     switch (message)
     {
     case WM_DESTROY:
@@ -254,25 +259,11 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
             int height = HIWORD(lParam);
         }
         break;
-
-    case WM_KEYDOWN:
-    case WM_KEYUP:
-    case WM_SYSKEYDOWN:
-    case WM_SYSKEYUP:
-    case WM_LBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONUP:
-    case WM_MBUTTONDOWN:
-    case WM_MBUTTONUP:
-    case WM_MOUSEMOVE:
-    case WM_MOUSEWHEEL:
-        // Input messages will be processed in ProcessMessages
-        break;
-
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
+
+    
 
     return 0;
 }

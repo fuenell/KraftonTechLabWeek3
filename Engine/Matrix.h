@@ -1,6 +1,10 @@
 ﻿#pragma once
 #include "stdafx.h"
+#include "Vector.h"
 #include "Vector4.h"
+
+
+//struct FQuaternion; // 전방 선언
 
 struct FMatrix
 {
@@ -289,15 +293,15 @@ struct FMatrix
         );
         s.Normalize();
         FVector u(
-			f.Cross(s)
+            f.Cross(s)
         );
         FMatrix V = IdentityMatrix();
-		// 아래 세 줄은 회전성분을 채우는 것이다.  (카메라의 x,y,z 축이 월드 좌표계에서 어디를 향하는지)
-		// camera's axis
+        // 아래 세 줄은 회전성분을 채우는 것이다.  (카메라의 x,y,z 축이 월드 좌표계에서 어디를 향하는지)
+        // camera's axis
         V.M[0][0] = s.X; V.M[0][1] = u.X; V.M[0][2] = f.X; V.M[0][3] = 0;
         V.M[1][0] = s.Y; V.M[1][1] = u.Y; V.M[1][2] = f.Y; V.M[1][3] = 0;
         V.M[2][0] = s.Z; V.M[2][1] = u.Z; V.M[2][2] = f.Z; V.M[2][3] = 0;
-		// translation(카메라의 위치를 카메라의 x,y,z 축으로 본 좌표의 음수다.)
+        // translation(카메라의 위치를 카메라의 x,y,z 축으로 본 좌표의 음수다.)
         // 월드 좌표의 eye 위치를 뷰 공간 원점으로 이동시키는 역할
         V.M[3][0] = -(eye.X * s.X + eye.Y * s.Y + eye.Z * s.Z);
         V.M[3][1] = -(eye.X * u.X + eye.Y * u.Y + eye.Z * u.Z);
@@ -305,29 +309,48 @@ struct FMatrix
         V.M[3][3] = 1;
         return V;
     }
+    //static FMatrix LookAtRHRow(const FVector& eye, const FVector& target, const FVector& up) {
+    //    FVector f = (eye - target).GetNormalized();  // f = -forward
+    //    FVector r = up.Cross(f).GetNormalized();     // right
+    //    FVector u = r.Cross(f);                      // up
 
+    //    FMatrix V = FMatrix::IdentityMatrix();
+
+    //    // ✅ rows = [r; u; f]   (f = -forward 이므로 결과적으로 [right; up; -forward])
+    //    V.M[0][0] = r.X; V.M[0][1] = r.Y; V.M[0][2] = r.Z; V.M[0][3] = 0.0f;
+    //    V.M[1][0] = u.X; V.M[1][1] = u.Y; V.M[1][2] = u.Z; V.M[1][3] = 0.0f;
+    //    V.M[2][0] = f.X; V.M[2][1] = f.Y; V.M[2][2] = f.Z; V.M[2][3] = 0.0f;
+
+    //    // row-vector 규약 translation
+    //    V.M[3][0] = -(eye.Dot(r));
+    //    V.M[3][1] = -(eye.Dot(u));
+    //    V.M[3][2] = -(eye.Dot(f)); // (= +eye·forward)
+    //    V.M[3][3] = 1.0f;
+    //    return V;
+    //}
     static FMatrix LookAtLH(const FVector& eye, const FVector& target, const FVector& up) {
         // f = normalize(target - eye)
-        FVector f(target.X - eye.X, target.Y - eye.Y, target.Z - eye.Z);
-        float fl = sqrtf(f.X * f.X + f.Y * f.Y + f.Z * f.Z); f.X /= fl; f.Y /= fl; f.Z /= fl;
-        // s = normalize(up × f)
+        FVector f(eye.X - target.X, eye.Y - target.Y, eye.Z - target.Z); // -forward
+        f.Normalize();
         FVector s(
-            up.Y * f.Z - up.Z * f.Y,
-            up.Z * f.X - up.X * f.Z,
-            up.X * f.Y - up.Y * f.X
+            up.Cross(f)
         );
-        float sl = sqrtf(s.X * s.X + s.Y * s.Y + s.Z * s.Z); s.X /= sl; s.Y /= sl; s.Z /= sl;
-        // u = s × f
+        s.Normalize();
         FVector u(
-            s.Y * f.Z - s.Z * f.Y,
-            s.Z * f.X - s.X * f.Z,
-            s.X * f.Y - s.Y * f.X
+            f.Cross(s)
         );
-        FMatrix V(0.0f);
-        V.M[0][0] = s.X; V.M[0][1] = s.Y; V.M[0][2] = s.Z; V.M[0][3] = -(s.X * eye.X + s.Y * eye.Y + s.Z * eye.Z);
-        V.M[1][0] = u.X; V.M[1][1] = u.Y; V.M[1][2] = u.Z; V.M[1][3] = -(u.X * eye.X + u.Y * eye.Y + u.Z * eye.Z);
-        V.M[2][0] = f.X; V.M[2][1] = f.Y; V.M[2][2] = f.Z; V.M[2][3] = -(f.X * eye.X + f.Y * eye.Y + f.Z * eye.Z);
-        V.M[3][0] = 0;   V.M[3][1] = 0;   V.M[3][2] = 0;   V.M[3][3] = 1;
+        FMatrix V = IdentityMatrix();
+        // 아래 세 줄은 회전성분을 채우는 것이다.  (카메라의 x,y,z 축이 월드 좌표계에서 어디를 향하는지)
+        // camera's axis
+        V.M[0][0] = s.X; V.M[0][1] = u.X; V.M[0][2] = f.X; V.M[0][3] = 0;
+        V.M[1][0] = s.Y; V.M[1][1] = u.Y; V.M[1][2] = f.Y; V.M[1][3] = 0;
+        V.M[2][0] = s.Z; V.M[2][1] = u.Z; V.M[2][2] = f.Z; V.M[2][3] = 0;
+        // translation(카메라의 위치를 카메라의 x,y,z 축으로 본 좌표의 음수다.)
+        // 월드 좌표의 eye 위치를 뷰 공간 원점으로 이동시키는 역할
+        V.M[3][0] = -(eye.X * s.X + eye.Y * s.Y + eye.Z * s.Z);
+        V.M[3][1] = -(eye.X * u.X + eye.Y * u.Y + eye.Z * u.Z);
+        V.M[3][2] = -(eye.X * f.X + eye.Y * f.Y + eye.Z * f.Z);
+        V.M[3][3] = 1;
         return V;
     }
     static FMatrix LookAtLHRow(const FVector& eye, const FVector& target, const FVector& up) {
@@ -367,6 +390,7 @@ struct FMatrix
         return P;
     }
 
+    // === Perspective (RH, row-vector, D3D식 depth[0,1]) ===
     static FMatrix PerspectiveFovRHRow(float fovY, float aspect, float zn, float zf) {
         float f = 1.0f / tanf(fovY * 0.5f);
         FMatrix P(0.0f);
@@ -374,7 +398,7 @@ struct FMatrix
         P.M[1][1] = f;
         // 음수여야 아래 뒤집기로 인해 양수가 된다.
         P.M[2][2] = zf / (zn - zf);
-		// 뒤집기 (카메라는 -z 를 바라보므로)
+        // 뒤집기 (카메라는 -z 를 바라보므로)
         P.M[2][3] = -1.0f;
         P.M[3][2] = (zn * zf) / (zn - zf);
         return P;
@@ -400,12 +424,13 @@ struct FMatrix
         // P.M[3][3] = 0 (이미 0)
         return P;
     }
-    static FMatrix OrthoRH(float w, float h, float zNear, float zFar) {
+    // === Orthographic (RH, row-vector, D3D식 depth[0,1]) ===
+    static FMatrix OrthoRHRow(float w, float h, float zn, float zf) {
         FMatrix O(0.0f);
         O.M[0][0] = 2.0f / w;
         O.M[1][1] = 2.0f / h;
-        O.M[2][2] = 1.0f / (zNear - zFar);
-        O.M[2][3] = zNear / (zNear - zFar);
+        O.M[2][2] = 1.0f / (zn - zf);         // 음수
+        O.M[2][3] = zn / (zn - zf);
         O.M[3][3] = 1.0f;
         return O;
     }
@@ -440,4 +465,11 @@ struct FMatrix
         FMatrix T = TranslationRow(t.X, t.Y, t.Z);
         return S * R * T;                        // row 규약 핵심
     }
+    // 쿼터니언 용
+    //static FMatrix TRSRow(const FVector& t, const FQuaternion& q, const FVector& s) {
+    //    FMatrix S = FMatrix::Scale(s.X, s.Y, s.Z);
+    //    FMatrix R = q.ToMatrix();  // RH 회전행렬 블록 
+    //    FMatrix T = FMatrix::TranslationRow(t.X, t.Y, t.Z);
+    //    return S * R * T;
+    //}
 };
