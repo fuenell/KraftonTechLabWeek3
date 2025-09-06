@@ -73,5 +73,5 @@ UMesh* UMeshManager::CreateGizmoArrowMesh()
 
 UMesh* UMeshManager::CreateGizmoGridMesh()
 {
-	return CreateMeshInternal(gizmo_grid_vertices, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	return CreateMeshInternal(GridGenerator::CreateGridVertices(5, 10), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }
