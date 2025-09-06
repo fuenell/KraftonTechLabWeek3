@@ -30,4 +30,6 @@ public:
 	void SetScale(const FVector& scl) { RelativeScale3D = scl; }
 	FVector GetPosition() const { return RelativeLocation; }
 	FVector GetScale() const { return RelativeScale3D; }
+
+	std::string GetType() const override { return "Sphere"; }
 };
