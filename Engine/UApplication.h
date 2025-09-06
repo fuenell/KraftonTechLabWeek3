@@ -24,8 +24,12 @@ private:
 	static WCHAR DefaultTitle[];
 
 	std::wstring windowTitle;
+	// 화면 사이즈 조절
+	bool isSizing = false;
 	int windowWidth;
 	int windowHeight;
+
+
 
 public:
 	UApplication();
@@ -68,4 +72,6 @@ protected:
 	virtual bool OnInitialize() { return true; }
 	virtual void RenderGUI() {}
 	virtual void OnShutdown() {}
+	// Called on window resize
+	virtual void OnResize(int width, int height) {}
 };

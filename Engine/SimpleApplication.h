@@ -23,4 +23,5 @@ protected:
     void Render() override;
     void RenderGUI() override;
     bool OnInitialize() override;
+    void OnResize(int width, int height) override;
 };
