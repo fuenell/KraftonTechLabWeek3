@@ -1,4 +1,5 @@
-﻿#pragma once
+#pragma once
+#include "Matrix.h"
 #include "UObject.h"
 #include "Vector.h"
 
@@ -13,6 +14,12 @@ public:
 		: RelativeLocation(pos), RelativeRotation(rot), RelativeScale3D(scl)
 	{
 	}
+    FMatrix GetWorldTransform();
+
+    virtual std::string GetType() const
+    {
+        return "USceneComponent";
+    }
 
 	// 위치와 스케일 설정 함수들
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }
@@ -22,11 +29,6 @@ public:
 	FVector GetPosition() const { return RelativeLocation; }
 	FVector GetScale() const { return RelativeScale3D; }
 	FVector GetRotation() const { return RelativeRotation; }
-
-	virtual std::string GetType() const
-	{
-		return "USceneComponent";
-	}
 
 	json::JSON Serialize() const override;
 	bool Deserialize(const json::JSON& data) override;
