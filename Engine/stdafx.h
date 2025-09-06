@@ -6,8 +6,11 @@
 #endif
 #include <windows.h>
 
+
 // C++ 표준 라이브러리
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <memory>
@@ -17,6 +20,7 @@
 #include <cassert>
 #include <cmath>
 #include <optional>
+#include <filesystem>
 
 // DirectX 관련
 #include <d3d11.h>
@@ -45,6 +49,9 @@ class UTimeManager;
 #define SAFE_RELEASE(p) if(p) { p->Release(); p = nullptr; }
 #define SAFE_DELETE(p) if(p) { delete p; p = nullptr; }
 #define SAFE_DELETE_ARRAY(p) if(p) { delete[] p; p = nullptr; }
+
+const float PI = 3.14159265358979323846f;
+const float PIDIV4 = PI / 4.0f;   // XM_PIDIV4 대체
 
 // Engine namespace (optional)
 namespace Engine

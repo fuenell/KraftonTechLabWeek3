@@ -8,8 +8,6 @@
 class SimpleApplication : public UApplication
 {
 private:
-    USphereComp* sphere, *sphere2;
-    ID3D11Buffer* sphereVertexBuffer;
 	// 화면의 너비, 높이
 	int width, height;
     UCamera camera;
@@ -17,6 +15,7 @@ private:
 public:
     SimpleApplication() = default;
     ~SimpleApplication() = default;
+    UScene* CreateDefaultScene() override;
 
 protected:
     void Update(float deltaTime) override;

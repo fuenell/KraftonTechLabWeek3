@@ -6,9 +6,8 @@
 #include "Camera.h"
 #include "ImguiConsole.h"
 #include "UScene.h"
+#include "UDefaultScene.h"
 
-const float PI = 3.14159265358979323846f;
-const float PIDIV4 = PI / 4.0f;   // XM_PIDIV4 대체
 // Simple application that inherits from UApplication
 void SimpleApplication::Update(float deltaTime)
 {
@@ -21,6 +20,7 @@ void SimpleApplication::Update(float deltaTime)
     }
     float dx = 0, dy = 0, dz = 0;
     bool boost = GetInputManager().IsKeyDown(VK_SHIFT); // Shift로 가속
+
     // Exit on ESC key
     if (GetInputManager().IsKeyDown(VK_ESCAPE))
     {
@@ -59,7 +59,7 @@ void SimpleApplication::Update(float deltaTime)
     {
         dz -= 1.0f; // 하
 	}
-    static float t = 0.0f; t += 0.016f;
+    static float t = 0.0f; t += deltaTime;
     // 대각선 이동 속도 보정(선택): 벡터 정규화
     float len = sqrtf(dx * dx + dy * dy + dz * dz);
     if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
@@ -71,6 +71,8 @@ void SimpleApplication::Update(float deltaTime)
         // 구 그리기
     //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
     //sphere->SetPosition({ 0, 0.0f, 0.1f * t });
+
+    GetSceneManager().GetScene()->Update(deltaTime);
 }
 
 void SimpleApplication::Render() 
@@ -79,8 +81,8 @@ void SimpleApplication::Render()
     GetRenderer().SetTargetAspect(camera.GetAspect());
 
     GetRenderer().SetViewProj(camera.GetView(), camera.GetProj());
-    sphere->Draw(GetRenderer());
-    sphere2->Draw(GetRenderer());
+
+    GetSceneManager().GetScene()->Render();
 }
 
 void SimpleApplication::RenderGUI()
@@ -95,7 +97,7 @@ void SimpleApplication::RenderGUI()
     ImGui::Separator();
 
     static int currentItem = 0;
-    int value = 10;
+    int value = GetSceneManager().GetScene()->GetObjectCount();
     const char* choices[] = {
         "a", "b"
     };
@@ -112,11 +114,19 @@ void SimpleApplication::RenderGUI()
 
     ImGui::Separator();
 
-    char sceneName[100] = "";
+    static char sceneName[100] = "";
     ImGui::InputText("Scene Name", sceneName, sizeof(sceneName));
     ImGui::Button("New scene");
-    ImGui::Button("Save scene");
-    ImGui::Button("Load scene");
+    if (ImGui::Button("Save scene"))
+    {
+        std::filesystem::path _path("./data/");
+        std::filesystem::create_directory(_path);
+        GetSceneManager().SaveScene(_path.string() + std::string(sceneName));
+    }
+    if (ImGui::Button("Load scene"))
+    {
+        GetSceneManager().LoadScene("./data/" + std::string(sceneName));
+    }
 
     ImGui::Separator();
 
@@ -248,19 +258,7 @@ bool SimpleApplication::OnInitialize()
     camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / height : 1.0f, 0.1f, 1000.0f);
     camera.LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
 
-    // Manager에서 공유 Mesh 가져오기
-    UMeshManager& meshManager = GetMeshManager();
-    UMesh* sharedSphereMesh = meshManager.RetrieveMesh("Sphere");
-    UMesh* gridMesh = meshManager.RetrieveMesh("GizmoGrid");
-
-    // 메시가 제대로 로드되었는지 확인
-    if (!sharedSphereMesh || !gridMesh) {
-        return false; // 초기화 실패
-    }
-
-    // Sphere 인스턴스 생성
-    sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
-    sphere2 = new USphereComp({ 0.3f, 0.3f, 0.3f }, { 0.2f, 0.2f, 0.2f }, gridMesh);
+    GetSceneManager().GetScene()->OnInitialize();
 
     return true;
 }
@@ -272,4 +270,9 @@ void SimpleApplication::OnResize(int width, int height) {
         (height > 0) ? (float)width / (float)height : 1.0f,
         camera.GetNearZ(),
         camera.GetFarZ());
+}
+
+UScene* SimpleApplication::CreateDefaultScene()
+{
+    return new UDefaultScene();
 }

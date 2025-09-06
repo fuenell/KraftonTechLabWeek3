@@ -10,6 +10,9 @@ public:
     FVector RelativeRotation;
     FVector RelativeScale3D;
 
+    USceneComponent(FVector loc = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 }) 
+        : RelativeLocation(loc), RelativeRotation(rot), RelativeScale3D(scl){}
+
     virtual std::string GetType() const
     {
         return "USceneComponent";

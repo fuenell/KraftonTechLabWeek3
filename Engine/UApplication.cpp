@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "UApplication.h"
+#include "UScene.h"
 
 // Static member definitions
 WCHAR UApplication::WindowClass[] = L"EngineWindowClass";
@@ -74,6 +75,12 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
     if (!meshManager.Initialize(&renderer))
     {
         MessageBox(hWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+
+    if (!sceneManager.Initialize(g_pApplication))
+    {
+        MessageBox(hWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
         return false;
     }
 
@@ -300,4 +307,8 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
     
 
     return 0;
+}
+
+UScene* UApplication::CreateDefaultScene() {
+    return new UScene();
 }

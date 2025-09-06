@@ -26,6 +26,10 @@ public:
         GUObjectArray[InternalIndex] = nullptr;
     }
 
+    virtual bool CountOnInspector() {
+        return false;
+    }
+
     // Override new/delete for tracking
     void* operator new(size_t size)
     {

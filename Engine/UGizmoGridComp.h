@@ -5,35 +5,17 @@
 #include "FVertexPosColor.h"
 #include "Vector.h"
 
-class USphereComp : public UPrimitiveComponent
+class json::JSON;
+
+class UGizmoGridComp : public UPrimitiveComponent
 {
-private:
-	float pitch, yaw, roll;
-
-	static USceneComponent* Create(json::JSON data)
-	{
-		USceneComponent* newInstance = new USphereComp();
-		newInstance->Deserialize(data);
-
-		return newInstance;
-	}
-
-	void RegisterToFactory()
-	{
-		static bool isRegistered = false;
-		if (isRegistered) return;
-
-		USceneComponentFactory::Register(GetType(), Create);
-		isRegistered = true;  // 플래그 설정
-	}
-
-
 public:
-	USphereComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 })
+	UGizmoGridComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 })
 		:UPrimitiveComponent(pos, rot, scl)
 	{
-		RegisterToFactory();
 	}
+
+	json::JSON Serialize() const override;
 
 	void UpdatePhysics(float t, bool bUsingGravity, float restitution) override;
 	bool OnCollision(UPrimitiveComponent* other, float restitution) override;
@@ -47,5 +29,5 @@ public:
 	FVector GetPosition() const { return RelativeLocation; }
 	FVector GetScale() const { return RelativeScale3D; }
 
-	std::string GetType() const override { return "Sphere"; }
+	std::string GetType() const override { return "GizmoGrid"; }
 };
