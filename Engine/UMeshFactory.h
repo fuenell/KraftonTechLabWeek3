@@ -2,22 +2,36 @@
 #include "UMesh.h"
 #include "URenderer.h"
 #include <vector>
+#include "GizmoVertices.h"
+
 
 class UMeshFactory
 {
+private:
+	// 공통 로직을 처리하는 내부 함수
+	template <size_t N>
+	static UMesh* CreateMeshInternal(ID3D11Device* device, const FVertexPosColor(&vertices)[N], D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+	{
+		auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices, N);
+		UMesh* mesh = new UMesh(device, convertedVertices, primitiveType);
+		return mesh;
+	}
 public:
-	// Sphere Mesh 생성
 	static UMesh* CreateSphereMesh(URenderer& renderer)
 	{
-		// 기존 데이터를 새 형식으로 변환
-		int numVertices = sizeof(sphere_vertices) / sizeof(FVertexSimpleOld);
-		auto convertedVertices = FVertexSimple::ConvertVertexData(
-			sphere_vertices,
-			numVertices
-		);
+		return CreateMeshInternal(renderer.GetDevice(), sphere_vertices);
+	}
 
-		UMesh* mesh = new UMesh();
-		mesh->Initialize(renderer.GetDevice(), convertedVertices); // Renderer를 통해 Device 접근
-		return mesh;
+
+	// Gizmo 메쉬 생성 함수들
+
+	static UMesh* CreateGizmoArrowMesh(URenderer& renderer)
+	{
+		return CreateMeshInternal(renderer.GetDevice(), gizmo_arrow_vertices);
+	}
+
+	static UMesh* CreateGizmoGridMesh(URenderer& renderer)
+	{
+		return CreateMeshInternal(renderer.GetDevice(), gizmo_grid_vertices, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	}
 };

@@ -118,6 +118,51 @@ public:
     const FVector GetLocation() const { return mEye; }
     const float GetFOV() const { return mFovYRad; }
 
+
+
+    float GetFovYDegrees() const { return mFovYRad * (180.0f / 3.14159265358979323846f); }
+    void  SetFovYDegrees(float deg) { SetPerspectiveDegrees(deg, mAspect, mNearZ, mFarZ); }
+
+    float GetAspect() const { return mAspect; }
+    float GetNearZ() const { return mNearZ; }
+    float GetFarZ()  const { return mFarZ; }
+    bool  IsOrtho()  const { return mUseOrtho; }
+
+    const FVector& GetRight()   const { return mRight; }
+    const FVector& GetUp()      const { return mUp; }
+    const FVector& GetForward() const { return mForward; }
+
+    // GUI 표시/편집용: Yaw(세계 Z), Pitch(카메라 Right)
+    void GetYawPitch(float& yawZ, float& pitch) const
+    {
+        // forward의 구면좌표 해석 (Z-up)
+        float fx = mForward.X, fy = mForward.Y, fz = mForward.Z;
+        // pitch 는 XY평면 대비
+        float clampedZ = (fz < -1.f ? -1.f : (fz > 1.f ? 1.f : fz));
+        pitch = asinf(clampedZ);
+        // 초기 forward가 -X였으니 기준을 맞추려고 π 오프셋
+        yawZ = atan2f(fy, fx) - (float)3.14159265358979323846;
+        // [-π, π]로 정규화(선택)
+        if (yawZ > 3.14159265f) yawZ -= 2.f * 3.14159265f;
+        if (yawZ < -3.14159265f) yawZ += 2.f * 3.14159265f;
+    }
+    void SetYawPitch(float yawZ, float pitch)
+    {
+        // clamp pitch
+        const float kMax = ToRad(89.0f);
+        if (pitch > kMax) pitch = kMax;
+        if (pitch < -kMax) pitch = -kMax;
+
+        // 기준 보정: 초기 forward가 -X 였으므로 yaw에 π 더해 사용
+        float cy = cosf(yawZ + (float)3.14159265358979323846);
+        float sy = sinf(yawZ + (float)3.14159265358979323846);
+        float cp = cosf(pitch), sp = sinf(pitch);
+
+        mForward = FVector(cp * cy, cp * sy, sp);
+        Orthonormalize();
+        mPitch = pitch; // 내부 누적 pitch 유지
+        RebuildView();
+    }
 private:
     // ---- 내부 상태 ----
     FVector mEye;      // 월드 위치

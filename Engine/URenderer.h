@@ -31,6 +31,8 @@ private:
 
     // Viewport
     D3D11_VIEWPORT viewport;
+    D3D11_VIEWPORT currentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
+    float targetAspect = 16.0f / 9.0f;
 
     // Window handle
     HWND hWnd;
@@ -40,6 +42,9 @@ private:
 
     FMatrix mVP;                 // 프레임 캐시
     CBTransform   mCBData;
+
+
+
 public:
     URenderer();
     ~URenderer();
@@ -116,8 +121,19 @@ private:
             for (int c = 0; c < 4; ++c)
                 dst[r * 4 + c] = src.M[r][c];
     }
-
 public:
     void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
     void SetModel(const FMatrix& M);                      // M*VP → b0 업로드
+    void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
+    // targetAspect를 내부에서 사용 (카메라에 의존 X)
+    D3D11_VIEWPORT MakeAspectFitViewport(int winW, int winH) const;
+    // 드래그 중 호출: currentViewport만 갈아끼움
+    void UseAspectFitViewport(int winW, int winH) {
+        currentViewport = MakeAspectFitViewport(winW, winH);
+    }
+    // 평소엔 풀 윈도우
+    void UseFullWindowViewport() {
+        currentViewport = viewport;
+    }
+
 };

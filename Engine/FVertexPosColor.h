@@ -2,29 +2,47 @@
 #include <math.h>
 #include "Vector.h"
 
-struct FVertexSimpleOld
+struct FVertexPosColor
 {
 	float x, y, z;       // Position (3개)
 	float r, g, b, a;    // Color (4개)
+
+	// 정적 함수 ChangeAxis 구현
+	static void ChangeAxis(FVertexPosColor vertices[], int count, int axis1, int axis2)
+	{
+		// 유효성 검사
+		if (axis1 < 0 || 2 < axis1 || axis2 < 0 || 2 < axis2 || axis1 == axis2)
+		{
+			// 유효하지 않은 축 인덱스인 경우 함수 종료
+			return;
+		}
+
+		// 모든 버텍스를 순회하며 축 교환
+		for (int i = 0; i < count; ++i)
+		{
+			//std::swap(vertices[i].y, vertices[i].z);
+			float* pCoords = &vertices[i].x; // 첫 번째 좌표의 포인터
+			std::swap(pCoords[axis1], pCoords[axis2]);
+		}
+	}
 };
 
 //정점 구조체 선언, 삼각형 배열 정의
 // 1. Define the triangle vertices
-struct FVertexSimple
+struct FVertexPosColor4
 {
 	float x, y, z, w;       // Position (float4) - w 추가
 	float r, g, b, a;       // Color (float4)
 
-
 	// 변환 함수
-	static std::vector<FVertexSimple> ConvertVertexData(const FVertexSimpleOld* oldVertices, int count)
+	static std::vector<FVertexPosColor4> ConvertVertexData(const FVertexPosColor* oldVertices, int count)
 	{
-		std::vector<FVertexSimple> newVertices;
+		std::vector<FVertexPosColor4> newVertices;
 		newVertices.reserve(count);
 
 		for (int i = 0; i < count; i++)
 		{
-			FVertexSimple newVertex;
+			FVertexPosColor4 newVertex;
 
 			// Position: w = 1.0f 추가
 			newVertex.x = oldVertices[i].x;

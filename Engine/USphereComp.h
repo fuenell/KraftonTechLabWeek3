@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "URenderer.h"
 #include "UPrimitiveComponent.h"
-#include "FVertexSimple.h"
+#include "FVertexPosColor.h"
 #include "Vector.h"
 
 class USphereComp : public UPrimitiveComponent

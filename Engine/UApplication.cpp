@@ -252,11 +252,39 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
         PostQuitMessage(0);
         break;
 
+    case WM_ENTERSIZEMOVE:
+        if (g_pApplication) g_pApplication->isSizing = true;
+        break;
     case WM_SIZE:
         if (g_pApplication && wParam != SIZE_MINIMIZED)
         {
             int width = LOWORD(lParam);
             int height = HIWORD(lParam);
+
+            if (g_pApplication->isSizing) {
+                // 드래그 중: 스왑체인 리사이즈 X, 레터/필러박스 뷰포트만 적용
+                g_pApplication->windowWidth = width;
+                g_pApplication->windowHeight = height;
+                g_pApplication->GetRenderer().UseAspectFitViewport(width, height);
+            }
+            else {
+                // 평소 리사이즈: 실제 리사이즈 + 풀윈도우 뷰포트
+                g_pApplication->GetRenderer().ResizeBuffers(width, height);
+                g_pApplication->GetRenderer().UseFullWindowViewport();
+                g_pApplication->OnResize(width, height); // 카메라 갱신
+            }
+        }
+        break;
+    case WM_EXITSIZEMOVE:
+        if (g_pApplication) {
+            g_pApplication->isSizing = false;
+            int width = g_pApplication->windowWidth;
+            int height = g_pApplication->windowHeight;
+            if (width > 0 && height > 0) {
+                g_pApplication->GetRenderer().ResizeBuffers(width, height);
+                g_pApplication->GetRenderer().UseFullWindowViewport();
+                g_pApplication->OnResize(width, height);
+            }
         }
         break;
     default:
