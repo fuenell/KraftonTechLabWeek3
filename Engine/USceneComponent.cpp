@@ -3,6 +3,11 @@
 #include "USceneComponent.h"
 #include "json.hpp"
 
+FMatrix USceneComponent::GetWorldTransform()
+{
+    return FMatrix::TRS(RelativeLocation, RelativeRotation, RelativeScale3D);
+}
+
 json::JSON USceneComponent::Serialize() const
 {
     json::JSON result;

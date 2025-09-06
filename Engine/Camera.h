@@ -115,6 +115,8 @@ public:
     // ===== 행렬 Get =====
     const FMatrix& GetView() const { return mView; }
     const FMatrix& GetProj() const { return mProj; }
+    const FVector GetLocation() const { return mEye; }
+    const float GetFOV() const { return mFovYRad; }
 
 
 

@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GizmoVertices.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="ImGui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -196,6 +197,7 @@
     <ClCompile Include="UGizmoGridComp.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="USceneManager.cpp" />
+    <ClCompile Include="URaycastManager.cpp" />
     <ClCompile Include="SimpleApplication.cpp" />
     <ClCompile Include="UApplication.cpp" />
     <ClCompile Include="UEngineStatics.cpp" />
@@ -209,6 +211,7 @@
     <ClCompile Include="UGUI.cpp" />
     <ClCompile Include="UInputManager.cpp" />
     <ClCompile Include="URenderer.cpp" />
+    <ClCompile Include="UTriangleComp.cpp" />
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
@@ -233,6 +236,7 @@
     <ClInclude Include="UDefaultScene.h" />
     <ClInclude Include="UGizmoGridComp.h" />
     <ClInclude Include="USceneManager.h" />
+    <ClInclude Include="URaycastManager.h" />
     <ClInclude Include="SimpleApplication.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="stdafx.h" />
@@ -249,6 +253,7 @@
     <ClInclude Include="UInputManager.h" />
     <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="URenderer.h" />
+    <ClInclude Include="UTriangleComp.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>

@@ -17,7 +17,7 @@ bool USphereComp::OnCollision(UPrimitiveComponent* other, float restitution)
 void USphereComp::UpdateConstantBuffer(URenderer& renderer)
 {
     FMatrix M = FMatrix::TRSRow(RelativeLocation, FVector(pitch, yaw, roll), RelativeScale3D);
-    renderer.SetModel(M);          // M,V,P를 통째로 상수버퍼에 업로드
+    renderer.SetModel(M, bIsSelected);          // M,V,P를 통째로 상수버퍼에 업로드
 }
 
 void USphereComp::Draw(URenderer& renderer)

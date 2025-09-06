@@ -7,6 +7,7 @@
 #include "ImguiConsole.h"
 #include "UScene.h"
 #include "UDefaultScene.h"
+#include "URaycastManager.h"
 
 // Simple application that inherits from UApplication
 void SimpleApplication::Update(float deltaTime)
@@ -73,6 +74,8 @@ void SimpleApplication::Update(float deltaTime)
     //sphere->SetPosition({ 0, 0.0f, 0.1f * t });
 
     GetSceneManager().GetScene()->Update(deltaTime);
+    //sphere->SetPosition({ 0, 0.0f, 0.1f * t });
+    //RaycastManager->Update(GetInputManager(), *sphere);
 }
 
 void SimpleApplication::Render() 
@@ -255,10 +258,27 @@ bool SimpleApplication::OnInitialize()
     width = 0.0f;
 	height = 0.0f;
 	camera = UCamera();
-    camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / height : 1.0f, 0.1f, 1000.0f);
+    camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / (float)height : 1.0f, 0.1f, 1000.0f);
     camera.LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
 
     GetSceneManager().GetScene()->OnInitialize();
+  /*
+    // Manager에서 공유 Mesh 가져오기
+    UMeshManager& meshManager = GetMeshManager();
+    UMesh* sharedSphereMesh = meshManager.RetrieveMesh("Sphere");
+    UMesh* gridMesh = meshManager.RetrieveMesh("GizmoGrid");
+
+    // 메시가 제대로 로드되었는지 확인
+    if (!sharedSphereMesh || !gridMesh) {
+        return false; // 초기화 실패
+    }
+
+    RaycastManager = new URaycastManager(GetRenderer(), camera);
+
+    // Sphere 인스턴스 생성
+    sphere = new USphereComp(sharedSphereMesh, { 0.0f, 0.0f, 0.5f }, { 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f });
+    sphere2 = new USphereComp(gridMesh);
+    */
 
     return true;
 }

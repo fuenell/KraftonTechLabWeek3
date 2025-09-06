@@ -721,12 +721,12 @@ void URenderer::SetViewProj(const FMatrix& V, const FMatrix& P)
 	// 여기서는 상수버퍼 업로드 안 함 (오브젝트에서 M과 합쳐서 업로드)
 }
 
-void URenderer::SetModel(const FMatrix& M)
+void URenderer::SetModel(const FMatrix& M, bool bIsSelected)
 {
 	// per-object: MVP = M * VP
 	FMatrix MVP = M * mVP;
-
 	CopyRowMajor(mCBData.MVP, MVP);
+	mCBData.IsSelected = bIsSelected ? 1.0f : 0.0f;
 	UpdateConstantBuffer(&mCBData, sizeof(mCBData));
 }
 

@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <math.h>
+#include "Vector.h"
+#include "Globals.h"
 
 struct FVertexPosColor
 {
@@ -34,9 +36,9 @@ struct FVertexPosColor4
 	float r, g, b, a;       // Color (float4)
 
 	// 변환 함수
-	static std::vector<FVertexPosColor4> ConvertVertexData(const FVertexPosColor* oldVertices, int count)
+	static TArray<FVertexPosColor4> ConvertVertexData(const FVertexPosColor* oldVertices, int count)
 	{
-		std::vector<FVertexPosColor4> newVertices;
+		TArray<FVertexPosColor4> newVertices;
 		newVertices.reserve(count);
 
 		for (int i = 0; i < count; i++)
@@ -59,6 +61,11 @@ struct FVertexPosColor4
 		}
 
 		return newVertices;
+	}
+
+	FVector GetPosition()
+	{
+		return {x, y, z};
 	}
 
 };
