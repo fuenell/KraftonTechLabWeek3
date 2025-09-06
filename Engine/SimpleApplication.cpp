@@ -3,6 +3,7 @@
 #include "UApplication.h"
 #include "SimpleApplication.h"
 #include "UMeshFactory.h"
+#include "Camera.h"
 #include "ImguiConsole.h"
 #include "UScene.h"
 
@@ -14,56 +15,70 @@ void SimpleApplication::Update(float deltaTime)
     // Basic update logic
     UApplication::Update(deltaTime);
 
+    GetRenderer().GetBackBufferSize(width, height);
+    if (height > 0) {
+        camera.SetAspect((float)width / (float)height);
+    }
+    float dx = 0, dy = 0, dz = 0;
+    bool boost = GetInputManager().IsKeyDown(VK_SHIFT); // Shift로 가속
     // Exit on ESC key
-    if (GetInputManager().IsKeyPressed(VK_ESCAPE))
+    if (GetInputManager().IsKeyDown(VK_ESCAPE))
     {
         RequestExit();
     }
+    // --- 마우스룩: RMB 누른 동안 회전 ---
+    if (GetInputManager().IsMouseLooking()) {
+        // 마우스룩 모드는 WndProc에서 Begin/End로 관리
+        float mdx = 0.f, mdy = 0.f;
+        GetInputManager().ConsumeMouseDelta(mdx, mdy);
+
+        const float sens = 0.005f; // 일단 크게 해서 동작 확인
+        camera.AddYawPitch(-mdx * sens, -mdy * sens);
+    }
+    if(GetInputManager().IsKeyDown('W'))
+    {
+        dy += 1.0f; // 전진
+	}
+    if (GetInputManager().IsKeyDown('A'))
+    {
+        dx -= 1.0f; // 좌
+    }
+    if (GetInputManager().IsKeyDown('S'))
+    {
+        dy -= 1.0f; // 후진
+    }
+    if (GetInputManager().IsKeyDown('D'))
+    {
+        dx += 1.0f; // 우
+    }
+    if(GetInputManager().IsKeyDown('Q'))
+    {
+        dz += 1.0f; // 상
+	}
+    if (GetInputManager().IsKeyDown('E'))
+    {
+        dz -= 1.0f; // 하
+	}
     static float t = 0.0f; t += 0.016f;
+    // 대각선 이동 속도 보정(선택): 벡터 정규화
+    float len = sqrtf(dx * dx + dy * dy + dz * dz);
+    if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
+    camera.MoveLocal(dx, dy, dz, deltaTime, boost);
 
-    // 구 위치를 시간에 따라 변경
-    sphere->SetPosition({ 0.0f,  0.1f * t, 0.1f * t });
 
-    int w = 0, h = 0; GetRenderer().GetBackBufferSize(w, h);
-    float aspect = (h > 0) ? (float)w / (float)h : 1.0f;
-
-    // RH + row 규약 투영
-    FMatrix P = FMatrix::PerspectiveFovLHRow((float)(PIDIV4 / 4.0), aspect, 0.1f, 100.0f);
-
-    // 카메라(궤도 이동 예시)
-    float radius = 5.0f;
-    FVector target(0.0f, 0.0f, 0.0f);
-    FVector up(0, 0, 1);                 // Z-up
-    // X축 방향 직선 이동
-    //FVector eye(t, 0, 0.0f);
-    // 타겟 = 현재 위치 + 바라보는 방향
-    //FMatrix V = FMatrix::LookAtRHRow(eye, target, up);
-
-    //카메라 위치: X축으로 직선 이동
-    FVector eye(10.f, 0.0f, 0.0f);
-
-    // 시선 고정: -X 방향을 계속 본다 ( Z-up)
-    FVector forward(-1.0f, 0.0f, 0.0f);
-
-    // 타겟 = 현재 위치 + 고정된 바라보는 방향
-    //FVector target = eye + forward;
-    FMatrix V = FMatrix::LookAtLHRow(eye, target, up);
     // Basic rendering - nothing for now
     // 3D objects would be rendered here
         // 구 그리기
-    GetRenderer().SetViewProj(V, P);  // 카메라 행렬 세팅
-
-    UScene* scene = new UScene();
-    scene->AddObject(sphere);
-    scene->AddObject(sphere2);
-
-    std::string str = scene->Serialize().dump();
-    //
+    //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
+    //sphere->SetPosition({ 0, 0.0f, 0.1f * t });
 }
 
 void SimpleApplication::Render() 
 {
+    // 카메라가 바뀌면 원하는 타이밍(매 프레임도 OK)에 알려주면 됨
+    GetRenderer().SetTargetAspect(camera.GetAspect());
 
+    GetRenderer().SetViewProj(camera.GetView(), camera.GetProj());
     sphere->Draw(GetRenderer());
     sphere2->Draw(GetRenderer());
 }
@@ -105,20 +120,42 @@ void SimpleApplication::RenderGUI()
 
     ImGui::Separator();
 
-    bool isOrthogonal = false;
+    bool isOrthogonal = camera.IsOrtho();
     ImGui::Checkbox("Orthogonal", &isOrthogonal);
+    if (isOrthogonal) {
+        // 원하는 직교 크기로 (예시: 월드 단위 10x10)
+        camera.SetOrtho(10.0f, 10.0f, camera.GetNearZ(), camera.GetFarZ(), /*leftHanded=*/false);
+    }
+    else {
+        camera.SetPerspectiveDegrees(camera.GetFovYDegrees(),
+            camera.GetAspect(), camera.GetNearZ(), camera.GetFarZ());
+    }
 
-    // 데이터
-    float fov = 53.000f;
-    float cameraLocation[3] = { 1.575f, 2.509f, -1.599f };
-    float cameraRotation[3] = { 0.820f, -0.458f, 0.000f };
 
-    // FOV 행 - 테이블 밖에서 처리
+    // === FOV (perspective일 때만 활성화) ===
+    float fovDeg = camera.GetFovYDegrees();
     float tableWidth = ImGui::GetContentRegionAvail().x;
-    ImGui::SetNextItemWidth(tableWidth * 0.75f); // 3/4 너비
-    ImGui::InputFloat("##fov", &fov, 0.0f, 0.0f, "%.3f");
+    ImGui::SetNextItemWidth(tableWidth * 0.75f);
+    ImGui::BeginDisabled(isOrthogonal);
+    if (ImGui::InputFloat("##fov", &fovDeg, 0.0f, 0.0f, "%.3f")) {
+        camera.SetFovYDegrees(fovDeg); // proj 재빌드 내부에서 함
+    }
+    ImGui::EndDisabled();
     ImGui::SameLine();
     ImGui::Text("FOV");
+
+    // === 위치 ===
+    FVector pos = camera.GetPosition();
+    float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
+
+    // === 회전(Yaw, Pitch, Roll=0 표기) ===
+    float yawZ = 0.f, pitch = 0.f;
+    camera.GetYawPitch(yawZ, pitch);
+    float cameraRotation[3] = {
+        yawZ * 180.0f / 3.14159265f,   // deg
+        pitch * 180.0f / 3.14159265f,  // deg
+        0.0f                           // roll 고정
+    };
 
     // 나머지는 테이블로
     if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None)) {
@@ -147,6 +184,14 @@ void SimpleApplication::RenderGUI()
         ImGui::EndTable();
     }
 
+    // === 변경사항을 카메라에 반영 ===
+    // 위치
+    camera.SetPosition(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+
+    // 회전 (roll은 무시)
+    float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
+    float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
+    camera.SetYawPitch(newYawRad, newPitchRad);
 
     ImGui::End();
 
@@ -196,13 +241,31 @@ void SimpleApplication::RenderGUI()
 
 bool SimpleApplication::OnInitialize()
 {
+    // 리사이즈/초기화
+    width = 0.0f;
+	height = 0.0f;
+	camera = UCamera();
+    camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / height : 1.0f, 0.1f, 1000.0f);
+    camera.LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
     // Factory에서 공유 Mesh 생성
     UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh();
     sharedSphereMesh->Initialize(GetRenderer().GetDevice());
 
+
+    UMesh* gridMesh = UMeshFactory::CreateGizmoGridMesh(GetRenderer());
+
     // Sphere 인스턴스 생성
     sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
-    sphere2 = new USphereComp({ 0.3f, 0.3f, 0.3f }, { 0.2f, 0.2f, 0.2f }, sharedSphereMesh);
+    sphere2 = new USphereComp({ 0.3f, 0.3f, 0.3f }, { 0.2f, 0.2f, 0.2f }, gridMesh);
 
     return true;
+}
+
+
+void SimpleApplication::OnResize(int width, int height) {
+    camera.SetPerspectiveDegrees(
+        camera.GetFovYDegrees(),
+        (height > 0) ? (float)width / (float)height : 1.0f,
+        camera.GetNearZ(),
+        camera.GetFarZ());
 }

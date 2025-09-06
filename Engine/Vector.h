@@ -23,7 +23,7 @@ struct FVector
     // ----- 기하 연산 -----
     float Dot(const FVector& o) const { return X * o.X + Y * o.Y + Z * o.Z; }
 
-    // RH 좌표계 기준 (언리얼과 동일한 순서)
+    // RH 좌표계 기준 
     FVector Cross(const FVector& o) const {
         return FVector(
             Y * o.Z - Z * o.Y,

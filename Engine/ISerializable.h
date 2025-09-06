@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "json.hpp"
+
 class ISerializable {
 public:
     virtual ~ISerializable() = default;

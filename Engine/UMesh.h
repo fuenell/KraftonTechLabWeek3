@@ -1,25 +1,22 @@
 ﻿// UMesh.h
 #pragma once
-#include "FVertexSimple.h"
 #include "stdafx.h"
+
+class FVertexSimple; // 전방 선언
 
 class UMesh
 {
 public:
-    ID3D11Buffer* VertexBuffer = nullptr;
-    std::vector<FVertexSimple> vertices;
-    int NumVertices = 0;
-    bool isInitialized = false;
+	ID3D11Buffer* VertexBuffer = nullptr;
+	int NumVertices = 0;
+	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
+	UINT Stride = 0;
 
-    void Initialize(ID3D11Device* device);
+	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성
+	UMesh(ID3D11Device* device, const std::vector<FVertexSimple>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-    // 생성자에서는 버텍스 데이터만 저장
-    UMesh(const std::vector<FVertexSimple>& verts) : vertices(verts) {
-        NumVertices = static_cast<int>(verts.size());
-    }
-
-    ~UMesh()
-    {
-        if (VertexBuffer) VertexBuffer->Release();
-    }
+	~UMesh()
+	{
+		if (VertexBuffer) VertexBuffer->Release();
+	}
 };
