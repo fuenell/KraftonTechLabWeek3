@@ -5,7 +5,11 @@
 #include "Matrix.h"
 #include <math.h>
 
-const float PI = 3.14159265358979323846f;
+// ===================== 유틸 =====================
+#ifndef PI
+#define PI 3.14159265358979323846
+#endif
+inline float ToRad(float d) { return d * (float)(PI / 180.0); }
 
 struct FQuaternion
 {
@@ -41,12 +45,12 @@ struct FQuaternion
     }
 
     // ====== 행벡터 친화 합성 ======
-    // 표준 해밀턴 곱(H): "먼저 a, 그 다음 b"를 column 규약으로 표현하면 b⊗a.
+    // 표준 해밀턴 곱(H): "먼저 a, 그 다음 b"를 column 규약으로 표현하면 b ⊗ a.
     // 우리는 row 규약이므로 "행렬 곱 순서와 동일"하도록 정의:
     //   ToMatrixRow(a * b) == ToMatrixRow(a) * ToMatrixRow(b)
     //   → operator*는 H(b,a)로 구현한다.
     static FQuaternion Hamilton(const FQuaternion& p, const FQuaternion& q) {
-        // 표준 해밀턴 곱: q⊗p (column 규약: 먼저 p, 그 다음 q)
+        // 표준 해밀턴 곱: q ⊗ p (column 규약: 먼저 p, 그 다음 q)
         return FQuaternion(
             q.W * p.X + q.X * p.W + q.Y * p.Z - q.Z * p.Y,
             q.W * p.Y - q.X * p.Z + q.Y * p.W + q.Z * p.X,
@@ -195,12 +199,17 @@ struct FQuaternion
     FVector Rotate(const FVector& v) const {
         FQuaternion qv(v.X, v.Y, v.Z, 0.0f);
         FQuaternion inv = Inverse();
-        // tmp = q ⊗ v
-        FQuaternion tmp = Hamilton(qv, *this);   // Hamilton(p,q)=q⊗p 이므로 (qv, q)
+        //// tmp = q ⊗ v
+        //FQuaternion tmp = Hamilton(qv, *this);   // Hamilton(p,q)=q⊗p 이므로 (qv, q)
 
-        // r = (q ⊗ v) ⊗ q^{-1}
-        FQuaternion r = Hamilton(inv, tmp);      // (tmp, inv) => tmp ⊗ inv
+        //// r = (q ⊗ v) ⊗ q^{-1}
+        //FQuaternion r = Hamilton(inv, tmp);      // (tmp, inv) => tmp ⊗ inv
 
+        // inv ⊗ v
+        FQuaternion tmp = Hamilton(qv, inv);   // Hamilton(p,q) = q ⊗ p
+
+        // (inv ⊗ v) ⊗ q
+        FQuaternion r = Hamilton(*this, tmp);  // => tmp ⊗ q
         return FVector(r.X, r.Y, r.Z);
     }
 
@@ -216,21 +225,57 @@ struct FQuaternion
         float wx = w * x, wy = w * y, wz = w * z;
 
         FMatrix R = FMatrix::IdentityMatrix();
-        // col0 = Right
-        R.M[0][0] = 1 - 2 * (yy + zz);
-        R.M[1][0] = 2 * (xy - wz);
-        R.M[2][0] = 2 * (xz + wy);
+        // row0 = Right (X)
+        R.M[0][0] = 1.0f - 2.0f * (yy + zz);
+        R.M[0][1] = 2.0f * (xy + wz);
+        R.M[0][2] = 2.0f * (xz - wy);
+        R.M[0][3] = 0.0f;
 
-        // col1 = Forward  (원래 col2 공식을 가져옴)
-        R.M[0][1] = 2 * (xz - wy);
-        R.M[1][1] = 2 * (yz + wx);
-        R.M[2][1] = 1 - 2 * (xx + yy);
+        // row1 = Up (Z)  ← Z-up이므로 표준 행렬의 row2를 여기로
+        R.M[1][0] = 2.0f * (xz + wy);
+        R.M[1][1] = 2.0f * (yz - wx);
+        R.M[1][2] = 1.0f - 2.0f * (xx + yy);
+        R.M[1][3] = 0.0f;
 
-        // col2 = Up       (원래 col1 공식을 가져옴)
-        R.M[0][2] = 2 * (xy + wz);
-        R.M[1][2] = 1 - 2 * (xx + zz);
-        R.M[2][2] = 2 * (yz - wx);
+        // row2 = Forward (Y)  ← 표준 행렬의 row1을 여기로
+        R.M[2][0] = 2.0f * (xy - wz);
+        R.M[2][1] = 1.0f - 2.0f * (xx + zz);
+        R.M[2][2] = 2.0f * (yz + wx);
+        R.M[2][3] = 0.0f;
 
+        return R;
+    }
+    FMatrix ToMatrixRowForModel() const {
+        FQuaternion q = Normalized();
+        float x = q.X, y = q.Y, z = q.Z, w = q.W;
+
+        float xx = x * x, yy = y * y, zz = z * z;
+        float xy = x * y, xz = x * z, yz = y * z;
+        float wx = w * x, wy = w * y, wz = w * z;
+
+        FMatrix R = FMatrix::IdentityMatrix();
+
+        // row0 = Right (X)
+        R.M[0][0] = 1.0f - 2.0f * (yy + zz);
+        R.M[0][1] = 2.0f * (xy + wz);
+        R.M[0][2] = 2.0f * (xz - wy);
+        R.M[0][3] = 0.0f;
+
+        // row1 = Forward (Y)
+        R.M[1][0] = 2.0f * (xy - wz);
+        R.M[1][1] = 1.0f - 2.0f * (xx + zz);
+        R.M[1][2] = 2.0f * (yz + wx);
+        R.M[1][3] = 0.0f;
+
+        // row2 = Up (Z)
+        R.M[2][0] = 2.0f * (xz + wy);
+        R.M[2][1] = 2.0f * (yz - wx);
+        R.M[2][2] = 1.0f - 2.0f * (xx + yy);
+        R.M[2][3] = 0.0f;
+
+        // row3
+        R.M[3][0] = R.M[3][1] = R.M[3][2] = 0.0f;
+        R.M[3][3] = 1.0f;
         return R;
     }
 
@@ -280,18 +325,39 @@ struct FQuaternion
 // 카메라 뷰 (row-vector): V = T(-eye) * R^T
 inline FMatrix MakeViewRow(const FVector& eye, const FQuaternion& q)
 {
-    FMatrix R = q.ToMatrixRow();
-    FMatrix Rt = FMatrix::Transpose(R);               // 회전의 역변환
-    FMatrix Tinv = FMatrix::TranslationRow(-eye.X, -eye.Y, -eye.Z);
+    //FMatrix R = q.ToMatrixRow();
+    //FMatrix Rt = FMatrix::Transpose(R);               // 회전의 역변환
+    //FMatrix Tinv = FMatrix::TranslationRow(-eye.X, -eye.Y, -eye.Z);
+    //return Tinv * Rt;
+    // 로컬 기준축(+X Right, +Y Forward, +Z Up)을 회전해서 월드축으로
+    FVector r = q.Rotate({1,0,0}).GetNormalized(); // Right
+    FVector f = q.Rotate({0,1,0}).GetNormalized(); // Forward
+    FVector u = q.Rotate({0,0,1}).GetNormalized(); // Up
 
-    return Tinv * Rt;
+    FVector fb = FVector(-f.X, -f.Y, -f.Z);        // ★ 예전 코드의 f(뒤벡터)와 동일: fb = -Forward
+
+    FMatrix V = FMatrix::IdentityMatrix();
+
+    // === 회전부 (예전 LookAt과 정확히 동일한 배치) ===
+    // row0 = s(=Right), row1 = u(=Up), row2 = f(=backward = -Forward)
+    V.M[0][0] = r.X;  V.M[0][1] = r.Y;  V.M[0][2] = r.Z;  V.M[0][3] = 0.0f;
+    V.M[1][0] = u.X;  V.M[1][1] = u.Y;  V.M[1][2] = u.Z;  V.M[1][3] = 0.0f;
+    V.M[2][0] = fb.X; V.M[2][1] = fb.Y; V.M[2][2] = fb.Z; V.M[2][3] = 0.0f;
+
+    // === 번역부 (예전 LookAt과 동일 수식) ===
+    V.M[3][0] = -(eye.X * r.X + eye.Y * r.Y + eye.Z * r.Z);
+    V.M[3][1] = -(eye.X * u.X + eye.Y * u.Y + eye.Z * u.Z);
+    V.M[3][2] = -(eye.X * fb.X + eye.Y * fb.Y + eye.Z * fb.Z);
+    V.M[3][3] = 1.0f;
+
+    return V;
 }
 
 // 모델행렬 (row-vector): M = S * R * T
 inline FMatrix MakeModelRow(const FVector& pos, const FQuaternion& rot, const FVector& scl)
 {
     FMatrix S = FMatrix::Scale(scl.X, scl.Y, scl.Z);
-    FMatrix R = rot.ToMatrixRow();
+    FMatrix R = rot.ToMatrixRowForModel();
     FMatrix T = FMatrix::TranslationRow(pos.X, pos.Y, pos.Z);
     return S * R * T;
 }

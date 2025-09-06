@@ -60,7 +60,7 @@ void SimpleApplication::Update(float deltaTime)
         // 구 그리기
     //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
      static float t = 0.0f; t += 0.016f;
-    sphere->SetPosition({ 0,  0.0f, 0.1f * t });
+    sphere->SetPosition({ 0, 0.1f * t,  0.0f });
     // 예: 초당 Yaw 30도 회전
     /*sphere->AddRotationEulerDeg(30.0f * deltaTime, 0.0f , 0.0f);*/
 }
@@ -196,6 +196,35 @@ void SimpleApplication::RenderGUI()
         float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
         camera.SetYawPitch(newYawRad, newPitchRad);
     }
+    // === Camera axes (world-space) 표시 ===
+    {
+        FVector r, f, u;
+        camera.GetBasis(r, f, u);
+
+        ImGui::Separator();
+        ImGui::Text("Camera Axes (world-space)");
+        if (ImGui::BeginTable("CamAxes", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+            ImGui::TableSetupColumn("Axis");
+            ImGui::TableSetupColumn("X");
+            ImGui::TableSetupColumn("Y");
+            ImGui::TableSetupColumn("Z");
+            ImGui::TableHeadersRow();
+
+            auto Row = [&](const char* name, const FVector& v) {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(name);
+                ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f", v.X);
+                ImGui::TableSetColumnIndex(2); ImGui::Text("%.3f", v.Y);
+                ImGui::TableSetColumnIndex(3); ImGui::Text("%.3f", v.Z);
+                };
+
+            Row("Right  (+X)", r);
+            Row("Forward(+Y)", f);
+            Row("Up     (+Z)", u);
+
+            ImGui::EndTable();
+        }
+    }
 
     ImGui::End();
 
@@ -249,8 +278,7 @@ bool SimpleApplication::OnInitialize()
     width = 0.0f;
 	height = 0.0f;
 	camera = UCamera();
-    camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / height : 1.0f, 0.1f, 1000.0f);
-    camera.LookAt({ 0,-10,0}, { 0,1,0 }, { 0,0,1 });
+    //camera.LookAt({ 0, 0 ,0 }, { 0,0,0 }, { 0,0,1 });
     // Factory에서 공유 Mesh 생성
     UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh(GetRenderer());
 

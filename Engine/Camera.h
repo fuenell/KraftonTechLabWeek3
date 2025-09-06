@@ -13,37 +13,60 @@ class UCamera
 public:
     UCamera()
         : mEye(0.0f, 0.0f, 0.0f)
-        , mFovYRad(ToRad(60.0f))
-        , mAspect(1.0f)
-        , mNearZ(0.1f)
-        , mFarZ(1000.0f)
+        , mRot(FQuaternion::Identity())       // ★ 쿼터니언 초기화
+        , mView(FMatrix::IdentityMatrix())
+        , mProj(FMatrix::IdentityMatrix())
+        , mFovY(ToRad(60.0f)), mAspect(1.0f), mNearZ(0.1f), mFarZ(1000.0f)
         , mUseOrtho(false)
         , mOrthoWidth(10.0f)
         , mOrthoHeight(10.0f)
-        , mRot(FQuaternion::Identity())       // ★ 쿼터니언 초기화
-        , mPitch(0.0f)
+        , bLockRoll(true)
     {
-        RecalcAxesFromQuat();                 // ★ 축 유도
-        RebuildView();
-        RebuildProj();
+        UpdateView();
+        UpdateProj();
     }
-
     // ===== 투영 설정 =====
+    void SetPerspective(float fovY, float aspect, float zn, float zf) {
+        mFovY = fovY; mAspect = aspect; mNearZ = zn; mFarZ = zf;
+        mProj = FMatrix::PerspectiveFovRHRow(fovY, aspect, zn, zf);
+    }
     void SetPerspectiveDegrees(float fovYDeg, float aspect, float zn, float zf)
     {
         mUseOrtho = false;
-        mFovYRad = ToRad(fovYDeg);
+        mFovY = ToRad(fovYDeg);
         mAspect = (aspect > 0.0f) ? aspect : 1.0f;
         mNearZ = zn; mFarZ = zf;
-        RebuildProj();
+        UpdateProj();
     }
-    void SetPerspective(float fovYRad, float aspect, float zn, float zf)
+    float GetFovYDegrees() const { return mFovY * (180.0f / 3.14159265358979323846f); }
+    void  SetFovYDegrees(float deg) { SetPerspectiveDegrees(deg, mAspect, mNearZ, mFarZ); }
+    // ===== 위치/자세 =====
+    void SetPosition(const FVector& eye) { mEye = eye; UpdateView(); }
+    void SetRotation(const FQuaternion& q) { mRot = q.Normalized(); UpdateView(); }
+    void SetLockRoll(bool on) { bLockRoll = on; UpdateView(); }
+    // target을 바라보도록 (RH, Z-up)
+    void LookAt(const FVector& eye, const FVector& target, const FVector& up = FVector(0, 0, 1))
     {
-        mUseOrtho = false;
-        mFovYRad = fovYRad;
-        mAspect = (aspect > 0.0f) ? aspect : 1.0f;
-        mNearZ = zn; mFarZ = zf;
-        RebuildProj();
+        mEye = eye;
+        // +Y forward 규약: 월드 forward = (target - eye)
+        FVector f = (target - eye).GetNormalized();
+        if (f.Length() < 1e-6f) f = FVector(0, 1, 0); // 안전장치
+
+        FQuaternion q = FQuaternion::LookRotation(f, up);
+        if (bLockRoll) {
+            // f 방향만 맞추고, 최종적으로 Up을 월드 Z와 일치시키는 간단 롤 보정
+            // (필요 없으면 제거 가능)
+            FVector right = q.Rotate(FVector(1, 0, 0));
+            FVector fwd = q.Rotate(FVector(0, 1, 0));
+            FVector up = FVector(0, 0, 1); // 강제 업
+            // r,u,f를 다시 정규직교화
+            FVector r = (fwd.Cross(up)).GetNormalized();
+            FVector u = (r.Cross(fwd)).GetNormalized();
+            // r,u,f로 다시 쿼터니언 구성
+            q = FQuaternion::LookRotation(fwd, u);
+        }
+        mRot = q.Normalized();
+        UpdateView();
     }
     // w,h는 뷰 공간 가로/세로 범위(직교 박스 크기)
     void SetOrtho(float w, float h, float zn, float zf, bool leftHanded=false)
@@ -52,33 +75,9 @@ public:
         mOrthoWidth = (w > 0.0f) ? w : 1.0f;
         mOrthoHeight = (h > 0.0f) ? h : 1.0f;
         mNearZ = zn; mFarZ = zf;
-        RebuildProj(leftHanded);
+        UpdateProj(leftHanded);
     }
-    void SetAspect(float aspect) { mAspect = (aspect > 0.0f) ? aspect : 1.0f; RebuildProj(); }
-
-    // ===== 위치/자세 =====
-    void SetPosition(const FVector& eye) { mEye = eye; RebuildView(); }
-    const FVector& GetPosition() const { return mEye; }
-
-    // target을 바라보도록 (RH, Z-up)
-    void LookAt(const FVector& eye, const FVector& target, const FVector& up = FVector(0,0,1))
-    {
-        mEye = eye;
-
-        // +Y forward 규약: 월드 forward = (target - eye)
-        FVector f = (target - eye).GetNormalized();
-
-        mRot = FQuaternion::LookRotation(f, up);
-
-        // pitch 추정도 +Y 기준
-        FVector fw = mRot.Rotate(FVector(0, 1, 0));
-        float clampedZ = std::clamp(fw.Z, -1.0f, 1.0f);
-        mPitch = asinf(clampedZ);
-
-        RecalcAxesFromQuat();
-        RebuildView();
-    }
-
+    void SetAspect(float aspect) { mAspect = (aspect > 0.0f) ? aspect : 1.0f; UpdateProj(); }
     // 로컬축 기준 이동 (dx=right, dy=forward, dz=up)
     void MoveLocal(float dx, float dy, float dz, float deltaTime, bool boost=false,
                    float baseSpeed=3.0f, float boostMul=3.0f)
@@ -87,52 +86,43 @@ public:
         float speed = baseSpeed * (boost ? boostMul : 1.0f);
         FVector delta = (mRight * dx + mForward * dy + mUp * dz) * (speed * deltaTime);
         mEye = mEye + delta;
-        RebuildView();
+        UpdateView();
     }
-
-    // 회전: yawZ는 세계 Z축 기준, pitch는 카메라 right축 기준 (라디안)
-    void AddYawPitch(float yawZ, float pitch)
+    void AddYawPitch(float yawRad, float pitchRad)
     {
+        // 로컬 축 기준으로 회전 (Yaw: Z-up에 대해, Pitch: Right에 대해)
+        // 간단히: 현재 축을 얻어 쿼터니언 갱신
+        FVector right = mRot.Rotate(FVector(1, 0, 0));
+        FVector up = mRot.Rotate(FVector(0, 0, 1));
         // 1) Yaw (world Z)
-        if (yawZ != 0.0f) {
-            FQuaternion qYaw = FQuaternion::FromAxisAngle(FVector(0, 0, 1), yawZ);
-            // ★ 세계 회전은 왼쪽 곱
-            mRot = qYaw * mRot;
+        FQuaternion qYaw   = FQuaternion::FromAxisAngle(up, yawRad);
+        FQuaternion qPitch = FQuaternion::FromAxisAngle(right, pitchRad);
+        // qNew * qOld (벡터를 왼쪽에서 회전시키는 규약)
+        mRot = (qPitch * (qYaw * mRot)).Normalized();  // 곱셈 연산자 있으면 이렇게 간결히
+        if (bLockRoll) {
+            // 롤 살짝 정리
+            FVector fwd = mRot.Rotate(FVector(0,1,0));
+            LookAt(mEye, mEye + fwd, FVector(0,0,1));
+            return;
         }
-        // 2) Pitch (current right)
-        if (pitch != 0.0f) {
-            const float kMax = ToRad(89.0f);
-            float newPitch = std::clamp(mPitch + pitch, -kMax, kMax);
-            float dp = newPitch - mPitch;
-            if (fabsf(dp) > 1e-6f) {
-                FVector right = mRot.Rotate(FVector(1, 0, 0)).GetNormalized();
-                FQuaternion qPitch = FQuaternion::FromAxisAngle(right, dp);
-                // ★ 로컬 회전은 오른쪽 곱
-                mRot = mRot * qPitch;
-                mPitch = newPitch;
-            }
-        }
-        RecalcAxesFromQuat();
-        RebuildView();
     }
 
     // ===== 행렬 Get =====
     const FMatrix& GetView() const { return mView; }
     const FMatrix& GetProj() const { return mProj; }
-
-
-
-    float GetFovYDegrees() const { return mFovYRad * (180.0f / PI); }
-    void  SetFovYDegrees(float deg) { SetPerspectiveDegrees(deg, mAspect, mNearZ, mFarZ); }
-
     float GetAspect() const { return mAspect; }
     float GetNearZ() const { return mNearZ; }
     float GetFarZ()  const { return mFarZ; }
     bool  IsOrtho()  const { return mUseOrtho; }
-
+    const FVector& GetPosition() const { return mEye; }
     const FVector& GetRight()   const { return mRight; }
     const FVector& GetUp()      const { return mUp; }
     const FVector& GetForward() const { return mForward; }
+    void GetBasis(FVector& outRight, FVector& outForward, FVector& outUp) const {
+        outRight = GetRight();
+        outForward = GetForward();
+        outUp = GetUp();
+    }
 
     // GUI 표시/편집용: Yaw(세계 Z), Pitch(카메라 Right)
     void GetYawPitch(float& yawZ, float& pitch) const {
@@ -158,10 +148,9 @@ public:
 
         // 합성: 세계 yaw(왼쪽 곱) → 로컬 pitch(오른쪽 곱)
         mRot = qYaw * qPitch;
-        mPitch = pitch;
 
-        RecalcAxesFromQuat();
-        RebuildView();
+
+        UpdateView();
     }
 private:
     // ---- 내부 상태 ----
@@ -174,7 +163,7 @@ private:
     FVector mForward;  // 카메라 바라보는 방향 (+forward)
 
     // 투영 파라미터
-    float   mFovYRad;
+    float   mFovY;
     float   mAspect;
     float   mNearZ, mFarZ;
     bool    mUseOrtho;
@@ -183,10 +172,7 @@ private:
     // 행렬
     FMatrix mView;
     FMatrix mProj;
-	// ---- 회전 상태 ----
-    // UCamera private 멤버에 누적 피치 저장
-    float mPitch;
-
+    bool  bLockRoll;
     // ---- 유틸 ----
     static inline float ToRad(float d) { return d * (float)(PI / 180.0); }
 
@@ -198,44 +184,20 @@ private:
         // 특이치 보정(거의 평행 등)은 필요 시 여기서 수행
     }
 
-    void RebuildView() {
+    void UpdateView() {
+        RecalcAxesFromQuat(); // GUI를 위해서
         mView = MakeViewRow(mEye, mRot);  // ★ T(-eye) * R^T
     }
 
-    void RebuildProj(bool leftHanded=false)
+    void UpdateProj(bool leftHanded=false)
     {
         if (!mUseOrtho) {
             // RH + row-vector + D3D depth [0,1]
-            mProj = FMatrix::PerspectiveFovRHRow(mFovYRad, mAspect, mNearZ, mFarZ);
+            mProj = FMatrix::PerspectiveFovRHRow(mFovY, mAspect, mNearZ, mFarZ);
         } else {
             // 직교 (요청 시 LH도 지원)
             if (!leftHanded) mProj = FMatrix::OrthoRHRow(mOrthoWidth, mOrthoHeight, mNearZ, mFarZ);
             else             mProj = FMatrix::OrthoLHRow(mOrthoWidth, mOrthoHeight, mNearZ, mFarZ);
         }
-    }
-
-// 카메라를 ‘항상 Z-up’으로 유지해 롤 드리프트 제거
-    void StabilizeUpright()
-    {
-        const FVector worldUp(0, 0, 1);
-
-        // 현재 forward(+Y 로컬)를 월드로
-        FVector f = mRot.Rotate(FVector(0, 1, 0)).GetNormalized();
-
-        // forward가 worldUp과 거의 평행이면 보조 up 사용
-        FVector upRef = (fabsf(f.Dot(worldUp)) > 0.999f) ? FVector(1, 0, 0) : worldUp;
-
-        // RH: Right = f × upRef,  Up = Right × f
-        FVector r = f.Cross(upRef); r.Normalize();
-        FVector u = r.Cross(f);    // 자동 직교
-
-        // 열: [r, f, u]
-        FMatrix R = FMatrix::IdentityMatrix();
-        R.M[0][0] = r.X; R.M[0][1] = f.X; R.M[0][2] = u.X;
-        R.M[1][0] = r.Y; R.M[1][1] = f.Y; R.M[1][2] = u.Y;
-        R.M[2][0] = r.Z; R.M[2][1] = f.Z; R.M[2][2] = u.Z;
-
-        mRot = FQuaternion::FromMatrixRow(R); // 롤 제거
-        RecalcAxesFromQuat();
     }
 };

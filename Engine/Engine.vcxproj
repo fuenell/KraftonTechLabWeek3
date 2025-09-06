@@ -214,6 +214,7 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="SimpleApplication.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="stdafx.h" />

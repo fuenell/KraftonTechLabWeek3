@@ -309,25 +309,6 @@ struct FMatrix
         V.M[3][3] = 1;
         return V;
     }
-    //static FMatrix LookAtRHRow(const FVector& eye, const FVector& target, const FVector& up) {
-    //    FVector f = (eye - target).GetNormalized();  // f = -forward
-    //    FVector r = up.Cross(f).GetNormalized();     // right
-    //    FVector u = r.Cross(f);                      // up
-
-    //    FMatrix V = FMatrix::IdentityMatrix();
-
-    //    // ✅ rows = [r; u; f]   (f = -forward 이므로 결과적으로 [right; up; -forward])
-    //    V.M[0][0] = r.X; V.M[0][1] = r.Y; V.M[0][2] = r.Z; V.M[0][3] = 0.0f;
-    //    V.M[1][0] = u.X; V.M[1][1] = u.Y; V.M[1][2] = u.Z; V.M[1][3] = 0.0f;
-    //    V.M[2][0] = f.X; V.M[2][1] = f.Y; V.M[2][2] = f.Z; V.M[2][3] = 0.0f;
-
-    //    // row-vector 규약 translation
-    //    V.M[3][0] = -(eye.Dot(r));
-    //    V.M[3][1] = -(eye.Dot(u));
-    //    V.M[3][2] = -(eye.Dot(f)); // (= +eye·forward)
-    //    V.M[3][3] = 1.0f;
-    //    return V;
-    //}
     static FMatrix LookAtLH(const FVector& eye, const FVector& target, const FVector& up) {
         // f = normalize(target - eye)
         FVector f(eye.X - target.X, eye.Y - target.Y, eye.Z - target.Z); // -forward
