@@ -6,8 +6,6 @@
 #include "Camera.h"
 #include "ImguiConsole.h"
 
-const float PI = 3.14159265358979323846f;
-const float PIDIV4 = PI / 4.0f;   // XM_PIDIV4 대체
 // Simple application that inherits from UApplication
 void SimpleApplication::Update(float deltaTime)
 {
@@ -18,8 +16,7 @@ void SimpleApplication::Update(float deltaTime)
     if (height > 0) {
         camera.SetAspect((float)width / (float)height);
     }
-    float dx = 0, dy = 0, dz = 0;
-    bool boost = GetInputManager().IsKeyDown(VK_SHIFT); // Shift로 가속
+
     // Exit on ESC key
     if (GetInputManager().IsKeyDown(VK_ESCAPE))
     {
@@ -31,37 +28,30 @@ void SimpleApplication::Update(float deltaTime)
         float mdx = 0.f, mdy = 0.f;
         GetInputManager().ConsumeMouseDelta(mdx, mdy);
 
-        const float sens = 0.005f; // 일단 크게 해서 동작 확인
-        camera.AddYawPitch(-mdx * sens, -mdy * sens);
+        // 프레임 독립 감도: (기본감도 * deltaTime)
+        const float baseSens = 1.5f; // 취향껏
+        const float yawPerPx = baseSens * deltaTime;  // 좌우
+        const float pitchPerPx = baseSens * deltaTime;  // 상하
+
+        // Z-up + RH + row 에 맞춘 Yaw(세계 Z), Pitch(카메라 Right)
+        camera.AddYawPitch(mdx * yawPerPx, mdy * pitchPerPx);
     }
-    if(GetInputManager().IsKeyDown('W'))
-    {
-        dy += 1.0f; // 전진
-	}
-    if (GetInputManager().IsKeyDown('A'))
-    {
-        dx -= 1.0f; // 좌
-    }
-    if (GetInputManager().IsKeyDown('S'))
-    {
-        dy -= 1.0f; // 후진
-    }
-    if (GetInputManager().IsKeyDown('D'))
-    {
-        dx += 1.0f; // 우
-    }
-    if(GetInputManager().IsKeyDown('Q'))
-    {
-        dz += 1.0f; // 상
-	}
-    if (GetInputManager().IsKeyDown('E'))
-    {
-        dz -= 1.0f; // 하
-	}
-    static float t = 0.0f; t += 0.016f;
+
+    // ====== 이동 입력 ======
+    float dx = 0, dy = 0, dz = 0;
+    if (GetInputManager().IsKeyDown('W')) dy += 1.0f;
+    if (GetInputManager().IsKeyDown('S')) dy -= 1.0f;
+    if (GetInputManager().IsKeyDown('D')) dx += 1.0f;
+    if (GetInputManager().IsKeyDown('A')) dx -= 1.0f;
+    if (GetInputManager().IsKeyDown('E')) dz += 1.0f;
+    if (GetInputManager().IsKeyDown('Q')) dz -= 1.0f;
+
+
     // 대각선 이동 속도 보정(선택): 벡터 정규화
     float len = sqrtf(dx * dx + dy * dy + dz * dz);
     if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
+
+    bool boost = GetInputManager().IsKeyDown(VK_SHIFT);
     camera.MoveLocal(dx, dy, dz, deltaTime, boost);
 
 
@@ -69,7 +59,10 @@ void SimpleApplication::Update(float deltaTime)
     // 3D objects would be rendered here
         // 구 그리기
     //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
-    sphere->SetPosition({ 0, 0.0f, 0.1f * t });
+     static float t = 0.0f; t += 0.016f;
+    sphere->SetPosition({ 0,  0.0f, 0.1f * t });
+    // 예: 초당 Yaw 30도 회전
+    /*sphere->AddRotationEulerDeg(30.0f * deltaTime, 0.0f , 0.0f);*/
 }
 
 void SimpleApplication::Render() 
@@ -156,6 +149,8 @@ void SimpleApplication::RenderGUI()
         0.0f                           // roll 고정
     };
 
+    // === 편집 UI ===
+    bool locEdited = false, rotEdited = false;
     // 나머지는 테이블로
     if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None)) {
         // Camera Location 행
@@ -163,8 +158,12 @@ void SimpleApplication::RenderGUI()
         for (int i = 0; i < 3; i++) {
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
-            ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
-                &cameraLocation[i], 0.0f, 0.0f, "%.3f");
+            // InputFloat가 true면 그 필드가 수정된 것
+            if (ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
+                &cameraLocation[i], 0.0f, 0.0f, "%.3f"))
+            {
+                locEdited = true;
+            }
         }
         ImGui::TableSetColumnIndex(3);
         ImGui::Text("Camera Location");
@@ -174,8 +173,11 @@ void SimpleApplication::RenderGUI()
         for (int i = 0; i < 3; i++) {
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
-            ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
-                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
+            if (ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
+                                   &cameraRotation[i], 0.0f, 0.0f, "%.3f"))
+            {
+                rotEdited = true;
+            }
         }
         ImGui::TableSetColumnIndex(3);
         ImGui::Text("Camera Rotation");
@@ -183,14 +185,17 @@ void SimpleApplication::RenderGUI()
         ImGui::EndTable();
     }
 
-    // === 변경사항을 카메라에 반영 ===
+    // // === 변경되었을 때만 카메라에 반영 ===
     // 위치
-    camera.SetPosition(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
-
-    // 회전 (roll은 무시)
-    float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
-    float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
-    camera.SetYawPitch(newYawRad, newPitchRad);
+    if (locEdited) {
+        camera.SetPosition(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+    }
+    if (rotEdited) {
+        // roll은 무시
+        float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
+        float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
+        camera.SetYawPitch(newYawRad, newPitchRad);
+    }
 
     ImGui::End();
 
@@ -245,7 +250,7 @@ bool SimpleApplication::OnInitialize()
 	height = 0.0f;
 	camera = UCamera();
     camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / height : 1.0f, 0.1f, 1000.0f);
-    camera.LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
+    camera.LookAt({ 0,-10,0}, { 0,1,0 }, { 0,0,1 });
     // Factory에서 공유 Mesh 생성
     UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh(GetRenderer());
 

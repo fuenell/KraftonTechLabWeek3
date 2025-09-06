@@ -12,7 +12,7 @@ struct FMatrix
     // ===== 생성/기본 =====
     FMatrix() { SetIdentity(); }
 
-	// 대각 행렬(모든 대각 원소가 동일한 값 v일 때는 스칼라 행렬)로 초기화 (대각선에 값, 나머지는 0)
+    // 대각 행렬(모든 대각 원소가 동일한 값 v일 때는 스칼라 행렬)로 초기화 (대각선에 값, 나머지는 0)
     FMatrix(float v) { for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) M[r][c] = (r == c) ? v : 0.0f; }
 
     static FMatrix IdentityMatrix() { FMatrix t; t.SetIdentity(); return t; }
@@ -157,8 +157,8 @@ struct FMatrix
         return true;
     }
     // 정규직교(orthonormal): 위 + 각 축 길이 1
-	// 사실 위의 IsOrthogonal 검사에서 이미 각 축 길이 1인지 확인하므로 동일하긴 하다.
-	// 벡터 집합에서는 직교와 정규 직교가 다르지만, 행렬에서는 직교 행렬이 곧 정규직교 행렬이다.
+    // 사실 위의 IsOrthogonal 검사에서 이미 각 축 길이 1인지 확인하므로 동일하긴 하다.
+    // 벡터 집합에서는 직교와 정규 직교가 다르지만, 행렬에서는 직교 행렬이 곧 정규직교 행렬이다.
     bool IsOrthonormal(float eps = 1e-4f) const { return IsOrthogonal(eps); }
 
     // 정규(normal) 행렬 (그래픽스 관례): 법선 변환용 N = (M^{-1})^T 의 상단 3x3
@@ -403,6 +403,7 @@ struct FMatrix
         P.M[3][2] = (zn * zf) / (zn - zf);
         return P;
     }
+
     static FMatrix PerspectiveFovLH(float fovY, float aspect, float zNear, float zFar) {
         float f = 1.0f / tanf(fovY * 0.5f);
         FMatrix P(0.0f);
@@ -465,11 +466,4 @@ struct FMatrix
         FMatrix T = TranslationRow(t.X, t.Y, t.Z);
         return S * R * T;                        // row 규약 핵심
     }
-    // 쿼터니언 용
-    //static FMatrix TRSRow(const FVector& t, const FQuaternion& q, const FVector& s) {
-    //    FMatrix S = FMatrix::Scale(s.X, s.Y, s.Z);
-    //    FMatrix R = q.ToMatrix();  // RH 회전행렬 블록 
-    //    FMatrix T = FMatrix::TranslationRow(t.X, t.Y, t.Z);
-    //    return S * R * T;
-    //}
 };
