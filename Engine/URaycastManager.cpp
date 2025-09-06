@@ -44,16 +44,14 @@ FVector URaycastManager::GetRaycastDirection()
     // assume the camera is 1.0f units of distance away from the screen
     float aspect = static_cast<float>(width) / static_cast<float>(height);
     FVector rayViewDir;
-    // rayViewDir.X = ndcX * tan(CameraFOV / 2.0f) * aspect;
-    // rayViewDir.Y = ndcY * tan(CameraFOV / 2.0f);
-    // rayViewDir.Z = 1.0f; // points forward in Camera space
-    rayViewDir.X = ndcY * tan(CameraFOV / 2.0f);
-    rayViewDir.Y = -1.0f;
-    rayViewDir.Z = ndcX * tan(CameraFOV / 2.0f) * aspect;
+    rayViewDir.X = ndcX * tan(CameraFOV / 2.0f) * aspect;
+    rayViewDir.Y = ndcY * tan(CameraFOV / 2.0f);
+    rayViewDir.Z = -1.0f; // points forward in Camera space
     rayViewDir.Normalize();
 
     // convert the camera-space ray direction to world direction
-    FMatrix V = Camera.GetView();
+    // FMatrix V = Camera.GetView();
+    FMatrix V = FMatrix::LookAtRH(Camera.GetLocation(), Camera.GetLocation() + Camera.GetForward(), Camera.GetUp());
     V = FMatrix::Inverse(V);
     FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
 
@@ -103,10 +101,10 @@ bool URaycastManager::RayIntersectsMesh(USphereComp& sphere, float& tHit)
 
     FMatrix worldTransform = sphere.GetWorldTransform();
 
-    // std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
-    // std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
-    // std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
-    // std::cout << "camera forward: " << Camera.GetForward().X << " " << Camera.GetForward().Y << " " << Camera.GetForward().Z << std::endl;
+    std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
+    std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
+    std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
+    std::cout << "camera forward: " << Camera.GetForward().X << " " << Camera.GetForward().Y << " " << Camera.GetForward().Z << std::endl;
 
     for (int i = 0; i < mesh.Vertices.size(); i += 3)
     {
