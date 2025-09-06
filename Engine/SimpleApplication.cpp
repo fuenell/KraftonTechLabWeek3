@@ -2,9 +2,10 @@
 #include "stdafx.h"
 #include "UApplication.h"
 #include "SimpleApplication.h"
-#include "UMeshFactory.h"
+#include "UMeshManager.h"
 #include "Camera.h"
 #include "ImguiConsole.h"
+#include "UScene.h"
 #include "URaycastManager.h"
 
 const float PI = 3.14159265358979323846f;
@@ -248,12 +249,18 @@ bool SimpleApplication::OnInitialize()
 	camera = UCamera();
     camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / (float)height : 1.0f, 0.1f, 1000.0f);
     camera.LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
-    // Factory에서 공유 Mesh 생성
-    UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh(GetRenderer());
+
+    // Manager에서 공유 Mesh 가져오기
+    UMeshManager& meshManager = GetMeshManager();
+    UMesh* sharedSphereMesh = meshManager.RetrieveMesh("Sphere");
+    UMesh* gridMesh = meshManager.RetrieveMesh("GizmoGrid");
+
+    // 메시가 제대로 로드되었는지 확인
+    if (!sharedSphereMesh || !gridMesh) {
+        return false; // 초기화 실패
+    }
+
     RaycastManager = new URaycastManager(GetRenderer(), camera);
-
-
-    UMesh* gridMesh = UMeshFactory::CreateGizmoGridMesh(GetRenderer());
 
     // Sphere 인스턴스 생성
     sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);

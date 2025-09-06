@@ -506,6 +506,9 @@ void URenderer::Draw(UINT vertexCount, UINT startVertexLocation)
 
 void URenderer::DrawMesh(UMesh* mesh)
 {
+	if (!mesh || !mesh->IsInitialized())
+		return;
+
 	UINT offset = 0;
 
 	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);

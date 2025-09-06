@@ -9,7 +9,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     SimpleApplication app;
 
     // Initialize engine systems
-    if (!app.Initialize(hInstance, L"Simple Engine", 1024, 1024))
+    if (!app.Initialize(hInstance, L"Simple Engine", 1600, 900))
     {
         MessageBox(nullptr, L"Failed to initialize application", L"Error", MB_OK | MB_ICONERROR);
         return -1;
