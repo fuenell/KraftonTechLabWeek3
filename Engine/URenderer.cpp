@@ -428,7 +428,7 @@ void URenderer::Prepare()
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
 	// Set viewport
-	deviceContext->RSSetViewports(1, &viewport);
+	deviceContext->RSSetViewports(1, &currentViewport);
 
 	// Clear render target and depth stencil
 	Clear();
@@ -705,7 +705,8 @@ bool URenderer::SetupViewport(int width, int height)
 	viewport.MaxDepth = 1.0f;
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
-
+	// 기본은 풀 윈도우
+	currentViewport = viewport;
 	return true;
 }
 
@@ -727,4 +728,22 @@ void URenderer::SetModel(const FMatrix& M)
 }
 
 
+D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int winW, int winH) const {
+	D3D11_VIEWPORT vp{};
+	vp.MinDepth = 0.0f; vp.MaxDepth = 1.0f;
 
+	float wa = (winH > 0) ? (float)winW / (float)winH : targetAspect;
+	if (wa > targetAspect) {
+		vp.Height = (float)winH;
+		vp.Width = vp.Height * targetAspect;
+		vp.TopLeftY = 0.0f;
+		vp.TopLeftX = 0.5f * (winW - vp.Width);
+	}
+	else {
+		vp.Width = (float)winW;
+		vp.Height = vp.Width / targetAspect;
+		vp.TopLeftX = 0.0f;
+		vp.TopLeftY = 0.5f * (winH - vp.Height);
+	}
+	return vp;
+}
