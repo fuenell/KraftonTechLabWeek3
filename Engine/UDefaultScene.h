@@ -5,9 +5,6 @@
 class UDefaultScene :
     public UScene
 {
-private:
-    USphereComp* sphere;
-    UGizmoGridComp* gizmoGrid;
 public:
     void Update(float deltaTime) override;
     bool OnInitialize() override;

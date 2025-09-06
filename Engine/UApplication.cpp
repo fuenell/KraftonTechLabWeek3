@@ -147,6 +147,8 @@ void UApplication::Update(float deltaTime)
 {
     // Base class update - can be overridden by derived classes
     // Update core engine systems here if needed
+
+    GetSceneManager().GetScene()->Update(deltaTime);
 }
 
 void UApplication::Render()
@@ -155,6 +157,9 @@ void UApplication::Render()
     // Derived classes should call this after their rendering
 
     // Render engine GUI
+
+
+    GetSceneManager().GetScene()->Render();
 }
 
 bool UApplication::CreateMainWindow(HINSTANCE hInstance)
@@ -307,6 +312,12 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
     
 
     return 0;
+}
+
+bool UApplication::OnInitialize()
+{
+    return GetSceneManager().GetScene()->OnInitialize();
+
 }
 
 UScene* UApplication::CreateDefaultScene() {

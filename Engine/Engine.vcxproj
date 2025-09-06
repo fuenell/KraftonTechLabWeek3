@@ -215,7 +215,7 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="UCamera.h" />
     <ClInclude Include="FVertexPosColor.h" />
     <ClInclude Include="GizmoVertices.h" />
     <ClInclude Include="ImguiConsole.h" />

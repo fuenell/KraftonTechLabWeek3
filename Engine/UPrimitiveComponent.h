@@ -10,10 +10,8 @@ class UMeshManager; // 전방 선언
 class UPrimitiveComponent : public USceneComponent
 {
 public:
-	UPrimitiveComponent(UMesh* inMesh = nullptr, FVector pos = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: USceneComponent(pos, rot, scl)
-		, mesh(inMesh)
-	{
+	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
+		: USceneComponent(loc, rot, scl), mesh(nullptr) {
 	}
 
 	bool bIsSelected = false;
@@ -22,8 +20,6 @@ public:
 	virtual void Draw(URenderer& renderer) = 0;
 	virtual bool OnCollision(UPrimitiveComponent* other, float restitution) = 0;
 	virtual void UpdateConstantBuffer(URenderer& renderer) = 0;
-	UPrimitiveComponent(FVector loc = {0,0,0}, FVector rot = {0,0,0}, FVector scl = {1,1,1})
-		: USceneComponent(loc, rot, scl), mesh(nullptr) {}
 	virtual ~UPrimitiveComponent() {}
 	
 	// 별도의 초기화 메서드

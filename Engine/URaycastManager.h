@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include <optional>
-#include "Camera.h"
+#include "UCamera.h"
 #include "UInputManager.h"
 #include "UPrimitiveComponent.h"
 #include "USphereComp.h"

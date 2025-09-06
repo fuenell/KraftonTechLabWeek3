@@ -21,7 +21,7 @@ bool UGizmoGridComp::OnCollision(UPrimitiveComponent* other, float restitution)
 void UGizmoGridComp::UpdateConstantBuffer(URenderer& renderer)
 {
     FMatrix M = FMatrix::TRSRow(RelativeLocation, FVector(0,0,0), RelativeScale3D);
-    renderer.SetModel(M);          // M,V,P를 통째로 상수버퍼에 업로드
+    renderer.SetModel(M, false);          // M,V,P를 통째로 상수버퍼에 업로드
 }
 
 void UGizmoGridComp::Draw(URenderer& renderer)
