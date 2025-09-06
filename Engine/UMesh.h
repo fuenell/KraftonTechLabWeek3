@@ -21,7 +21,8 @@ public:
 
 	~UMesh()
 	{
-		if (VertexBuffer) VertexBuffer->Release();
+		std::cout << "deleting mesh" << std::endl;
+		// if (VertexBuffer) VertexBuffer->Release();
 	}
 
 	void Init(ID3D11Device* device);

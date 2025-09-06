@@ -29,5 +29,5 @@ private:
     float MouseX, MouseY;
     FVector RayOrigin, RayDirection;
 
-    FVector TransformVertexToWorld(const FVertexPosColor& vertex, const FMatrix& world);
+    FVector TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world);
 };

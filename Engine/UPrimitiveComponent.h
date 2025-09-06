@@ -7,6 +7,8 @@
 class UPrimitiveComponent : public USceneComponent
 {
 public:
+	bool bIsSelected = false;
+	
 	virtual void UpdatePhysics(float t, bool bUsingGravity, float restitution) = 0;
 	virtual void Draw(URenderer& renderer) = 0;
 	virtual bool OnCollision(UPrimitiveComponent* other, float restitution) = 0;

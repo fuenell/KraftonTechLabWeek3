@@ -16,23 +16,13 @@ void URaycastManager::Update(UInputManager& input, USphereComp& primitive)
     float tHit;
     if (RayIntersectsMesh(primitive, tHit))
     {
-        std::cout << tHit;
+        primitive.bIsSelected = true;
+        std::cout << "IT'S HIT!!!!!!!!! here: " << tHit << std::endl;
     }
-    
-    // USphereComp* closestSphere = nullptr;
-    // float closestT = FLT_MAX;
-    //
-    // // Optional: do something with the hit sphere
-    // if (closestSphere)
-    // {
-    //     FVector hitPoint = RayOrigin + RayDirection * closestT;
-    //
-    //     std::cout << "Hit sphere at (" 
-    //       << hitPoint.X << ", " 
-    //       << hitPoint.Y << ", " 
-    //       << hitPoint.Z << ")" 
-    //       << std::endl;
-    // }
+    else
+    {
+        primitive.bIsSelected = false;
+    }
 }
 
 FVector URaycastManager::GetRaycastOrigin()
@@ -54,9 +44,12 @@ FVector URaycastManager::GetRaycastDirection()
     // assume the camera is 1.0f units of distance away from the screen
     float aspect = static_cast<float>(width) / static_cast<float>(height);
     FVector rayViewDir;
-    rayViewDir.X = ndcX * tan(CameraFOV / 2.0f) * aspect;
-    rayViewDir.Y = ndcY * tan(CameraFOV / 2.0f);
-    rayViewDir.Z = -1.0f; // points forward in Camera space
+    // rayViewDir.X = ndcX * tan(CameraFOV / 2.0f) * aspect;
+    // rayViewDir.Y = ndcY * tan(CameraFOV / 2.0f);
+    // rayViewDir.Z = 1.0f; // points forward in Camera space
+    rayViewDir.X = ndcY * tan(CameraFOV / 2.0f);
+    rayViewDir.Y = -1.0f;
+    rayViewDir.Z = ndcX * tan(CameraFOV / 2.0f) * aspect;
     rayViewDir.Normalize();
 
     // convert the camera-space ray direction to world direction
@@ -101,7 +94,7 @@ FVector URaycastManager::GetRaycastDirection()
 
 bool URaycastManager::RayIntersectsMesh(USphereComp& sphere, float& tHit)
 {
-    UMesh mesh = sphere.GetMesh();
+    UMesh& mesh = sphere.GetMesh();
     if (mesh.NumVertices < 3)
         return false;
     
@@ -110,38 +103,39 @@ bool URaycastManager::RayIntersectsMesh(USphereComp& sphere, float& tHit)
 
     FMatrix worldTransform = sphere.GetWorldTransform();
 
-    std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
-    std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
-    std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
+    // std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
+    // std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
+    // std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
+    // std::cout << "camera forward: " << Camera.GetForward().X << " " << Camera.GetForward().Y << " " << Camera.GetForward().Z << std::endl;
 
-    // for (int i = 0; i < mesh.CPUVertices.size(); i += 3)
-    // {
-    //     FVector triangleVertices[3] = {
-    //         TransformVertexToWorld(mesh.CPUVertices[i], worldTransform),
-    //         TransformVertexToWorld(mesh.CPUVertices[i + 1], worldTransform),
-    //         TransformVertexToWorld(mesh.CPUVertices[i + 2], worldTransform)
-    //     };
-    //
-    //     std::cout << "\nTriangle " << i / 3 << ":" << std::endl;
-    //     std::cout << "  v0: " << triangleVertices[0].X << " " << triangleVertices[0].Y << " " << triangleVertices[0].Z << std::endl;
-    //     std::cout << "  v1: " << triangleVertices[1].X << " " << triangleVertices[1].Y << " " << triangleVertices[1].Z << std::endl;
-    //     std::cout << "  v2: " << triangleVertices[2].X << " " << triangleVertices[2].Y << " " << triangleVertices[2].Z << std::endl;
-    //
-    //     auto result = RayIntersectsTriangle(triangleVertices);
-    //     if (result.has_value())
-    //     {
-    //         float t = (*result - RayOrigin).Length(); // distance along ray
-    //         if (t < closestT)
-    //         {
-    //             closestT = t;
-    //             hit = true;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         std::cout << "  --> No intersection with this triangle" << std::endl;
-    //     }
-    // }
+    for (int i = 0; i < mesh.Vertices.size(); i += 3)
+    {
+        FVector triangleVertices[3] = {
+            TransformVertexToWorld(mesh.Vertices[i], worldTransform),
+            TransformVertexToWorld(mesh.Vertices[i + 1], worldTransform),
+            TransformVertexToWorld(mesh.Vertices[i + 2], worldTransform)
+        };
+    
+        // std::cout << "\nTriangle " << i / 3 << ":" << std::endl;
+        // std::cout << "  v0: " << triangleVertices[0].X << " " << triangleVertices[0].Y << " " << triangleVertices[0].Z << std::endl;
+        // std::cout << "  v1: " << triangleVertices[1].X << " " << triangleVertices[1].Y << " " << triangleVertices[1].Z << std::endl;
+        // std::cout << "  v2: " << triangleVertices[2].X << " " << triangleVertices[2].Y << " " << triangleVertices[2].Z << std::endl;
+    
+        auto result = RayIntersectsTriangle(triangleVertices);
+        if (result.has_value())
+        {
+            float t = (*result - RayOrigin).Length(); // distance along ray
+            if (t < closestT)
+            {
+                closestT = t;
+                hit = true;
+            }
+        }
+        else
+        {
+            // std::cout << "  --> No intersection with this triangle" << std::endl;
+        }
+    }
 
     if (hit)
     {
@@ -189,9 +183,9 @@ std::optional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVe
         return {};
 }
 
-FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor& vertex, const FMatrix& world)
+FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world)
 {
-    FVector4 pos4(vertex.x, vertex.y, vertex.z, 1.0f);
+    FVector4 pos4(vertex.x, vertex.y, vertex.z, vertex.w);
     FVector4 worldPos4 = FMatrix::MultiplyVector(world, pos4);
     return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
 }

@@ -8,6 +8,8 @@ struct CBTransform
 {
     // HLSL의 row_major float4x4와 메모리 호환을 위해 float[16]로 보냄
     float MVP[16];
+    float IsSelected;
+    float padding[3];
 };
 
 class URenderer
@@ -123,7 +125,7 @@ private:
     }
 public:
     void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
-    void SetModel(const FMatrix& M);                      // M*VP → b0 업로드
+    void SetModel(const FMatrix& M, bool IsSelected);                      // M*VP → b0 업로드
     void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
     // targetAspect를 내부에서 사용 (카메라에 의존 X)
     D3D11_VIEWPORT MakeAspectFitViewport(int winW, int winH) const;
