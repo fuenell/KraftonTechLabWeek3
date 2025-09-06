@@ -2,8 +2,9 @@
 #include "URaycastManager.h"
 #include "Vector.h"
 #include "URenderer.h"
+#include "UScene.h"
 
-void URaycastManager::Update(UInputManager& input, USphereComp& primitive)
+void URaycastManager::Update(UInputManager& input)
 {
     if (!input.IsMouseButtonDown(0)) return;
     
@@ -14,29 +15,34 @@ void URaycastManager::Update(UInputManager& input, USphereComp& primitive)
     RayDirection = GetRaycastDirection();
 
     float tHit;
-    if (RayIntersectsMesh(primitive, tHit))
+    for (UObject* object : GUObjectArray)
     {
-        primitive.bIsSelected = true;
-        std::cout << "IT'S HIT!!!!!!!!! here: " << tHit << std::endl;
-    }
-    else
-    {
-        primitive.bIsSelected = false;
+        UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
+        if (!primitive) continue;
+        if (RayIntersectsMesh(*primitive, tHit))
+        {
+            primitive->bIsSelected = true;
+            std::cout << "IT'S HIT!!!!!!!!! here: " << tHit << std::endl;
+        }
+        else
+        {
+            primitive->bIsSelected = false;
+        }
     }
 }
 
 FVector URaycastManager::GetRaycastOrigin()
 {
-    return Camera.GetLocation();
+    return Camera->GetLocation();
 }
 
 FVector URaycastManager::GetRaycastDirection()
 {
-    float CameraFOV = Camera.GetFOV();
+    float CameraFOV = Camera->GetFOV();
 
     // convert the mouse coords to Normalized Device Coordinates (NDC)
     int width = 0, height = 0;
-    Renderer.GetBackBufferSize(width, height);
+    Renderer->GetBackBufferSize(width, height);
     float ndcX = (2.0f * MouseX) / static_cast<float>(width) - 1.0f;
     float ndcY = 1.0f - (2.0f * MouseY) / static_cast<float>(height);
 
@@ -51,7 +57,7 @@ FVector URaycastManager::GetRaycastDirection()
 
     // convert the camera-space ray direction to world direction
     // FMatrix V = Camera.GetView();
-    FMatrix V = FMatrix::LookAtRH(Camera.GetLocation(), Camera.GetLocation() + Camera.GetForward(), Camera.GetUp());
+    FMatrix V = FMatrix::LookAtRH(Camera->GetLocation(), Camera->GetLocation() + Camera->GetForward(), Camera->GetUp());
     V = FMatrix::Inverse(V);
     FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
 
@@ -59,59 +65,29 @@ FVector URaycastManager::GetRaycastDirection()
     return {rayDirection.X, rayDirection.Y, rayDirection.Z};
 }
 
-// bool RaycastManager::RayIntersectsSphere(FVector& rayOrigin, FVector& rayDirection, USphereComp& sphere, float& tHit)
-// {
-//     // R(t) = O + tD
-//     // where O = rayOrigin, D = rayDirection
-//     // C = intersection of circle
-//     
-//     // to check intersection:
-//     // || R(t) - C ||^2 = r^2
-//     // because || R(t) - C || is the distance from point to center. squared for easier calculations
-//     // || O + tD - C ||^2 = r^2
-//     // Let L = O - C
-//     // || L + tD ||^2 = r^2
-//     // (L + tD) . (L + tD) = r^2
-//     // t^2 (D . D) + 2(D . L)t + (L . L - r^2) = 0
-//     // note D . D = 1 because D is normalized
-//     // use the quadratic equation
-//     // t = - (D . L) +- sqrt((D . L)^2 - (L . L - r^2))
-//
-//     FVector L = rayOrigin - sphere.GetPosition();
-//     float b = L.Dot(rayDirection);
-//     float c = L.Dot(L) - sphere.GetRadius() * sphere.GetRadius();
-//
-//     float determinant = b * b - c;
-//     if (determinant < 0.0f) return false;
-//
-//     tHit = - b - sqrtf(determinant);
-//     // may be negative, which will be the intersection behind the ray origin.
-//     // doesn't matter for now
-//     return true;
-// }
-
-bool URaycastManager::RayIntersectsMesh(USphereComp& sphere, float& tHit)
+bool URaycastManager::RayIntersectsMesh(UPrimitiveComponent& primitive, float& tHit)
 {
-    UMesh& mesh = sphere.GetMesh();
-    if (mesh.NumVertices < 3)
+    UMesh* mesh = primitive.GetMesh();
+    if (!mesh) return false;
+    if (mesh->NumVertices < 3)
         return false;
     
     bool hit = false;
     float closestT = FLT_MAX;
 
-    FMatrix worldTransform = sphere.GetWorldTransform();
+    FMatrix worldTransform = primitive.GetWorldTransform();
 
-    std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
-    std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
-    std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
-    std::cout << "camera forward: " << Camera.GetForward().X << " " << Camera.GetForward().Y << " " << Camera.GetForward().Z << std::endl;
+    // std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
+    // std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
+    // std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
+    // std::cout << "camera forward: " << Camera->GetForward().X << " " << Camera->GetForward().Y << " " << Camera->GetForward().Z << std::endl;
 
-    for (int i = 0; i < mesh.Vertices.size(); i += 3)
+    for (int i = 0; i + 2 < mesh->NumVertices; i += 3)
     {
         FVector triangleVertices[3] = {
-            TransformVertexToWorld(mesh.Vertices[i], worldTransform),
-            TransformVertexToWorld(mesh.Vertices[i + 1], worldTransform),
-            TransformVertexToWorld(mesh.Vertices[i + 2], worldTransform)
+            TransformVertexToWorld(mesh->Vertices[i], worldTransform),
+            TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform),
+            TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform)
         };
     
         // std::cout << "\nTriangle " << i / 3 << ":" << std::endl;
@@ -187,3 +163,34 @@ FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, 
     FVector4 worldPos4 = FMatrix::MultiplyVector(world, pos4);
     return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
 }
+
+// bool RaycastManager::RayIntersectsSphere(FVector& rayOrigin, FVector& rayDirection, USphereComp& sphere, float& tHit)
+// {
+//     // R(t) = O + tD
+//     // where O = rayOrigin, D = rayDirection
+//     // C = intersection of circle
+//     
+//     // to check intersection:
+//     // || R(t) - C ||^2 = r^2
+//     // because || R(t) - C || is the distance from point to center. squared for easier calculations
+//     // || O + tD - C ||^2 = r^2
+//     // Let L = O - C
+//     // || L + tD ||^2 = r^2
+//     // (L + tD) . (L + tD) = r^2
+//     // t^2 (D . D) + 2(D . L)t + (L . L - r^2) = 0
+//     // note D . D = 1 because D is normalized
+//     // use the quadratic equation
+//     // t = - (D . L) +- sqrt((D . L)^2 - (L . L - r^2))
+//
+//     FVector L = rayOrigin - sphere.GetPosition();
+//     float b = L.Dot(rayDirection);
+//     float c = L.Dot(L) - sphere.GetRadius() * sphere.GetRadius();
+//
+//     float determinant = b * b - c;
+//     if (determinant < 0.0f) return false;
+//
+//     tHit = - b - sqrtf(determinant);
+//     // may be negative, which will be the intersection behind the ray origin.
+//     // doesn't matter for now
+//     return true;
+// }

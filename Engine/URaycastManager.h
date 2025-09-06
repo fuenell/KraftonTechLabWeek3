@@ -10,21 +10,21 @@
 class URaycastManager
 {
 public:
-    URaycastManager(URenderer& renderer, UCamera& camera)
+    URaycastManager(URenderer* renderer, UCamera* camera)
     : Renderer(renderer), Camera(camera) 
     {
     }
     
-    void Update(UInputManager& input, USphereComp& primitive); // parameter for testing
+    void Update(UInputManager& input); // parameter for testing
     FVector GetRaycastOrigin();
     FVector GetRaycastDirection();
 
-    bool RayIntersectsMesh(USphereComp& sphere, float& tHit);
+    bool RayIntersectsMesh(UPrimitiveComponent& primitive, float& tHit);
     std::optional<FVector>  RayIntersectsTriangle(FVector triangleVertices[3]);
     
 private:
-    URenderer& Renderer;
-    UCamera& Camera;
+    URenderer* Renderer;
+    UCamera* Camera;
 
     float MouseX, MouseY;
     FVector RayOrigin, RayDirection;
