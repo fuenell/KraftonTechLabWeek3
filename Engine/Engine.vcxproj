@@ -191,6 +191,12 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
+    <ClCompile Include="Matrix.cpp" />
+    <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="UDefaultScene.cpp" />
+    <ClCompile Include="UGizmoGridComp.cpp" />
+    <ClCompile Include="UPrimitiveComponent.cpp" />
+    <ClCompile Include="USceneManager.cpp" />
     <ClCompile Include="URaycastManager.cpp" />
     <ClCompile Include="SimpleApplication.cpp" />
     <ClCompile Include="UApplication.cpp" />
@@ -204,7 +210,6 @@
     <ClCompile Include="UTImeManager.cpp" />
     <ClCompile Include="UGUI.cpp" />
     <ClCompile Include="UInputManager.cpp" />
-    <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="URenderer.cpp" />
     <ClCompile Include="UTriangleComp.cpp" />
     <ClCompile Include="Vector4.h" />
@@ -227,6 +232,10 @@
     <ClInclude Include="ISerializable.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="UDefaultScene.h" />
+    <ClInclude Include="UGizmoGridComp.h" />
+    <ClInclude Include="USceneManager.h" />
     <ClInclude Include="URaycastManager.h" />
     <ClInclude Include="SimpleApplication.h" />
     <ClInclude Include="Sphere.h" />

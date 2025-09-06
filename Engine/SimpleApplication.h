@@ -19,6 +19,7 @@ private:
 public:
     SimpleApplication() = default;
     ~SimpleApplication() = default;
+    UScene* CreateDefaultScene() override;
 
 protected:
     void Update(float deltaTime) override;

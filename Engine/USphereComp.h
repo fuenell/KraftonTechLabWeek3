@@ -15,6 +15,7 @@ private:
 	{
 		USceneComponent* newInstance = new USphereComp();
 		newInstance->Deserialize(data);
+
 		return newInstance;
 	}
 
@@ -28,8 +29,8 @@ private:
 	}
 
 public:
-	USphereComp(UMesh* inMesh = nullptr, FVector pos = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: UPrimitiveComponent(inMesh, pos, rot, scl) // 부모 생성자 호출
+	USphereComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 })
+		:UPrimitiveComponent(pos, rot, scl)
 	{
 		RegisterToFactory();
 	}

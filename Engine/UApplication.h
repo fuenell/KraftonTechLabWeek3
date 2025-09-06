@@ -5,6 +5,7 @@
 #include "UGUI.h"
 #include "UTimeManager.h"
 #include "UMeshManager.h"
+#include "USceneManager.h"
 
 class UApplication
 {
@@ -16,6 +17,7 @@ private:
 	UGUI gui;
 	UTimeManager timeManager;
 	UMeshManager meshManager;
+	USceneManager sceneManager;
 
 	// Application state
 	bool bIsRunning;
@@ -50,6 +52,7 @@ public:
 	// System access
 	URenderer& GetRenderer() { return renderer; }
 	UMeshManager& GetMeshManager() { return meshManager; }
+	USceneManager& GetSceneManager() { return sceneManager; }
 	UInputManager& GetInputManager() { return inputManager; }
 	UGUI& GetGUI() { return gui; }
 	UTimeManager& GetTimeManager() { return timeManager; }
@@ -60,6 +63,7 @@ public:
 	// Application state
 	bool IsRunning() const { return bIsRunning; }
 	void RequestExit() { bIsRunning = false; }
+	virtual UScene* CreateDefaultScene();
 
 protected:
 	// Internal methods
