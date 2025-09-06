@@ -22,17 +22,20 @@ struct FVector4
         }
     }
 
-    // 동차좌표를 3D로 변환 (W로 나눔)
-    void Homogenize()
+    // 동차좌표 → 3D (안전한 동차화)
+    void Homogenize(float eps = 1e-6f)
     {
-        // 예외 처리 해야됨
-        //if (W == 0.f)
-           // throw std::runtime_error("Cannot homogenize with W = 0");
-
-        X /= W;
-        Y /= W;
-        Z /= W;
-        W = 1.f;
+        if (fabsf(W) < eps) {
+            // W≈0이면 투영 불능. 쓰임새에 따라 0으로 두거나 1로 보정.
+            // 여기선 안전 보정: 변화 없이 W만 1로 둠.
+            W = 1.0f;
+            return;
+        }
+        X /= W; Y /= W; Z /= W; W = 1.0f;
+    }
+    FVector ToVec3Homogenized(float eps = 1e-6f) const {
+        if (fabsf(W) < eps) return FVector(X, Y, Z); // 최선 보정
+        return FVector(X / W, Y / W, Z / W);
     }
 
     // 내적 (4차원)
