@@ -286,6 +286,7 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
                 g_pApplication->OnResize(width, height);
             }
         }
+        break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

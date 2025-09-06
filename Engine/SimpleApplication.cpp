@@ -18,7 +18,6 @@ void SimpleApplication::Update(float deltaTime)
     if (height > 0) {
         camera.SetAspect((float)width / (float)height);
     }
-    //Camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / (float)height : 1.0f, 0.1f, 100.0f);
     float dx = 0, dy = 0, dz = 0;
     bool boost = GetInputManager().IsKeyDown(VK_SHIFT); // Shift로 가속
     // Exit on ESC key

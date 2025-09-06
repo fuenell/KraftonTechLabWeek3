@@ -700,15 +700,14 @@ bool URenderer::CreateDepthStencilView(int width, int height)
 
 bool URenderer::SetupViewport(int width, int height)
 {
-	// 기본은 풀 윈도우
-	currentViewport = viewport;
 	viewport.Width = static_cast<FLOAT>(width);
 	viewport.Height = static_cast<FLOAT>(height);
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
-
+	// 기본은 풀 윈도우
+	currentViewport = viewport;
 	return true;
 }
 
