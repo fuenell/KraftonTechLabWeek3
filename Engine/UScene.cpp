@@ -44,6 +44,8 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
         }
     }
 
+    GizmoManager = new UGizmoManager(meshManager);
+
     return true;
 }
 
@@ -137,6 +139,8 @@ void UScene::Render()
             primitive->Draw(*renderer);
         }
     }
+
+    GizmoManager->Draw(*renderer);
 }
 
 void UScene::Update(float deltaTime)

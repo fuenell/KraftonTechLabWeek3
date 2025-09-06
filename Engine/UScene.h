@@ -4,6 +4,7 @@
 #include "UMeshManager.h"
 #include "USceneManager.h"
 #include "json.hpp"
+#include "UGizmoManager.h"
 
 class UCamera;
 class URaycastManager;
@@ -25,6 +26,7 @@ protected:
     //UScene owns camera
     UCamera* camera;
     URaycastManager* RaycastManager;
+    UGizmoManager* GizmoManager;
 
     virtual void RenderGUI() {}
     virtual void OnShutdown() {}

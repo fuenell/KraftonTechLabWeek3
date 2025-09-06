@@ -1,9 +1,7 @@
 ﻿#pragma once
 #include "UPrimitiveComponent.h"
 
-class FMesh;
-
-class UGizmoGridComp : public UPrimitiveComponent
+class UGizmoArrowComp : public UPrimitiveComponent
 {
 public:
 	using UPrimitiveComponent::UPrimitiveComponent;
@@ -14,5 +12,5 @@ public:
 	void UpdateConstantBuffer(URenderer& renderer) override;
 	void Draw(URenderer& renderer) override;
 
-	std::string GetType() const override { return "GizmoGrid"; }
+	std::string GetType() const override { return "GizmoArrow"; }
 };
