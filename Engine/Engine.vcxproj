@@ -194,7 +194,7 @@
     <ClCompile Include="UApplication.cpp" />
     <ClCompile Include="UEngineStatics.cpp" />
     <ClCompile Include="UMesh.cpp" />
-    <ClCompile Include="UMeshFactory.cpp" />
+    <ClCompile Include="UMeshManager.cpp" />
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
@@ -230,7 +230,7 @@
     <ClInclude Include="UApplication.h" />
     <ClInclude Include="UEngineStatics.h" />
     <ClInclude Include="UMesh.h" />
-    <ClInclude Include="UMeshFactory.h" />
+    <ClInclude Include="UMeshManager.h" />
     <ClInclude Include="UObject.h" />
     <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />

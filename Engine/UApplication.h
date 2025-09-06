@@ -4,6 +4,7 @@
 #include "UInputManager.h"
 #include "UGUI.h"
 #include "UTimeManager.h"
+#include "UMeshManager.h"
 
 class UApplication
 {
@@ -14,6 +15,7 @@ private:
 	UInputManager inputManager;
 	UGUI gui;
 	UTimeManager timeManager;
+	UMeshManager meshManager;
 
 	// Application state
 	bool bIsRunning;
@@ -47,6 +49,7 @@ public:
 
 	// System access
 	URenderer& GetRenderer() { return renderer; }
+	UMeshManager& GetMeshManager() { return meshManager; }
 	UInputManager& GetInputManager() { return inputManager; }
 	UGUI& GetGUI() { return gui; }
 	UTimeManager& GetTimeManager() { return timeManager; }

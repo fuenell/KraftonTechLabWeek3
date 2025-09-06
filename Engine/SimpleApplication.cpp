@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "UApplication.h"
 #include "SimpleApplication.h"
-#include "UMeshFactory.h"
+#include "UMeshManager.h"
 #include "Camera.h"
 #include "ImguiConsole.h"
 #include "UScene.h"
@@ -247,12 +247,16 @@ bool SimpleApplication::OnInitialize()
 	camera = UCamera();
     camera.SetPerspectiveDegrees(60.0f, (height > 0) ? (float)width / height : 1.0f, 0.1f, 1000.0f);
     camera.LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
-    // Factory에서 공유 Mesh 생성
-    UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh();
-    sharedSphereMesh->Initialize(GetRenderer().GetDevice());
 
+    // Manager에서 공유 Mesh 가져오기
+    UMeshManager& meshManager = GetMeshManager();
+    UMesh* sharedSphereMesh = meshManager.RetrieveMesh("Sphere");
+    UMesh* gridMesh = meshManager.RetrieveMesh("GizmoGrid");
 
-    UMesh* gridMesh = UMeshFactory::CreateGizmoGridMesh(GetRenderer());
+    // 메시가 제대로 로드되었는지 확인
+    if (!sharedSphereMesh || !gridMesh) {
+        return false; // 초기화 실패
+    }
 
     // Sphere 인스턴스 생성
     sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
