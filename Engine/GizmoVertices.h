@@ -1,10 +1,10 @@
 ﻿#pragma once
-#include "FVertexSimple.h"
+#include "FVertexPosColor.h"
 
 float gridSize = 10.0f; // 한쪽 방향으로의 격자 크기 (예: -10에서 +10까지)
 float halfSize = gridSize;
 
-FVertexSimpleOld gizmo_grid_vertices[] =
+FVertexPosColor gizmo_grid_vertices[] =
 {
 	// 세로 선 (Z축 방향)
 	{ -halfSize, 0.0f, -halfSize, 1, 1, 1, 1 }, { -halfSize, 0.0f,  halfSize, 1, 1, 1, 1 },
@@ -59,7 +59,7 @@ float cylHeight = 1;        // 원기둥 높이
 float coneHeight = 0.5;       // 원뿔 높이
 float coneRadius = 0.3;		// 원뿔 반지름
 
-FVertexSimpleOld gizmo_arrow_vertices[] =
+FVertexPosColor gizmo_arrow_vertices[] =
 {
 	// 원기둥 바닥 (총 8개 삼각형)
 	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },

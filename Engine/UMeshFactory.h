@@ -10,9 +10,9 @@ class UMeshFactory
 private:
 	// 공통 로직을 처리하는 내부 함수
 	template <size_t N>
-	static UMesh* CreateMeshInternal(ID3D11Device* device, const FVertexSimpleOld(&vertices)[N], D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+	static UMesh* CreateMeshInternal(ID3D11Device* device, const FVertexPosColor(&vertices)[N], D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
 	{
-		auto convertedVertices = FVertexSimple::ConvertVertexData(vertices, N);
+		auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices, N);
 		UMesh* mesh = new UMesh(device, convertedVertices, primitiveType);
 		return mesh;
 	}
