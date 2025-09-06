@@ -10,6 +10,18 @@ struct FVector4
     float W;
     FVector4(float _x = 0, float _y = 0, float _z = 0, float _w = 1) : X(_x), Y(_y), Z(_z), W(_w) {}
 
+    float& operator[](int index)
+    {
+        switch (index)
+        {
+        case 0: return X;
+        case 1: return Y;
+        case 2: return Z;
+        case 3: return W;
+        default: throw std::out_of_range("FVector4 index out of range");
+        }
+    }
+
     // 동차좌표를 3D로 변환 (W로 나눔)
     void Homogenize()
     {

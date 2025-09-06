@@ -99,8 +99,6 @@ public:
     bool CheckDeviceState();
     void GetBackBufferSize(int& width, int& height);
 
-
-
 private:
     // Internal helper functions
     bool CreateDeviceAndSwapChain(HWND windowHandle);

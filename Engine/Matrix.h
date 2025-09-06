@@ -26,6 +26,20 @@ struct FMatrix
                     R.M[r][c] += A.M[r][k] * B.M[k][c];
         return R;
     }
+    
+    static FVector4 MultiplyVector(FMatrix m, FVector4 v)
+    {
+        FVector4 R(0,0,0,0);
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                R[i] += m.M[i][j] * v[j];
+            }
+        }
+        return R;
+    }
+    
     FMatrix operator*(const FMatrix& B) const { return Multiply(*this, B); }
 
     static FMatrix Transpose(const FMatrix& A) {
