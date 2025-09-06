@@ -22,6 +22,15 @@ void SimpleApplication::Update(float deltaTime)
     {
         RequestExit();
     }
+    // --- 마우스룩: RMB 누른 동안 회전 ---
+    if (GetInputManager().IsMouseLooking()) {
+        // 마우스룩 모드는 WndProc에서 Begin/End로 관리
+        float mdx = 0.f, mdy = 0.f;
+        GetInputManager().ConsumeMouseDelta(mdx, mdy);
+
+        const float sens = 0.005f; // 일단 크게 해서 동작 확인
+        camera.AddYawPitch(mdx * sens, mdy * sens);
+    }
     if(GetInputManager().IsKeyDown('W'))
     {
         dy += 1.0f; // 전진
@@ -46,12 +55,11 @@ void SimpleApplication::Update(float deltaTime)
     {
         dz -= 1.0f; // 하
 	}
-    camera.MoveLocal(dx, dy, dz, deltaTime, boost);
     static float t = 0.0f; t += 0.016f;
     // 대각선 이동 속도 보정(선택): 벡터 정규화
     float len = sqrtf(dx * dx + dy * dy + dz * dz);
     if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
-   /* Camera.MoveLocal(dx, dy, dz, deltaTime, boost);*/
+    camera.MoveLocal(dx, dy, dz, deltaTime, boost);
 
 
     // Basic rendering - nothing for now
@@ -63,31 +71,6 @@ void SimpleApplication::Update(float deltaTime)
 
 void SimpleApplication::Render() 
 {
-//    int w = 0, h = 0; GetRenderer().GetBackBufferSize(w, h);
-//    float aspect = (h > 0) ? (float)w / (float)h : 1.0f;
-//
-//    // RH + row 규약 투영
-//    FMatrix P = FMatrix::PerspectiveFovRHRow((float)(PIDIV4 / 4.0), aspect, 0.1f, 100.0f);
-//
-//    // 카메라(궤도 이동 예시)
-//    FVector target(0.0f, 0.0f, 0.0f);
-//    //FVector up(0, 0, 1);                 // Z-up
-//    FVector eye(10.0f, 0.0f, 0.0f);
-//    // X축 방향 직선 이동
-//    //FVector eye(t, 0, 0.0f);
-//    // 타겟 = 현재 위치 + 바라보는 방향
-//    //FMatrix V = FMatrix::LookAtRHRow(eye, target, up);
-//
-//// 카메라 위치: X축으로 직선 이동
-//    //FVector eye(t, 0.0f, 0.0f);
-//
-//    // 시선 고정: -X 방향을 계속 본다 (RH, Z-up)
-//    FVector forward(0.0f, 0.0f, 0.0f);
-//
-//    // 타겟 = 현재 위치 + 고정된 바라보는 방향
-//    //FVector target = eye + forward;
-//    FVector up(0, 0, 1); // Z-up
-//    FMatrix V = FMatrix::LookAtRHRow(eye, target, up);
     GetRenderer().SetViewProj(camera.GetView(), camera.GetProj());
     sphere->Draw(GetRenderer());
 }

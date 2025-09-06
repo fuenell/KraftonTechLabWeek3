@@ -11,8 +11,16 @@ private:
     // Mouse states
     bool mouseButtons[3]; // Left, Right, Middle
     bool prevMouseButtons[3];
-    int mouseX, mouseY;
+    int mouseX = 0, mouseY = 0;
+    int prevMouseX, prevMouseY;
+    int mouseDeltaX, mouseDeltaY;
 
+    // Per-frame wheel delta (accumulate within a frame)
+    int wheelDelta;
+
+    bool initializedMouse = false;
+    bool mouseLook = false;
+    float accumDX = 0.0f, accumDY = 0.0f; // 프레임 누적 델타
 public:
     UInputManager();
     ~UInputManager();
@@ -37,6 +45,31 @@ public:
     // Utility
     void ResetStates();
 
+
+    void OnMouseMove(int x, int y) {
+        if (!initializedMouse) { prevMouseX = mouseX = x; prevMouseY = mouseY = y; initializedMouse = true; }
+        prevMouseX = mouseX; prevMouseY = mouseY;
+        mouseX = x; mouseY = y;
+        if (mouseLook) { accumDX += float(mouseX - prevMouseX); accumDY += float(mouseY - prevMouseY); }
+    }
+
+    // RMB 눌렀을 때 호출
+    void BeginMouseLook() {
+        mouseLook = true;
+        accumDX = accumDY = 0.0f; // 첫 프레임 점프 방지
+    }
+    // RMB 뗐을 때 호출
+    void EndMouseLook() {
+        mouseLook = false;
+        accumDX = accumDY = 0.0f;
+    }
+    bool IsMouseLooking() const { return mouseLook; }
+
+    // 한 프레임치 델타를 꺼내고 0으로 리셋
+    void ConsumeMouseDelta(float& dx, float& dy) {
+        dx = accumDX; dy = accumDY;
+        accumDX = accumDY = 0.0f;
+    }
 private:
     void HandleKeyDown(WPARAM wParam);
     void HandleKeyUp(WPARAM wParam);

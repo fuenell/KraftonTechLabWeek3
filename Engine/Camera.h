@@ -90,12 +90,24 @@ public:
     // 회전: yawZ는 세계 Z축 기준, pitch는 카메라 right축 기준 (라디안)
     void AddYawPitch(float yawZ, float pitch)
     {
+        // 1) Yaw: 세계 Z축 기준
         if (yawZ != 0.0f) {
             RotateAroundWorldZ(yawZ);
         }
+
+        // 2) Pitch: 카메라 Right축 기준 (누적 + 클램프)
         if (pitch != 0.0f) {
-            RotateAroundRight(pitch);
+            const float kMax = ToRad(89.0f);
+            float newPitch = mPitch + pitch;
+            if (newPitch > kMax) newPitch = kMax;
+            if (newPitch < -kMax) newPitch = -kMax;
+            float dp = newPitch - mPitch;   // 허용 범위 내 실제 적용치
+            if (fabsf(dp) > 1e-6f) {
+                RotateAroundRight(dp);
+                mPitch = newPitch;
+            }
         }
+
         Orthonormalize();
         RebuildView();
     }
@@ -121,6 +133,9 @@ private:
     // 행렬
     FMatrix mView;
     FMatrix mProj;
+	// ---- 회전 상태 ----
+    // UCamera private 멤버에 누적 피치 저장
+    float mPitch = 0.0f;  // 현재 누적 Pitch (라디안)
 
     // ---- 유틸 ----
     static inline float ToRad(float d) { return d * (float)(3.14159265358979323846 / 180.0); }
