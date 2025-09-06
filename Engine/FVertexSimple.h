@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <math.h>
+#include "Vector.h"
 
 struct FVertexSimpleOld
 {
@@ -41,6 +42,11 @@ struct FVertexSimple
 		}
 
 		return newVertices;
+	}
+
+	FVector GetPosition()
+	{
+		return {x, y, z};
 	}
 
 };

@@ -12,6 +12,8 @@ public:
 	virtual void UpdateConstantBuffer(URenderer& renderer) = 0;
 	virtual ~UPrimitiveComponent() {}
 
+	UMesh& GetMesh() { return *mesh; }
+
 protected:
 	UMesh* mesh;
 };
