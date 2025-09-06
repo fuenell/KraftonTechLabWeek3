@@ -63,9 +63,6 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>IMGUI</Filter>
     </ClCompile>
-    <ClCompile Include="UPrimitive.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="UInputManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -76,9 +73,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="UApplication.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="USphere.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="UMesh.cpp">
@@ -96,11 +90,26 @@
     <ClCompile Include="Math.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Globals.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="UEngineStatics.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="UObject.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="USceneComponent.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="USphereComp.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="UPrimitiveComponent.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FVertexSimple.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Sphere.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -134,9 +143,6 @@
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>IMGUI</Filter>
     </ClInclude>
-    <ClInclude Include="UPrimitive.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -155,9 +161,6 @@
     <ClInclude Include="SimpleApplication.h">
       <Filter>Application\헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="USphere.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="UMesh.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -174,6 +177,30 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ImguiConsole.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GizmoVertices.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UEngineStatics.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UObject.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="USceneComponent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="USphereComp.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="UPrimitiveComponent.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="FVertexPosColor.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
