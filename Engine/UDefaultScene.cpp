@@ -18,8 +18,6 @@ bool UDefaultScene::OnInitialize()
 
     AddObject(sphere);
 
-    GizmoManager->SetTarget(sphere);
-
     RaycastManager = new URaycastManager(GetRenderer(), GetCamera());
 
 	return true;
