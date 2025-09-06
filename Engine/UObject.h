@@ -1,10 +1,12 @@
-#pragma once
+﻿#pragma once
 #include "UEngineStatics.h"
 #include "Globals.h"
+#include "ISerializable.h"
+
 typedef int int32;
 typedef unsigned int uint32;
 
-class UObject
+class UObject : ISerializable
 {
 public:
     uint32 UUID;
@@ -35,5 +37,10 @@ public:
     {
         UEngineStatics::RemoveAllocation(size);
         ::operator delete(ptr);
+    }
+
+    json::JSON Serialize() const override
+    {
+        return json::JSON();
     }
 };

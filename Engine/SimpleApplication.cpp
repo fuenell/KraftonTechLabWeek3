@@ -5,6 +5,7 @@
 #include "UMeshFactory.h"
 #include "Camera.h"
 #include "ImguiConsole.h"
+#include "UScene.h"
 
 const float PI = 3.14159265358979323846f;
 const float PIDIV4 = PI / 4.0f;   // XM_PIDIV4 대체
@@ -69,7 +70,7 @@ void SimpleApplication::Update(float deltaTime)
     // 3D objects would be rendered here
         // 구 그리기
     //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
-    sphere->SetPosition({ 0, 0.0f, 0.1f * t });
+    //sphere->SetPosition({ 0, 0.0f, 0.1f * t });
 }
 
 void SimpleApplication::Render() 

@@ -189,6 +189,7 @@
     <ClCompile Include="UMesh.cpp" />
     <ClCompile Include="UMeshFactory.cpp" />
     <ClCompile Include="UObject.cpp" />
+    <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
     <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="UTImeManager.cpp" />
@@ -213,6 +214,8 @@
     <ClInclude Include="ImGui\imstb_rectpack.h" />
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="ISerializable.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="SimpleApplication.h" />
     <ClInclude Include="Sphere.h" />
@@ -222,6 +225,7 @@
     <ClInclude Include="UMesh.h" />
     <ClInclude Include="UMeshFactory.h" />
     <ClInclude Include="UObject.h" />
+    <ClInclude Include="UScene.h" />
     <ClInclude Include="USceneComponent.h" />
     <ClInclude Include="USphereComp.h" />
     <ClInclude Include="UTimeManager.h" />
