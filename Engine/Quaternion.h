@@ -125,6 +125,7 @@ struct FQuaternion
     // forward/up으로부터 LookRotation
     // forward, up은 정규화 안 되어 있어도 됨.
 // quaternion.h
+	// 카메라는 -Y가 forward 방향
     static FQuaternion LookRotation(const FVector& forward, const FVector& up)
     {
         FVector f = forward; f.Normalize();          // Forward(+Y)
@@ -135,9 +136,11 @@ struct FQuaternion
             upN = (fabsf(f.Z) < 0.9f) ? FVector(0, 0, 1) : FVector(1, 0, 0);
         }
 
-        // RH, Z-up: Right = f × up , Up = Right × f
-        FVector r = f.Cross(upN);  r.Normalize();
-        FVector u = r.Cross(f);    // 자동 직교
+        // RH, Z-up 규약:
+        // Right = up × forward, Up = forward × right
+        FVector r = f.Cross(upN);     // f × up  → r = -X (원하는 결과)
+        r.Normalize();
+        FVector u = r.Cross(f);       // RH에서 up 재구성
 
         // ⬇ 열 순서 [r, f, u]
         float m00 = r.X, m01 = f.X, m02 = u.X;
@@ -199,17 +202,12 @@ struct FQuaternion
     FVector Rotate(const FVector& v) const {
         FQuaternion qv(v.X, v.Y, v.Z, 0.0f);
         FQuaternion inv = Inverse();
-        //// tmp = q ⊗ v
-        //FQuaternion tmp = Hamilton(qv, *this);   // Hamilton(p,q)=q⊗p 이므로 (qv, q)
+        // tmp = q ⊗ v
+        FQuaternion tmp = Hamilton(qv, *this);   // Hamilton(p,q)=q⊗p 이므로 (qv, q)
 
-        //// r = (q ⊗ v) ⊗ q^{-1}
-        //FQuaternion r = Hamilton(inv, tmp);      // (tmp, inv) => tmp ⊗ inv
+        // r = (q ⊗ v) ⊗ q^{-1}
+        FQuaternion r = Hamilton(inv, tmp);      // (tmp, inv) => tmp ⊗ inv
 
-        // inv ⊗ v
-        FQuaternion tmp = Hamilton(qv, inv);   // Hamilton(p,q) = q ⊗ p
-
-        // (inv ⊗ v) ⊗ q
-        FQuaternion r = Hamilton(*this, tmp);  // => tmp ⊗ q
         return FVector(r.X, r.Y, r.Z);
     }
 
@@ -334,7 +332,7 @@ inline FMatrix MakeViewRow(const FVector& eye, const FQuaternion& q)
     FVector f = q.Rotate({0,1,0}).GetNormalized(); // Forward
     FVector u = q.Rotate({0,0,1}).GetNormalized(); // Up
 
-    FVector fb = FVector(-f.X, -f.Y, -f.Z);        // ★ 예전 코드의 f(뒤벡터)와 동일: fb = -Forward
+    FVector fb = -f;        // 카메라 forward(-Y)
 
     FMatrix V = FMatrix::IdentityMatrix();
 

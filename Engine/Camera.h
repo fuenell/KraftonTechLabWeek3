@@ -48,16 +48,14 @@ public:
     void LookAt(const FVector& eye, const FVector& target, const FVector& up = FVector(0, 0, 1))
     {
         mEye = eye;
-        // +Y forward 규약: 월드 forward = (target - eye)
         FVector f = (target - eye).GetNormalized();
-        if (f.Length() < 1e-6f) f = FVector(0, 1, 0); // 안전장치
+        if (f.Length() < 1e-6f) f = FVector(0, -1, 0); // 안전장치
 
         FQuaternion q = FQuaternion::LookRotation(f, up);
         if (bLockRoll) {
             // f 방향만 맞추고, 최종적으로 Up을 월드 Z와 일치시키는 간단 롤 보정
             // (필요 없으면 제거 가능)
-            FVector right = q.Rotate(FVector(1, 0, 0));
-            FVector fwd = q.Rotate(FVector(0, 1, 0));
+            FVector fwd = q.Rotate(FVector(0, 1, 0)); // 모델 +Y
             FVector up = FVector(0, 0, 1); // 강제 업
             // r,u,f를 다시 정규직교화
             FVector r = (fwd.Cross(up)).GetNormalized();
@@ -176,11 +174,12 @@ private:
     // ---- 유틸 ----
     static inline float ToRad(float d) { return d * (float)(PI / 180.0); }
 
-    // 쿼터니언 → 축 유도 (row 규약에서 로컬 축 정의: +X Right, +Y Forward, +Z Up)
+    // 쿼터니언 → 축 유도 (row 규약에서 로컬 축 정의: +X Right, -Y Forward, +Z Up)
+	// 카메라는 -Y가 forward 방향
     void RecalcAxesFromQuat() {
         mRight = mRot.Rotate(FVector(1, 0, 0)).GetNormalized();
-        mForward = mRot.Rotate(FVector(0, 1, 0)).GetNormalized();
         mUp = mRot.Rotate(FVector(0, 0, 1)).GetNormalized();
+        mForward = (mUp.Cross(mRight)).GetNormalized();
         // 특이치 보정(거의 평행 등)은 필요 시 여기서 수행
     }
 
