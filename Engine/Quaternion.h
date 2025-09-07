@@ -121,15 +121,64 @@ struct FQuaternion
         // 먼저 X, 그 다음 Y, 그 다음 Z → row 규약 합성
         return qx * qy * qz;
     }
+    // 카메라 전용: 로컬 -Y가 forward
+    static FQuaternion LookRotationCamera(const FVector& fCamW, const FVector& upW)
+    {
+        FVector fY = (fCamW).GetNormalized();
+        FVector uN = upW.GetNormalized();
 
-    // forward/up으로부터 LookRotation
-    // forward, up은 정규화 안 되어 있어도 됨.
-// quaternion.h
-	// 카메라는 -Y가 forward 방향
+        if (fabsf(fY.Dot(uN)) > 0.999f) {
+            uN = (fabsf(fY.Z) < 0.9f) ? FVector(0, 0, 1) : FVector(1, 0, 0);
+        }
+
+        // ★ 핵심: r = fY × up,  u = r × fY  (이 조합이 Right=-X, Up=+Z를 보장)
+        FVector r = (uN.Cross(fY)).GetNormalized();      // fY × up
+        FVector u = (fY.Cross(r)).GetNormalized();       // r × fY
+
+
+        // rows = [r; u; fY] 로부터 쿼터니언 역산 (네 기존 역산 코드 재사용)
+        // ★ rows = [r; u; f]  (row-vector 규약: 행이 축)
+        float m00 = r.X, m01 = r.Y, m02 = r.Z;
+        float m10 = u.X, m11 = u.Y, m12 = u.Z;
+        float m20 = fY.X, m21 = fY.Y, m22 = fY.Z;
+
+        float tr = m00 + m11 + m22;
+        FQuaternion q;
+        if (tr > 0.0f) {
+            float s = sqrtf(tr + 1.0f) * 2.0f;
+            q.W = 0.25f * s;
+            q.X = (m21 - m12) / s;
+            q.Y = (m02 - m20) / s;
+            q.Z = (m10 - m01) / s;
+        }
+        else if (m00 > m11 && m00 > m22) {
+            float s = sqrtf(1.0f + m00 - m11 - m22) * 2.0f;
+            q.W = (m21 - m12) / s;
+            q.X = 0.25f * s;
+            q.Y = (m01 + m10) / s;
+            q.Z = (m02 + m20) / s;
+        }
+        else if (m11 > m22) {
+            float s = sqrtf(1.0f + m11 - m00 - m22) * 2.0f;
+            q.W = (m02 - m20) / s;
+            q.X = (m01 + m10) / s;
+            q.Y = 0.25f * s;
+            q.Z = (m12 + m21) / s;
+        }
+        else {
+            float s = sqrtf(1.0f + m22 - m00 - m11) * 2.0f;
+            q.W = (m10 - m01) / s;
+            q.X = (m02 + m20) / s;
+            q.Y = (m12 + m21) / s;
+            q.Z = 0.25f * s;
+        }
+        return q.Normalized();
+    }
+	// 카메라 전용 LookRotation
     static FQuaternion LookRotation(const FVector& forward, const FVector& up)
     {
-        FVector f = forward; f.Normalize();          // Forward(+Y)
-        FVector upN = up;     upN.Normalize();       // World Up(+Z)
+        FVector f = forward; f.Normalize();          
+        FVector upN = up;     upN.Normalize();       
 
         // f‖upN 방지
         if (fabsf(f.Dot(upN)) > 0.999f) {
@@ -138,14 +187,13 @@ struct FQuaternion
 
         // RH, Z-up 규약:
         // Right = up × forward, Up = forward × right
-        FVector r = f.Cross(upN);     // f × up  → r = -X (원하는 결과)
-        r.Normalize();
-        FVector u = r.Cross(f);       // RH에서 up 재구성
+        FVector r = upN.Cross(f); r.Normalize(); // ★ up × f
+        FVector u = f.Cross(r); u.Normalize();                  // ★ f × r
 
-        // ⬇ 열 순서 [r, f, u]
-        float m00 = r.X, m01 = f.X, m02 = u.X;
-        float m10 = r.Y, m11 = f.Y, m12 = u.Y;
-        float m20 = r.Z, m21 = f.Z, m22 = u.Z;
+        // ★ rows = [r; u; f]  (row-vector 규약: 행이 축)
+        float m00 = r.X, m01 = r.Y, m02 = r.Z;
+        float m10 = u.X, m11 = u.Y, m12 = u.Z;
+        float m20 = f.X, m21 = f.Y, m22 = f.Z;
 
         float tr = m00 + m11 + m22;
         FQuaternion q;
@@ -211,9 +259,7 @@ struct FQuaternion
         return FVector(r.X, r.Y, r.Z);
     }
 
-    // === 행벡터 규약 회전행렬 생성 ===
-    // v' = v * R
-    // quaternion.h
+    // === 행벡터 규약 회전행렬 (모델용): rows = [Right; Forward; Up]
     FMatrix ToMatrixRow() const {
         FQuaternion q = Normalized();
         float x = q.X, y = q.Y, z = q.Z, w = q.W;
@@ -223,57 +269,22 @@ struct FQuaternion
         float wx = w * x, wy = w * y, wz = w * z;
 
         FMatrix R = FMatrix::IdentityMatrix();
-        // row0 = Right (X)
-        R.M[0][0] = 1.0f - 2.0f * (yy + zz);
-        R.M[0][1] = 2.0f * (xy + wz);
-        R.M[0][2] = 2.0f * (xz - wy);
-        R.M[0][3] = 0.0f;
-
-        // row1 = Up (Z)  ← Z-up이므로 표준 행렬의 row2를 여기로
-        R.M[1][0] = 2.0f * (xz + wy);
-        R.M[1][1] = 2.0f * (yz - wx);
-        R.M[1][2] = 1.0f - 2.0f * (xx + yy);
-        R.M[1][3] = 0.0f;
-
-        // row2 = Forward (Y)  ← 표준 행렬의 row1을 여기로
-        R.M[2][0] = 2.0f * (xy - wz);
-        R.M[2][1] = 1.0f - 2.0f * (xx + zz);
-        R.M[2][2] = 2.0f * (yz + wx);
-        R.M[2][3] = 0.0f;
-
-        return R;
-    }
-    FMatrix ToMatrixRowForModel() const {
-        FQuaternion q = Normalized();
-        float x = q.X, y = q.Y, z = q.Z, w = q.W;
-
-        float xx = x * x, yy = y * y, zz = z * z;
-        float xy = x * y, xz = x * z, yz = y * z;
-        float wx = w * x, wy = w * y, wz = w * z;
-
-        FMatrix R = FMatrix::IdentityMatrix();
 
         // row0 = Right (X)
         R.M[0][0] = 1.0f - 2.0f * (yy + zz);
         R.M[0][1] = 2.0f * (xy + wz);
         R.M[0][2] = 2.0f * (xz - wy);
-        R.M[0][3] = 0.0f;
 
         // row1 = Forward (Y)
         R.M[1][0] = 2.0f * (xy - wz);
         R.M[1][1] = 1.0f - 2.0f * (xx + zz);
         R.M[1][2] = 2.0f * (yz + wx);
-        R.M[1][3] = 0.0f;
 
         // row2 = Up (Z)
         R.M[2][0] = 2.0f * (xz + wy);
         R.M[2][1] = 2.0f * (yz - wx);
         R.M[2][2] = 1.0f - 2.0f * (xx + yy);
-        R.M[2][3] = 0.0f;
 
-        // row3
-        R.M[3][0] = R.M[3][1] = R.M[3][2] = 0.0f;
-        R.M[3][3] = 1.0f;
         return R;
     }
 
@@ -328,26 +339,42 @@ inline FMatrix MakeViewRow(const FVector& eye, const FQuaternion& q)
     //FMatrix Tinv = FMatrix::TranslationRow(-eye.X, -eye.Y, -eye.Z);
     //return Tinv * Rt;
     // 로컬 기준축(+X Right, +Y Forward, +Z Up)을 회전해서 월드축으로
-    FVector r = q.Rotate({1,0,0}).GetNormalized(); // Right
-    FVector f = q.Rotate({0,1,0}).GetNormalized(); // Forward
-    FVector u = q.Rotate({0,0,1}).GetNormalized(); // Up
+    //FVector r = q.Rotate({1,0,0}).GetNormalized(); // Right
+    //FVector f = q.Rotate({0,1,0}).GetNormalized(); // Forward
+    //FVector u = q.Rotate({0,0,1}).GetNormalized(); // Up
 
-    FVector fb = -f;        // 카메라 forward(-Y)
+    //f = -f;        // 카메라 forward(-Y)
+
+    //FMatrix V = FMatrix::IdentityMatrix();
+
+    //// === 회전부 (예전 LookAt과 정확히 동일한 배치) ===
+    //// row0 = s(=Right), row1 = u(=Up), row2 = f(=backward = -Forward)
+    //V.M[0][0] = r.X;  V.M[0][1] = r.Y;  V.M[0][2] = r.Z;  V.M[0][3] = 0.0f;
+    //V.M[1][0] = u.X;  V.M[1][1] = u.Y;  V.M[1][2] = u.Z;  V.M[1][3] = 0.0f;
+    //V.M[2][0] = f.X; V.M[2][1] = f.Y; V.M[2][2] = f.Z; V.M[2][3] = 0.0f;
+
+    //// === 번역부 (예전 LookAt과 동일 수식) ===
+    //V.M[3][0] = -(eye.X * r.X + eye.Y * r.Y + eye.Z * r.Z);
+    //V.M[3][1] = -(eye.X * u.X + eye.Y * u.Y + eye.Z * u.Z);
+    //V.M[3][2] = -(eye.X * f.X + eye.Y * f.Y + eye.Z * f.Z);
+    //V.M[3][3] = 1.0f;
+
+    //return V;
+    FVector f = q.Rotate({ 0,1,0 }).GetNormalized(); // Forward(-Y)
+    FVector u_tmp = q.Rotate({ 0, 0, 1 }).GetNormalized(); // 임시 Up
+    FVector r = (u_tmp.Cross(f)).GetNormalized();    // Right = Up × Forward
+    FVector u = (f.Cross(r)).GetNormalized();        // Up = Forward × Right
 
     FMatrix V = FMatrix::IdentityMatrix();
-
-    // === 회전부 (예전 LookAt과 정확히 동일한 배치) ===
-    // row0 = s(=Right), row1 = u(=Up), row2 = f(=backward = -Forward)
+    // rows = [Right; Up; Forward]  (row-vector 규약)
     V.M[0][0] = r.X;  V.M[0][1] = r.Y;  V.M[0][2] = r.Z;  V.M[0][3] = 0.0f;
     V.M[1][0] = u.X;  V.M[1][1] = u.Y;  V.M[1][2] = u.Z;  V.M[1][3] = 0.0f;
-    V.M[2][0] = fb.X; V.M[2][1] = fb.Y; V.M[2][2] = fb.Z; V.M[2][3] = 0.0f;
+    V.M[2][0] = f.X;  V.M[2][1] = f.Y;  V.M[2][2] = f.Z;  V.M[2][3] = 0.0f;
 
-    // === 번역부 (예전 LookAt과 동일 수식) ===
     V.M[3][0] = -(eye.X * r.X + eye.Y * r.Y + eye.Z * r.Z);
     V.M[3][1] = -(eye.X * u.X + eye.Y * u.Y + eye.Z * u.Z);
-    V.M[3][2] = -(eye.X * fb.X + eye.Y * fb.Y + eye.Z * fb.Z);
+    V.M[3][2] = -(eye.X * f.X + eye.Y * f.Y + eye.Z * f.Z);
     V.M[3][3] = 1.0f;
-
     return V;
 }
 
@@ -355,7 +382,7 @@ inline FMatrix MakeViewRow(const FVector& eye, const FQuaternion& q)
 inline FMatrix MakeModelRow(const FVector& pos, const FQuaternion& rot, const FVector& scl)
 {
     FMatrix S = FMatrix::Scale(scl.X, scl.Y, scl.Z);
-    FMatrix R = rot.ToMatrixRowForModel();
+    FMatrix R = rot.ToMatrixRow();
     FMatrix T = FMatrix::TranslationRow(pos.X, pos.Y, pos.Z);
     return S * R * T;
 }

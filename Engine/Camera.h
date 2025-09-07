@@ -22,8 +22,8 @@ public:
         , mOrthoHeight(10.0f)
         , bLockRoll(true)
     {
-        UpdateView();
-        UpdateProj();
+        //UpdateView();
+        //UpdateProj();
     }
     // ===== 투영 설정 =====
     void SetPerspective(float fovY, float aspect, float zn, float zf) {
@@ -49,19 +49,19 @@ public:
     {
         mEye = eye;
         FVector f = (target - eye).GetNormalized();
-        if (f.Length() < 1e-6f) f = FVector(0, -1, 0); // 안전장치
+        //if (f.Length() < 1e-6f) f = FVector(0, 1, 0); // 안전장치
 
-        FQuaternion q = FQuaternion::LookRotation(f, up);
+        // ★ 로컬 -Y가 forward이므로, +Y 가정의 LookRotation엔 -f를 넣는다.
+        FQuaternion q = FQuaternion::LookRotationCamera(f, up);
         if (bLockRoll) {
-            // f 방향만 맞추고, 최종적으로 Up을 월드 Z와 일치시키는 간단 롤 보정
-            // (필요 없으면 제거 가능)
-            FVector fwd = q.Rotate(FVector(0, 1, 0)); // 모델 +Y
+            // 로컬 -Y를 돌려 진짜 월드 forward를 얻는다
+            FVector fwd = q.Rotate(FVector(0, -1, 0)); // world forward
             FVector up = FVector(0, 0, 1); // 강제 업
-            // r,u,f를 다시 정규직교화
-            FVector r = (fwd.Cross(up)).GetNormalized();
-            FVector u = (r.Cross(fwd)).GetNormalized();
-            // r,u,f로 다시 쿼터니언 구성
-            q = FQuaternion::LookRotation(fwd, u);
+            // ★ 일관성 유지: r = up × fwd, u = fwd × r
+            FVector r = (up.Cross(fwd)).GetNormalized();
+            FVector u = (fwd.Cross(r)).GetNormalized();
+            // ★ LookRotation은 "+Y→forward" 가정이므로 -fwd를 넣어야 최종적으로 (-Y→fwd)가 성립
+            q = FQuaternion::LookRotationCamera(fwd, u);
         }
         mRot = q.Normalized();
         UpdateView();
@@ -122,7 +122,7 @@ public:
         outUp = GetUp();
     }
 
-    // GUI 표시/편집용: Yaw(세계 Z), Pitch(카메라 Right)
+    //// GUI 표시/편집용: Yaw(세계 Z), Pitch(카메라 Right)
     void GetYawPitch(float& yawZ, float& pitch) const {
         // forward로부터 구면좌표 (Z-up)
         FVector f = mForward;
@@ -132,24 +132,24 @@ public:
         if (yawZ > PI) yawZ -= 2.f * PI;
         if (yawZ < -PI) yawZ += 2.f * PI;
     }
-    void SetYawPitch(float yawZ, float pitch) {
-        const float kMax = ToRad(89.0f);
-        if (pitch > kMax) pitch = kMax;
-        if (pitch < -kMax) pitch = -kMax;
+    //void SetYawPitch(float yawZ, float pitch) {
+    //    const float kMax = ToRad(89.0f);
+    //    if (pitch > kMax) pitch = kMax;
+    //    if (pitch < -kMax) pitch = -kMax;
 
-        // 1) 절대 yaw: 세계 Z축 기준
-        FQuaternion qYaw = FQuaternion::FromAxisAngle(FVector(0, 0, 1), yawZ);
+    //    // 1) 절대 yaw: 세계 Z축 기준
+    //    FQuaternion qYaw = FQuaternion::FromAxisAngle(FVector(0, 0, 1), yawZ);
 
-        // 2) pitch: yaw 적용 후의 카메라 Right(로컬 X) 기준
-        FVector right = qYaw.Rotate(FVector(1, 0, 0)).GetNormalized();
-        FQuaternion qPitch = FQuaternion::FromAxisAngle(right, pitch);
+    //    // 2) pitch: yaw 적용 후의 카메라 Right(로컬 X) 기준
+    //    FVector right = qYaw.Rotate(FVector(1, 0, 0)).GetNormalized();
+    //    FQuaternion qPitch = FQuaternion::FromAxisAngle(right, pitch);
 
-        // 합성: 세계 yaw(왼쪽 곱) → 로컬 pitch(오른쪽 곱)
-        mRot = qYaw * qPitch;
+    //    // 합성: 세계 yaw(왼쪽 곱) → 로컬 pitch(오른쪽 곱)
+    //    mRot = qYaw * qPitch;
 
 
-        UpdateView();
-    }
+    //    UpdateView();
+    //}
 private:
     // ---- 내부 상태 ----
     FVector mEye;      // 월드 위치
@@ -174,13 +174,22 @@ private:
     // ---- 유틸 ----
     static inline float ToRad(float d) { return d * (float)(PI / 180.0); }
 
-    // 쿼터니언 → 축 유도 (row 규약에서 로컬 축 정의: +X Right, -Y Forward, +Z Up)
 	// 카메라는 -Y가 forward 방향
     void RecalcAxesFromQuat() {
-        mRight = mRot.Rotate(FVector(1, 0, 0)).GetNormalized();
+        mRight = mRot.Rotate(FVector(-1, 0, 0)).GetNormalized();     
+        mForward = mRot.Rotate(FVector(0, -1, 0)).GetNormalized();  // 로컬 -Y → 월드 Forward
         mUp = mRot.Rotate(FVector(0, 0, 1)).GetNormalized();
-        mForward = (mUp.Cross(mRight)).GetNormalized();
-        // 특이치 보정(거의 평행 등)은 필요 시 여기서 수행
+
+        //FVector f = mRot.Rotate(FVector(0, 1, 0)).GetNormalized(); // Forward(-Y)
+        //FVector u_tmp = mRot.Rotate(FVector(0, 0, 1)).GetNormalized(); // Up(+Z) (임시)
+
+        //// 2) 일관 규약으로 재직교: r = u × f, u = f × r
+        //FVector r = (u_tmp.Cross(f)).GetNormalized();  // Right
+        //FVector u = (f.Cross(r)).GetNormalized();      // Up (최종)
+
+        //mForward = f;
+        //mRight = r;
+        //mUp = u;
     }
 
     void UpdateView() {

@@ -60,7 +60,7 @@ void SimpleApplication::Update(float deltaTime)
         // 구 그리기
     //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
      static float t = 0.0f; t += 0.016f;
-    sphere->SetPosition({ 0.1f * t,0 ,   0.0f });
+    sphere->SetPosition({ 0.1f * t, 0,  0});
     // 예: 초당 Yaw 30도 회전
     /*sphere->AddRotationEulerDeg(30.0f * deltaTime, 0.0f , 0.0f);*/
 }
