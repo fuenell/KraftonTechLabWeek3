@@ -9,6 +9,7 @@ class EditorApplication : public UApplication
 {
 private:
 	UGizmoManager gizmoManager;
+	TArray<USceneComponent*> sceneComponents;
 public:
 	EditorApplication() = default;
 	~EditorApplication() = default;
