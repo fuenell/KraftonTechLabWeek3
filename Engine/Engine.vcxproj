@@ -215,7 +215,6 @@
     <ClCompile Include="UInputManager.cpp" />
     <ClCompile Include="URenderer.cpp" />
     <ClCompile Include="UTriangleComp.cpp" />
-    <ClCompile Include="Vector4.cpp" />
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
