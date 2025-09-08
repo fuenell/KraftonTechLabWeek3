@@ -89,11 +89,19 @@ void USphereComp::GetRotationEulerDeg(float& pitchDeg, float& yawDeg, float& rol
 // 증분
 void USphereComp::AddRotationEulerRad(float dp, float dy, float dr)
 {
-    // row-vector 합성 규약: 먼저 X, 그다음 Y, 그다음 Z 적용
-    Rotation = Rotation
-        * FQuaternion::FromAxisAngle(FVector(1, 0, 0), dp)
-        * FQuaternion::FromAxisAngle(FVector(0, 1, 0), dy)
-        * FQuaternion::FromAxisAngle(FVector(0, 0, 1), dr);
+    // 현재 로컬축을 "월드축"으로 뽑는다: ax = q·(+X), ay = q·(+Y), az = q·(+Z)
+    FVector ax = Rotation.Rotate(FVector(1, 0, 0)).GetNormalized();
+    FVector ay = Rotation.Rotate(FVector(0, 1, 0)).GetNormalized();
+    FVector az = Rotation.Rotate(FVector(0, 0, 1)).GetNormalized();
+
+    // 각 축 기준 +각도 회전 쿼터니언
+    FQuaternion qx = FQuaternion::FromAxisAngle(ax, dp);
+    FQuaternion qy = FQuaternion::FromAxisAngle(ay, dy);
+    FQuaternion qz = FQuaternion::FromAxisAngle(az, dr);
+
+    // ★ row-vector에서 "로컬 회전"은 왼쪽 곱으로 누적 (X → Y → Z 적용 순서)
+    FQuaternion dq = qz * qy * qx;
+    Rotation = (dq * Rotation).Normalized();
 }
 
 void USphereComp::AddRotationEulerDeg(float dpDeg, float dyDeg, float drDeg)

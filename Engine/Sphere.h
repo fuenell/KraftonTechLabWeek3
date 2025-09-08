@@ -5,7 +5,7 @@
 
 inline FVertexPosColor test[] = {
 	 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Top - Red
-	- 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Left - Green
+	-0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, // Left - Green
 	 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f  // Right - Blue
 };
 

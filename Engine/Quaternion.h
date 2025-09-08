@@ -58,13 +58,11 @@ struct FQuaternion
             q.W * p.W - q.X * p.X - q.Y * p.Y - q.Z * p.Z
         );
     }
-
     FQuaternion operator*(const FQuaternion& rhs) const {
         // row 규약 합성: 먼저 this, 그 다음 rhs
         // → 표준 해밀턴으로는 Hamilton(this, rhs)가 아니라 Hamilton(rhs, this)
         return Hamilton(rhs, *this);
     }
-
     // 스칼라 보간/SLERP
     // 계산 빠름 (성분끼리 그냥 선형 보간)
     // 근사적인 회전 → 두 회전 사이가 "대략적"으로 부드럽게 이어짐
@@ -182,7 +180,8 @@ struct FQuaternion
         return FVector(r.X, r.Y, r.Z);
     }
 
-    // === 행벡터 규약 회전행렬 (모델용): rows = [Right; Forward; Up]
+    // === COLUMNS are axes (row-vector) ===
+    // col0 = q·(+X) = Right
     FMatrix ToMatrixRow() const {
         FQuaternion q = Normalized();
         float x = q.X, y = q.Y, z = q.Z, w = q.W;
@@ -193,17 +192,18 @@ struct FQuaternion
 
         FMatrix R = FMatrix::IdentityMatrix();
 
-        // col0 = Right (X)
+        // === COLUMNS are axes (row-vector) ===
+        // col0 = q·(+X) = Right
         R.M[0][0] = 1.0f - 2.0f * (yy + zz);
         R.M[0][1] = 2.0f * (xy + wz);
         R.M[0][2] = 2.0f * (xz - wy);
 
-        // col1 = Forward (Y)
+        // col1 = q·(+Y)
         R.M[1][0] = 2.0f * (xy - wz);
         R.M[1][1] = 1.0f - 2.0f * (xx + zz);
         R.M[1][2] = 2.0f * (yz + wx);
 
-        // col2 = Up (Z)
+        // col2 = q·(+Z) = Up
         R.M[2][0] = 2.0f * (xz + wy);
         R.M[2][1] = 2.0f * (yz - wx);
         R.M[2][2] = 1.0f - 2.0f * (xx + yy);

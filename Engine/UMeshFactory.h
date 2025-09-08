@@ -32,6 +32,7 @@ public:
 
 	static UMesh* CreateGizmoGridMesh(URenderer& renderer)
 	{
+		FVertexPosColor::ChangeAxis(gizmo_grid_vertices, sizeof(gizmo_grid_vertices) / sizeof(FVertexPosColor), 1, 2);
 		return CreateMeshInternal(renderer.GetDevice(), gizmo_grid_vertices, D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	}
 };

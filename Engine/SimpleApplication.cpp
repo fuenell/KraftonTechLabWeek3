@@ -16,7 +16,6 @@ void SimpleApplication::Update(float deltaTime)
     if (height > 0) {
         camera.SetAspect((float)width / (float)height);
     }
-
     // Exit on ESC key
     if (GetInputManager().IsKeyDown(VK_ESCAPE))
     {
@@ -29,14 +28,13 @@ void SimpleApplication::Update(float deltaTime)
         GetInputManager().ConsumeMouseDelta(mdx, mdy);
 
         // 프레임 독립 감도: (기본감도 * deltaTime)
-        const float baseSens = 1.5f; // 취향껏
+        const float baseSens = 1.f; // 취향껏
         const float yawPerPx = baseSens * deltaTime;  // 좌우
         const float pitchPerPx = baseSens * deltaTime;  // 상하
 
         // Z-up + RH + row 에 맞춘 Yaw(세계 Z), Pitch(카메라 Right)
-        camera.AddYawPitch(mdx * yawPerPx, mdy * pitchPerPx);
+        camera.AddYawPitch(-mdx * yawPerPx, -mdy * pitchPerPx);
     }
-
     // ====== 이동 입력 ======
     float dx = 0, dy = 0, dz = 0;
     if (GetInputManager().IsKeyDown('W')) dy += 1.0f;
@@ -46,23 +44,17 @@ void SimpleApplication::Update(float deltaTime)
     if (GetInputManager().IsKeyDown('E')) dz += 1.0f;
     if (GetInputManager().IsKeyDown('Q')) dz -= 1.0f;
 
-
     // 대각선 이동 속도 보정(선택): 벡터 정규화
     float len = sqrtf(dx * dx + dy * dy + dz * dz);
     if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
-
     bool boost = GetInputManager().IsKeyDown(VK_SHIFT);
     camera.MoveLocal(dx, dy, dz, deltaTime, boost);
 
-
-    // Basic rendering - nothing for now
-    // 3D objects would be rendered here
-        // 구 그리기
-    //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
      static float t = 0.0f; t += 0.016f;
-    sphere->SetPosition({ 0.1f * t, 0, 0 });
+    sphere->SetPosition({ 0,  0.5f * t ,0 });
     // 예: 초당 Yaw 30도 회전
-    /*sphere->AddRotationEulerDeg(30.0f * deltaTime, 0.0f , 0.0f);*/
+    sphere->AddRotationEulerDeg(-30.0f * deltaTime, 0.0f,  0.0f );
+	//sphere2->AddRotationEulerDeg(45.0f * deltaTime, 0.0f , 0.0f);
 }
 
 void SimpleApplication::Render() 
@@ -202,28 +194,21 @@ void SimpleApplication::RenderGUI()
         camera.GetBasis(r, f, u);
 
         ImGui::Separator();
-        ImGui::Text("Camera Axes (local-space)");
-        if (ImGui::BeginTable("CamAxes", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-            ImGui::TableSetupColumn("Axis");
-            ImGui::TableSetupColumn("X");
-            ImGui::TableSetupColumn("Y");
-            ImGui::TableSetupColumn("Z");
-            ImGui::TableHeadersRow();
+        ImGui::Text("Camera Axes (row-vector, +Y = Forward)");
 
-            auto Row = [&](const char* name, const FVector& v) {
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(name);
-                ImGui::TableSetColumnIndex(1); ImGui::Text("%.3f", v.X);
-                ImGui::TableSetColumnIndex(2); ImGui::Text("%.3f", v.Y);
-                ImGui::TableSetColumnIndex(3); ImGui::Text("%.3f", v.Z);
-                };
+        FVector R = camera.GetRight();
+        FVector F = camera.GetForward();
+        FVector U = camera.GetUp();
 
-            Row("Right  (+X)", r);
-            Row("Forward(+Y)", f);
-            Row("Up     (+Z)", u);
+        ImGui::Text("Right   R = (%.3f, %.3f, %.3f)", R.X, R.Y, R.Z);
+        ImGui::Text("Forward F = (%.3f, %.3f, %.3f)", F.X, F.Y, F.Z);
+        ImGui::Text("Up      U = (%.3f, %.3f, %.3f)", U.X, U.Y, U.Z);
 
-            ImGui::EndTable();
-        }
+        // 쿼터니언 표기 (W,X,Y,Z)
+        FQuaternion q = camera.GetRotation(); // 네가 만든 getter
+        ImGui::Separator();
+        ImGui::Text("Rotation Quaternion q = [ x: %.6f, y: %.6f, z: %.6f, w: %.6f ]",
+             q.X, q.Y, q.Z, q.W);
     }
 
     ImGui::End();
@@ -274,25 +259,19 @@ void SimpleApplication::RenderGUI()
 
 bool SimpleApplication::OnInitialize()
 {
-    // 리사이즈/초기화
+    // 초기화
     width = 0.0f;
 	height = 0.0f;
 	camera = UCamera();
     camera.LookAt({ 10, 0 , 0 }, { 0,0,0 }, { 0,0,1 });
     // Factory에서 공유 Mesh 생성
     UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh(GetRenderer());
-
-
     UMesh* gridMesh = UMeshFactory::CreateGizmoGridMesh(GetRenderer());
-
     // Sphere 인스턴스 생성
-    sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
-    sphere2 = new USphereComp({ 0.3f, 0.3f, 0.3f }, { 0.2f, 0.2f, 0.2f }, gridMesh);
-
+    sphere = new USphereComp({ 0.3f, 0.3f, 0.3f }, { 0.5f, 0.5f, 0.5f }, sharedSphereMesh);
+    sphere2 = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.2f, 0.2f, 0.2f }, gridMesh);
     return true;
 }
-
-
 void SimpleApplication::OnResize(int width, int height) {
     camera.SetPerspectiveDegrees(
         camera.GetFovYDegrees(),
