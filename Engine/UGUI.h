@@ -5,7 +5,7 @@
 // Forward declaration
 class UTimeManager;
 
-class UGUI : UEngineSubsystem
+class UGUI : public UEngineSubsystem
 {
 private:
     bool bInitialized;

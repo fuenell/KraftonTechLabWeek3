@@ -21,6 +21,7 @@
 #include <cmath>
 #include <optional>
 #include <filesystem>
+#include <climits>
 
 // DirectX 관련
 #include <d3d11.h>

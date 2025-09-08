@@ -85,4 +85,9 @@ public:
     {
         return true;
     }
+
+    void SetUUID(uint32 uuid)
+    {
+        UUID = uuid;
+    }
 };

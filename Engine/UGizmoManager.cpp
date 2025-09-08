@@ -35,16 +35,16 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 		return false;
 	}
 
-	arrowX->SetColor((1, 0, 0, 1));
-	arrowY->SetColor((0, 1, 0, 1));
-	arrowZ->SetColor((0, 0, 1, 1));
+	arrowX->SetColor({ 1, 0, 0, 1 });
+	arrowY->SetColor({ 0, 1, 0, 1 });
+	arrowZ->SetColor({ 0, 0, 1, 1 });
 
 	// --- 2. 이동 기즈모(화살표) 생성 ---
 	bool gridArrowSuccess = true;
 
-	arrowX->SetRotation({ 0.0f, 0.0f, 90.0f });
-	arrowY->SetRotation({ -90.0f, 0.0f, 0.0f });
-	arrowZ->SetRotation({ 0.0f, 90.0f, 0.0f });
+	arrowX->SetRotation({ 0.0f, 0.0f, -90.0f });
+	arrowY->SetRotation({ 0.0f, 90.0f, 0.0f });
+	arrowZ->SetRotation({ 90.0f, 0.0f, 0.0f });
 
 	transformGizmoPrimitives.push_back(arrowX);
 	transformGizmoPrimitives.push_back(arrowZ);

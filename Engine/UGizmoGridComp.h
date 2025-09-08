@@ -14,4 +14,9 @@ public:
 	using UGizmoComponent::UGizmoComponent;
 
 	std::string GetType() const override { return "GizmoGrid"; }
+	
+	json::JSON Serialize() const override
+	{
+		return json::JSON();
+	}
 };

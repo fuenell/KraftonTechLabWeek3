@@ -81,9 +81,6 @@
     <ClCompile Include="USphereComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Vector4.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Math.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -130,9 +127,6 @@
       <Filter>Runtime</Filter>
     </ClCompile>
     <ClCompile Include="UObject.cpp">
-      <Filter>Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Globals.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="UGUI.cpp">
@@ -199,9 +193,6 @@
     </ClInclude>
     <ClInclude Include="GizmoVertices.h">
       <Filter>Engine\Core\Mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="Globals.h">
-      <Filter>Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="ISerializable.h">
       <Filter>Engine\Core</Filter>
@@ -292,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="UEngineSubsystem.h">
       <Filter>Engine\Subsystem</Filter>
+    </ClInclude>
+    <ClInclude Include="TArray.h">
+      <Filter>Engine\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

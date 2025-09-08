@@ -46,6 +46,7 @@ public:
     static UScene* Create(json::JSON data);
 
     void AddObject(USceneComponent* obj);
+    void SetVersion(int v) { version = v; }
 
     json::JSON Serialize() const override;
 
