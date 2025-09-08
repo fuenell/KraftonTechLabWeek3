@@ -37,6 +37,8 @@ void EditorApplication::Update(float deltaTime)
         return;
     }
 
+    if (ImGui::GetIO().WantCaptureMouse) return;
+
     if (GetInputManager().IsMouseButtonPressed(0))
     {
         TArray<UPrimitiveComponent*> primitives;
