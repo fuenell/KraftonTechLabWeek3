@@ -22,14 +22,17 @@ void EditorApplication::Update(float deltaTime)
     UGizmoComponent* hitGizmo = nullptr;
     UPrimitiveComponent* hitPrimitive = nullptr;
 
-    if (bIsMouseButtonDown)
-    {
-        // 드래그 하고 있을때 
-    }
-
     if (GetInputManager().IsMouseButtonReleased(0))
     {
         bIsMouseButtonDown = false;
+        return;   
+    }
+    
+    if (bIsMouseButtonDown)
+    {
+        // 드래그 하고 있을때
+
+        return;
     }
     
     if (GetInputManager().IsMouseButtonPressed(0))
@@ -39,18 +42,20 @@ void EditorApplication::Update(float deltaTime)
         TArray<UPrimitiveComponent*> primitives;
         TArray<UGizmoComponent*> gizmos;
 
-        for (UGizmoComponent* gizmo : gizmoManager.GetRaycastableGizmos())
+        TArray<UGizmoComponent*>& g = gizmoManager.GetRaycastableGizmos();
+        if (g.size() > 0)
         {
-            std::cout << gizmo << std::endl;
-            gizmos.push_back(gizmo);
-            gizmo->bIsSelected = false;
+            for (UGizmoComponent* gizmo : g)
+            {
+                gizmos.push_back(gizmo);
+                gizmo->bIsSelected = false;
+            }   
         }
 
         for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
         {
             if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
             {
-                std::cout << primitive << std::endl;
                 if (primitive->GetMesh()) primitives.push_back(primitive);
                 primitive->bIsSelected = false;
             }
