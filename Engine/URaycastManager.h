@@ -29,7 +29,7 @@ public:
     void Update(UCamera* camera);
 
     // bool RayIntersectsMesh(UPrimitiveComponent& primitive, float& tHit);
-    bool RayIntersectsMesh(UCamera* camera, UMesh* mesh, const FMatrix& worldTransform, float& tHit);
+    bool RayIntersectsMeshes(UCamera* camera, TArray<UPrimitiveComponent*> primitives, UPrimitiveComponent*& hitPrimitive);
     std::optional<FVector>  RayIntersectsTriangle(FVector triangleVertices[3]);
     
 private:

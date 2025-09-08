@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "UPrimitiveComponent.h"
 #include "UGizmoComponent.h"
+#include "URaycastManager.h"
 
 class UMeshManager; // 전방 선언
 class URenderer;
@@ -17,7 +18,7 @@ public:
 	// 기즈모가 조작할 대상 객체를 설정합니다.
 	void SetTarget(UPrimitiveComponent* target);
 
-	//bool Raycast(URaycastManager* rayCastManager, UGizmoComponent& out);
+	bool Raycast(URaycastManager* rayCastManager, UGizmoComponent& out);
 
 	//// 매 프레임 호출되어 입력을 처리하고 기즈모의 상태를 갱신합니다.
 	//void Update(const InputManager& input, const Camera& camera, float deltaTime);

@@ -54,18 +54,18 @@ void UGizmoManager::SetTarget(UPrimitiveComponent* target)
 	targetObject = target;
 }
 
-//bool UGizmoManager::Raycast(URaycastManager* rayCastManager, UGizmoComponent& out)
-//{
-//	//for (UMesh* gizmoMesh : transformGizmoPrimitives)
-//	//{
-//	//	if (FMath::IntersectRayMesh(ray, gizmoMesh, m_ActiveGizmo->GetWorldTransform(), hitResult))
-//	//	{
-//	//		// Gizmo에 특화된 결과 처리
-//	//		return true;
-//	//	}
-//	//}
-//	return false;
-//}
+bool UGizmoManager::Raycast(URaycastManager* rayCastManager, UGizmoComponent& out)
+{
+	// for (UMesh* gizmoMesh : transformGizmoPrimitives)
+	// {
+	// 	if (FMath::IntersectRayMesh(ray, gizmoMesh, m_ActiveGizmo->GetWorldTransform(), hitResult))
+	// 	{
+	// 		// Gizmo에 특화된 결과 처리
+	// 		return true;
+	// 	}
+	// }
+	return false;
+}
 
 void UGizmoManager::Draw(URenderer& renderer)
 {
