@@ -225,7 +225,7 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 	resultRay.Origin = camera->GetLocation(); // 카메라의 월드 위치
 	resultRay.Direction = (worldPos - resultRay.Origin).GetNormalized();
 
-	UE_LOG("%f %f %f / %f %f %f", resultRay.Origin.X, resultRay.Origin.Y, resultRay.Origin.Z, resultRay.Direction.X, resultRay.Direction.Y, resultRay.Direction.Z);
+	//UE_LOG("%f %f %f / %f %f %f", resultRay.Origin.X, resultRay.Origin.Y, resultRay.Origin.Z, resultRay.Direction.X, resultRay.Direction.Y, resultRay.Direction.Z);
 
 	return resultRay;
 }
