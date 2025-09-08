@@ -4,30 +4,74 @@
 #include "URenderer.h"
 #include "UScene.h"
 
-void URaycastManager::Update(UInputManager& input)
+URaycastManager::URaycastManager()
+    : Renderer(nullptr),
+      Camera(nullptr),
+      InputManager(nullptr),
+      RayOrigin(FVector(0,0,0)),
+      RayDirection(FVector(0,0,0)),
+      MouseX(0),
+      MouseY(0)
 {
-    if (!input.IsMouseButtonDown(0)) return;
+}
+
+URaycastManager::URaycastManager(URenderer* renderer, UCamera* camera, UInputManager* inputManager)
+    : Renderer(renderer),
+      Camera(camera),
+      InputManager(inputManager),
+      RayOrigin(FVector(0,0,0)),
+      RayDirection(FVector(0,0,0)),
+      MouseX(0),
+      MouseY(0)
+{
+}
+
+URaycastManager::~URaycastManager()
+{
+    Renderer = nullptr;
+    Camera   = nullptr;
+    InputManager   = nullptr;
+}
+
+void URaycastManager::Update()
+{
+    if (!InputManager->IsMouseButtonDown(0)) return;
     
-    MouseX = static_cast<float>(input.GetMouseX());
-    MouseY = static_cast<float>(input.GetMouseY());
+    MouseX = static_cast<float>(InputManager->GetMouseX());
+    MouseY = static_cast<float>(InputManager->GetMouseY());
 
     RayOrigin = GetRaycastOrigin();
     RayDirection = GetRaycastDirection();
 
-    float tHit;
+    float closestHit = 1e30f; // start with "infinity"
+    UPrimitiveComponent* closestPrimitive = nullptr;
+    
     for (UObject* object : GUObjectArray)
     {
         UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
         if (!primitive) continue;
-        if (RayIntersectsMesh(*primitive, tHit))
+
+        float tHit = 0.0f;
+        if (RayIntersectsMesh(primitive->GetMesh(), primitive->GetWorldTransform(), tHit))
         {
-            primitive->bIsSelected = true;
-            std::cout << "IT'S HIT!!!!!!!!! here: " << tHit << std::endl;
+            if (tHit < closestHit)
+            {
+                closestHit = tHit;
+                closestPrimitive = primitive;
+            }
         }
-        else
-        {
-            primitive->bIsSelected = false;
-        }
+    }
+
+    for (UObject* object : GUObjectArray)
+    {
+        UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
+        if (primitive) primitive->bIsSelected = false;
+    }
+    
+    if (closestPrimitive)
+    {
+        closestPrimitive->bIsSelected = true;
+        std::cout << "Closest hit at distance: " << closestHit << std::endl;
     }
 }
 
@@ -65,17 +109,14 @@ FVector URaycastManager::GetRaycastDirection()
     return {rayDirection.X, rayDirection.Y, rayDirection.Z};
 }
 
-bool URaycastManager::RayIntersectsMesh(UPrimitiveComponent& primitive, float& tHit)
+bool URaycastManager::RayIntersectsMesh(UMesh* mesh, const FMatrix& worldTransform, float& tHit)
 {
-    UMesh* mesh = primitive.GetMesh();
     if (!mesh) return false;
     if (mesh->NumVertices < 3)
         return false;
     
     bool hit = false;
     float closestT = FLT_MAX;
-
-    FMatrix worldTransform = primitive.GetWorldTransform();
 
     // std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
     // std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
