@@ -188,3 +188,33 @@ FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, 
 //     // doesn't matter for now
 //     return true;
 // }
+
+// 현재 클릭한 마우스 위치와 카메라를 기준으로 ray 생성
+FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
+{
+    MouseX = static_cast<float>(InputManager->GetMouseX());
+    MouseY = static_cast<float>(InputManager->GetMouseY());
+
+    int viewportWidth = 0, viewportHeight = 0;
+    Renderer->GetBackBufferSize(viewportWidth, viewportHeight);
+
+    // 1단계: Screen -> NDC
+    FVector ndcPos;
+    ndcPos.X = (MouseX / viewportWidth) * 2.0f - 1.0f;
+    ndcPos.Y = 1.0f - (MouseY / viewportHeight) * 2.0f;
+    ndcPos.Z = 0.0f; // Near Plane
+
+    FMatrix invProjectionMatrix = FMatrix::Inverse(camera->GetProj());
+    FVector viewPos = invProjectionMatrix.TransformPointRow(ndcPos);
+
+    // 3단계: View -> World
+    FMatrix invViewMatrix = FMatrix::Inverse(camera->GetView());
+    FVector worldPos = invViewMatrix.TransformPointRow(viewPos);
+
+    // 4단계: 방향 벡터 계산
+    FRay resultRay;
+    resultRay.Origin = camera->GetPosition(); // 카메라의 월드 위치
+    resultRay.Direction = (worldPos - resultRay.Origin).GetNormalized();
+
+    return resultRay;
+}

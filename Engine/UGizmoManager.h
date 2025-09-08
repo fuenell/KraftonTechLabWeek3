@@ -7,6 +7,14 @@
 class UMeshManager; // 전방 선언
 class URenderer;
 
+enum class EAxis { None, X, Y, Z };
+
+struct FPlane
+{
+	FVector PointOnPlane;
+	FVector Normal;
+};
+
 class UGizmoManager : UEngineSubsystem
 {
 public:
@@ -29,10 +37,26 @@ public:
 
 	UPrimitiveComponent* GetTarget() { return targetObject; }
 	TArray<UGizmoComponent*>& GetRaycastableGizmos();
+	void BeginDrag(UCamera* camera, EAxis selectedAxis);
+	void UpdateDrag(const FRay& mouseRay);
+	void EndDrag();
+
+	//bool IsDragging() const { return m_bIsDragging; }
 
 private:
+	// 드래그 상태 변수
+	bool m_bIsDragging = false;
+	EAxis m_SelectedAxis = EAxis::None;
+
 	UMeshManager* MeshManager;
 	UPrimitiveComponent* targetObject = nullptr; // 현재 선택된 객체
+
+	// 드래그 계산을 위해 저장해두는 정보
+	FVector m_DragStartLocation;    // 드래그 시작 시 Target의 월드 위치
+	FPlane m_MovementPlane;         // 계산된 이동 평면
+
+	// 유틸리티 함수
+	FVector GetAxisVector(EAxis axis);
 
 	// 역할에 따라 프리미티브를 분리해서 저장합니다.
 	UGizmoComponent* gridPrimitive = nullptr;              // 월드 그리드

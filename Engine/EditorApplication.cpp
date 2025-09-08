@@ -7,8 +7,8 @@
 #include "UScene.h"
 #include "UDefaultScene.h"
 #include "URaycastManager.h"
+#include "UGizmoArrowComp.h"
 
-// Simple application that inherits from UApplication
 void EditorApplication::Update(float deltaTime)
 {
     // Basic update logic
@@ -24,21 +24,21 @@ void EditorApplication::Update(float deltaTime)
 
     if (GetInputManager().IsMouseButtonReleased(0))
     {
-        bIsMouseButtonDown = false;
-        return;   
-    }
-    
-    if (bIsMouseButtonDown)
-    {
-        // 드래그 하고 있을때
-
+        gizmoManager.EndDrag();
+        bIsGizmoDragging = false;
         return;
     }
-    
+
+    // 드래그 하고 있을때
+    if (bIsGizmoDragging)
+    {
+        FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
+        gizmoManager.UpdateDrag(ray);
+        return;
+    }
+
     if (GetInputManager().IsMouseButtonPressed(0))
     {
-        bIsMouseButtonDown = true;
-
         TArray<UPrimitiveComponent*> primitives;
         TArray<UGizmoComponent*> gizmos;
 
@@ -49,7 +49,7 @@ void EditorApplication::Update(float deltaTime)
             {
                 gizmos.push_back(gizmo);
                 gizmo->bIsSelected = false;
-            }   
+            }
         }
 
         for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
@@ -67,6 +67,9 @@ void EditorApplication::Update(float deltaTime)
             {
                 target->bIsSelected = true;
                 hitGizmo->bIsSelected = true;
+                UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo);
+                gizmoManager.BeginDrag(GetSceneManager().GetScene()->GetCamera(), arrow->Axis);
+                bIsGizmoDragging = true;
             }
         }
         else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive))
@@ -78,7 +81,6 @@ void EditorApplication::Update(float deltaTime)
         {
             gizmoManager.SetTarget(nullptr);
         }
-        // }
     }
 }
 

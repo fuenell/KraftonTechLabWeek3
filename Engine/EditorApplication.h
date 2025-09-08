@@ -11,7 +11,7 @@ private:
 	UGizmoManager gizmoManager;
 	TArray<USceneComponent*> sceneComponents;
 
-	bool bIsMouseButtonDown = false;
+	bool bIsGizmoDragging = false;
 	
 public:
 	EditorApplication() = default;
