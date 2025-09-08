@@ -8,15 +8,16 @@
 class SimpleApplication : public UApplication
 {
 private:
+	UGizmoManager gizmoManager;
 public:
-    SimpleApplication() = default;
-    ~SimpleApplication() = default;
-    UScene* CreateDefaultScene() override;
+	SimpleApplication() = default;
+	~SimpleApplication() = default;
+	UScene* CreateDefaultScene() override;
 
 protected:
-    void Update(float deltaTime) override;
-    void Render() override;
-    void RenderGUI() override;
-    bool OnInitialize() override;
-    void OnResize(int width, int height) override;
+	void Update(float deltaTime) override;
+	void Render() override;
+	void RenderGUI() override;
+	bool OnInitialize() override;
+	void OnResize(int width, int height) override;
 };

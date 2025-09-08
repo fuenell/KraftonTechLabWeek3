@@ -11,212 +11,246 @@
 // Simple application that inherits from UApplication
 void SimpleApplication::Update(float deltaTime)
 {
-    // Basic update logic
-    UApplication::Update(deltaTime);
+	// Basic update logic
+	UApplication::Update(deltaTime);
 
-    // Exit on ESC key
-    if (GetInputManager().IsKeyDown(VK_ESCAPE))
-    {
-        RequestExit();
-    }
+	gizmoManager.SetTarget(nullptr);
+	for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
+	{
+		// 일단 표준 RTTI 사용
+		if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+		{
+			if (primitive->bIsSelected)
+			{
+				gizmoManager.SetTarget(primitive);
+				break;
+			}
+		}
+	}
+
+	GetRaycastManager().Update(GetSceneManager().GetScene()->GetCamera());
+
+	// Exit on ESC key
+	if (GetInputManager().IsKeyDown(VK_ESCAPE))
+	{
+		RequestExit();
+	}
 }
 
-void SimpleApplication::Render() 
+void SimpleApplication::Render()
 {
-    UApplication::Render();
+	UApplication::Render();
+
+	gizmoManager.Draw(GetRenderer());
 }
 
 void SimpleApplication::RenderGUI()
 {
-    ImGui::Begin("Jungle Control Panel");
+	ImGui::Begin("Jungle Control Panel");
 
-    ImGui::Text("Hello Jungle World!");
+	ImGui::Text("Hello Jungle World!");
 
-    float frameRate = ImGui::GetIO().Framerate;
-    ImGui::Text("FPS %.0f (%.0f ms)", frameRate,1000.0f/frameRate);
+	float frameRate = ImGui::GetIO().Framerate;
+	ImGui::Text("FPS %.0f (%.0f ms)", frameRate, 1000.0f / frameRate);
 
-    ImGui::Separator();
+	ImGui::Separator();
 
-    static int currentItem = 0;
-    int value = GetSceneManager().GetScene()->GetObjectCount();
-    const char* choices[] = {
-        "a", "b"
-    };
-
-
-    ImGui::Combo("Primitive", &currentItem, choices, sizeof(choices) / sizeof(const char*));
-    ImGui::Button("Spawn");
-    ImGui::SameLine();
-
-    ImGui::BeginDisabled();
-    ImGui::SameLine();
-    ImGui::InputInt("Number of spawned primitives", &value, 0);
-    ImGui::EndDisabled();
-
-    ImGui::Separator();
-
-    static char sceneName[100] = "";
-    ImGui::InputText("Scene Name", sceneName, sizeof(sceneName));
-    ImGui::Button("New scene");
-    if (ImGui::Button("Save scene"))
-    {
-        std::filesystem::path _path("./data/");
-        std::filesystem::create_directory(_path);
-        GetSceneManager().SaveScene(_path.string() + std::string(sceneName));
-    }
-    if (ImGui::Button("Load scene"))
-    {
-        GetSceneManager().LoadScene("./data/" + std::string(sceneName));
-    }
-
-    ImGui::Separator();
-
-    UCamera* camera = GetSceneManager().GetScene()->GetCamera();
-
-    bool isOrthogonal = camera->IsOrtho();
-    ImGui::Checkbox("Orthogonal", &isOrthogonal);
-    if (isOrthogonal) {
-        // 원하는 직교 크기로 (예시: 월드 단위 10x10)
-        camera->SetOrtho(10.0f, 10.0f, camera->GetNearZ(), camera->GetFarZ(), /*leftHanded=*/false);
-    }
-    else {
-        camera->SetPerspectiveDegrees(camera->GetFovYDegrees(),
-            camera->GetAspect(), camera->GetNearZ(), camera->GetFarZ());
-    }
+	static int currentItem = 0;
+	int value = GetSceneManager().GetScene()->GetObjectCount();
+	const char* choices[] = {
+		"a", "b"
+	};
 
 
-    // === FOV (perspective일 때만 활성화) ===
-    float fovDeg = camera->GetFovYDegrees();
-    float tableWidth = ImGui::GetContentRegionAvail().x;
-    ImGui::SetNextItemWidth(tableWidth * 0.75f);
-    ImGui::BeginDisabled(isOrthogonal);
-    if (ImGui::InputFloat("##fov", &fovDeg, 0.0f, 0.0f, "%.3f")) {
-        camera->SetFovYDegrees(fovDeg); // proj 재빌드 내부에서 함
-    }
-    ImGui::EndDisabled();
-    ImGui::SameLine();
-    ImGui::Text("FOV");
+	ImGui::Combo("Primitive", &currentItem, choices, sizeof(choices) / sizeof(const char*));
+	ImGui::Button("Spawn");
+	ImGui::SameLine();
 
-    // === 위치 ===
-    FVector pos = camera->GetPosition();
-    float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
+	ImGui::BeginDisabled();
+	ImGui::SameLine();
+	ImGui::InputInt("Number of spawned primitives", &value, 0);
+	ImGui::EndDisabled();
 
-    // === 회전(Yaw, Pitch, Roll=0 표기) ===
-    float yawZ = 0.f, pitch = 0.f;
-    camera->GetYawPitch(yawZ, pitch);
-    float cameraRotation[3] = {
-        yawZ * 180.0f / 3.14159265f,   // deg
-        pitch * 180.0f / 3.14159265f,  // deg
-        0.0f                           // roll 고정
-    };
+	ImGui::Separator();
 
-    // 나머지는 테이블로
-    if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None)) {
-        // Camera Location 행
-        ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++) {
-            ImGui::TableSetColumnIndex(i);
-            ImGui::SetNextItemWidth(-1);
-            ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
-                &cameraLocation[i], 0.0f, 0.0f, "%.3f");
-        }
-        ImGui::TableSetColumnIndex(3);
-        ImGui::Text("Camera Location");
+	static char sceneName[100] = "";
+	ImGui::InputText("Scene Name", sceneName, sizeof(sceneName));
+	ImGui::Button("New scene");
+	if (ImGui::Button("Save scene"))
+	{
+		std::filesystem::path _path("./data/");
+		std::filesystem::create_directory(_path);
+		GetSceneManager().SaveScene(_path.string() + std::string(sceneName));
+	}
+	if (ImGui::Button("Load scene"))
+	{
+		GetSceneManager().LoadScene("./data/" + std::string(sceneName));
+	}
 
-        // Camera Rotation 행
-        ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++) {
-            ImGui::TableSetColumnIndex(i);
-            ImGui::SetNextItemWidth(-1);
-            ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
-                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
-        }
-        ImGui::TableSetColumnIndex(3);
-        ImGui::Text("Camera Rotation");
+	ImGui::Separator();
 
-        ImGui::EndTable();
-    }
+	UCamera* camera = GetSceneManager().GetScene()->GetCamera();
 
-    // === 변경사항을 카메라에 반영 ===
-    // 위치
-    camera->SetPosition(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+	bool isOrthogonal = camera->IsOrtho();
+	ImGui::Checkbox("Orthogonal", &isOrthogonal);
+	if (isOrthogonal)
+	{
+		// 원하는 직교 크기로 (예시: 월드 단위 10x10)
+		camera->SetOrtho(10.0f, 10.0f, camera->GetNearZ(), camera->GetFarZ(), /*leftHanded=*/false);
+	}
+	else
+	{
+		camera->SetPerspectiveDegrees(camera->GetFovYDegrees(),
+			camera->GetAspect(), camera->GetNearZ(), camera->GetFarZ());
+	}
 
-    // 회전 (roll은 무시)
-    float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
-    float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
-    camera->SetYawPitch(newYawRad, newPitchRad);
 
-    ImGui::End();
+	// === FOV (perspective일 때만 활성화) ===
+	float fovDeg = camera->GetFovYDegrees();
+	float tableWidth = ImGui::GetContentRegionAvail().x;
+	ImGui::SetNextItemWidth(tableWidth * 0.75f);
+	ImGui::BeginDisabled(isOrthogonal);
+	if (ImGui::InputFloat("##fov", &fovDeg, 0.0f, 0.0f, "%.3f"))
+	{
+		camera->SetFovYDegrees(fovDeg); // proj 재빌드 내부에서 함
+	}
+	ImGui::EndDisabled();
+	ImGui::SameLine();
+	ImGui::Text("FOV");
 
-    ImGui::Begin("Jungle Property Window");
+	// === 위치 ===
+	FVector pos = camera->GetPosition();
+	float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
 
-    // 나머지는 테이블로
-    if (ImGui::BeginTable("EditablePropertyTable", 4, ImGuiTableFlags_None)) {
-        ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++) {
-            ImGui::TableSetColumnIndex(i);
-            ImGui::SetNextItemWidth(-1);
-            ImGui::InputFloat(("##tra" + std::to_string(i)).c_str(),
-                &cameraLocation[i], 0.0f, 0.0f, "%.3f");
-        }
-        ImGui::TableSetColumnIndex(3);
-        ImGui::Text("Translation");
+	// === 회전(Yaw, Pitch, Roll=0 표기) ===
+	float yawZ = 0.f, pitch = 0.f;
+	camera->GetYawPitch(yawZ, pitch);
+	float cameraRotation[3] = {
+		yawZ * 180.0f / 3.14159265f,   // deg
+		pitch * 180.0f / 3.14159265f,  // deg
+		0.0f                           // roll 고정
+	};
 
-        ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++) {
-            ImGui::TableSetColumnIndex(i);
-            ImGui::SetNextItemWidth(-1);
-            ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
-                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
-        }
-        ImGui::TableSetColumnIndex(3);
-        ImGui::Text("Rotation");
+	// 나머지는 테이블로
+	if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None))
+	{
+		// Camera Location 행
+		ImGui::TableNextRow();
+		for (int i = 0; i < 3; i++)
+		{
+			ImGui::TableSetColumnIndex(i);
+			ImGui::SetNextItemWidth(-1);
+			ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
+				&cameraLocation[i], 0.0f, 0.0f, "%.3f");
+		}
+		ImGui::TableSetColumnIndex(3);
+		ImGui::Text("Camera Location");
 
-        ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++) {
-            ImGui::TableSetColumnIndex(i);
-            ImGui::SetNextItemWidth(-1);
-            ImGui::InputFloat(("##scl" + std::to_string(i)).c_str(),
-                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
-        }
-        ImGui::TableSetColumnIndex(3);
-        ImGui::Text("Scale");
+		// Camera Rotation 행
+		ImGui::TableNextRow();
+		for (int i = 0; i < 3; i++)
+		{
+			ImGui::TableSetColumnIndex(i);
+			ImGui::SetNextItemWidth(-1);
+			ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
+				&cameraRotation[i], 0.0f, 0.0f, "%.3f");
+		}
+		ImGui::TableSetColumnIndex(3);
+		ImGui::Text("Camera Rotation");
 
-        ImGui::EndTable();
-    }
+		ImGui::EndTable();
+	}
 
-    ImGui::End();
+	// === 변경사항을 카메라에 반영 ===
+	// 위치
+	camera->SetPosition(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
 
-    bool isConsoleOpen = false;
-    static ImguiConsole imguiConsole;
-    imguiConsole.Draw("Console", &isConsoleOpen);
+	// 회전 (roll은 무시)
+	float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
+	float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
+	camera->SetYawPitch(newYawRad, newPitchRad);
+
+	ImGui::End();
+
+	ImGui::Begin("Jungle Property Window");
+
+	// 나머지는 테이블로
+	if (ImGui::BeginTable("EditablePropertyTable", 4, ImGuiTableFlags_None))
+	{
+		ImGui::TableNextRow();
+		for (int i = 0; i < 3; i++)
+		{
+			ImGui::TableSetColumnIndex(i);
+			ImGui::SetNextItemWidth(-1);
+			ImGui::InputFloat(("##tra" + std::to_string(i)).c_str(),
+				&cameraLocation[i], 0.0f, 0.0f, "%.3f");
+		}
+		ImGui::TableSetColumnIndex(3);
+		ImGui::Text("Translation");
+
+		ImGui::TableNextRow();
+		for (int i = 0; i < 3; i++)
+		{
+			ImGui::TableSetColumnIndex(i);
+			ImGui::SetNextItemWidth(-1);
+			ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
+				&cameraRotation[i], 0.0f, 0.0f, "%.3f");
+		}
+		ImGui::TableSetColumnIndex(3);
+		ImGui::Text("Rotation");
+
+		ImGui::TableNextRow();
+		for (int i = 0; i < 3; i++)
+		{
+			ImGui::TableSetColumnIndex(i);
+			ImGui::SetNextItemWidth(-1);
+			ImGui::InputFloat(("##scl" + std::to_string(i)).c_str(),
+				&cameraRotation[i], 0.0f, 0.0f, "%.3f");
+		}
+		ImGui::TableSetColumnIndex(3);
+		ImGui::Text("Scale");
+
+		ImGui::EndTable();
+	}
+
+	ImGui::End();
+
+	bool isConsoleOpen = false;
+	static ImguiConsole imguiConsole;
+	imguiConsole.Draw("Console", &isConsoleOpen);
 }
 
 bool SimpleApplication::OnInitialize()
 {
-    UApplication::OnInitialize();
-    // 리사이즈/초기화
-    
+	UApplication::OnInitialize();
+	// 리사이즈/초기화
 
-    return true;
+	if (!gizmoManager.Initialize(&GetMeshManager()))
+	{
+		MessageBox(GetWindowHandle(), L"Failed to initialize gizmo manager", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
+	return true;
 }
 
 
-void SimpleApplication::OnResize(int width, int height) {
-    UScene* scene = GetSceneManager().GetScene();
-    if (scene == nullptr) return;
+void SimpleApplication::OnResize(int width, int height)
+{
+	UScene* scene = GetSceneManager().GetScene();
+	if (scene == nullptr) return;
 
-    UCamera* camera = scene->GetCamera();
-    if (camera == nullptr) return;
+	UCamera* camera = scene->GetCamera();
+	if (camera == nullptr) return;
 
-    camera->SetPerspectiveDegrees(
-        camera->GetFovYDegrees(),
-        (height > 0) ? (float)width / (float)height : 1.0f,
-        camera->GetNearZ(),
-        camera->GetFarZ());
+	camera->SetPerspectiveDegrees(
+		camera->GetFovYDegrees(),
+		(height > 0) ? (float)width / (float)height : 1.0f,
+		camera->GetNearZ(),
+		camera->GetFarZ());
 }
 
 UScene* SimpleApplication::CreateDefaultScene()
 {
-    return new UDefaultScene();
+	return new UDefaultScene();
 }

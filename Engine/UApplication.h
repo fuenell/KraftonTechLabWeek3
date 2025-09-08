@@ -21,7 +21,6 @@ private:
 	UMeshManager meshManager;
 	USceneManager sceneManager;
 	URaycastManager raycastManager;
-	UGizmoManager gizmoManager;
 
 	// Application state
 	bool bIsRunning;
@@ -60,6 +59,7 @@ public:
 	UInputManager& GetInputManager() { return inputManager; }
 	UGUI& GetGUI() { return gui; }
 	UTimeManager& GetTimeManager() { return timeManager; }
+	URaycastManager& GetRaycastManager() { return raycastManager; }
 
 	// Window management
 	HWND GetWindowHandle() const { return hWnd; }
