@@ -142,7 +142,7 @@ void EditorApplication::OnResize(int width, int height)
     if (camera == nullptr) return;
 
     camera->SetPerspectiveDegrees(
-        camera->GetFovYDegrees(),
+        camera->GetFOV(),
         (height > 0) ? (float)width / (float)height : 1.0f,
         camera->GetNearZ(),
         camera->GetFarZ());

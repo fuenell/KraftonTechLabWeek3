@@ -34,7 +34,7 @@ public:
     float GetNearZ() const { return mNearZ; }
     float GetFarZ()  const { return mFarZ; }
     bool  IsOrtho()  const { return mUseOrtho; }
-    const FVector& GetPosition() const { return mEye; }
+    const FVector& GetLocation() const { return mEye; }
     const FVector& GetRight()   const { return mRight; }
     const FQuaternion& GetRotation()   const { return mRot; }
     const FVector& GetUp()      const { return mUp; }
@@ -57,10 +57,10 @@ public:
         mNearZ = zn; mFarZ = zf;
         UpdateProj();
     }
-    float GetFovYDegrees() const { return mFovY * (180.0f / PI); }
-    void  SetFovYDegrees(float deg) { SetPerspectiveDegrees(deg, mAspect, mNearZ, mFarZ); }
+    float GetFOV() const { return mFovY * (180.0f / PI); }
+    void  SetFOV(float deg) { SetPerspectiveDegrees(deg, mAspect, mNearZ, mFarZ); }
     // ===== 위치/자세 =====
-    void SetPosition(const FVector& eye) { mEye = eye; UpdateView(); }
+    void SetLocation(const FVector& eye) { mEye = eye; UpdateView(); }
     void SetRotation(const FQuaternion& q) { mRot = q.Normalized(); UpdateView(); }
     void SetLockRoll(bool on) { bLockRoll = on; UpdateView(); }
     // target을 바라보도록 (RH, Z-up)
