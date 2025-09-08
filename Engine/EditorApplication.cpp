@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "UApplication.h"
-#include "SimpleApplication.h"
+#include "EditorApplication.h"
 #include "UMeshManager.h"
 #include "ImguiConsole.h"
 #include "UScene.h"
@@ -9,7 +9,7 @@
 #include "URaycastManager.h"
 
 // Simple application that inherits from UApplication
-void SimpleApplication::Update(float deltaTime)
+void EditorApplication::Update(float deltaTime)
 {
 	// Basic update logic
 	UApplication::Update(deltaTime);
@@ -37,14 +37,14 @@ void SimpleApplication::Update(float deltaTime)
 	}
 }
 
-void SimpleApplication::Render()
+void EditorApplication::Render()
 {
 	UApplication::Render();
 
 	gizmoManager.Draw(GetRenderer());
 }
 
-void SimpleApplication::RenderGUI()
+void EditorApplication::RenderGUI()
 {
 	ImGui::Begin("Jungle Control Panel");
 
@@ -220,7 +220,7 @@ void SimpleApplication::RenderGUI()
 	imguiConsole.Draw("Console", &isConsoleOpen);
 }
 
-bool SimpleApplication::OnInitialize()
+bool EditorApplication::OnInitialize()
 {
 	UApplication::OnInitialize();
 	// 리사이즈/초기화
@@ -235,7 +235,7 @@ bool SimpleApplication::OnInitialize()
 }
 
 
-void SimpleApplication::OnResize(int width, int height)
+void EditorApplication::OnResize(int width, int height)
 {
 	UScene* scene = GetSceneManager().GetScene();
 	if (scene == nullptr) return;
@@ -250,7 +250,7 @@ void SimpleApplication::OnResize(int width, int height)
 		camera->GetFarZ());
 }
 
-UScene* SimpleApplication::CreateDefaultScene()
+UScene* EditorApplication::CreateDefaultScene()
 {
 	return new UDefaultScene();
 }

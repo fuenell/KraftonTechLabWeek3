@@ -5,13 +5,13 @@
 #include "URaycastManager.h"
 
 // Simple application that inherits from UApplication
-class SimpleApplication : public UApplication
+class EditorApplication : public UApplication
 {
 private:
 	UGizmoManager gizmoManager;
 public:
-	SimpleApplication() = default;
-	~SimpleApplication() = default;
+	EditorApplication() = default;
+	~EditorApplication() = default;
 	UScene* CreateDefaultScene() override;
 
 protected:

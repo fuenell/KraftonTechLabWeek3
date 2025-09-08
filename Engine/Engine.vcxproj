@@ -201,7 +201,7 @@
     <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="USceneManager.cpp" />
     <ClCompile Include="URaycastManager.cpp" />
-    <ClCompile Include="SimpleApplication.cpp" />
+    <ClCompile Include="EditorApplication.cpp" />
     <ClCompile Include="UApplication.cpp" />
     <ClCompile Include="UEngineStatics.cpp" />
     <ClCompile Include="UMesh.cpp" />
@@ -243,7 +243,7 @@
     <ClInclude Include="UGizmoManager.h" />
     <ClInclude Include="USceneManager.h" />
     <ClInclude Include="URaycastManager.h" />
-    <ClInclude Include="SimpleApplication.h" />
+    <ClInclude Include="EditorApplication.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UApplication.h" />
