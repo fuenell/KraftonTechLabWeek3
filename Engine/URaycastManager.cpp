@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "URaycastManager.h"
+
+#include "ImguiConsole.h"
 #include "Vector.h"
 #include "URenderer.h"
 #include "UScene.h"
@@ -79,6 +81,9 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
     {
         UMesh* mesh = component->GetMesh();
         FMatrix worldTransform = component->GetWorldTransform();
+
+        std::cout << "\nChecking component: " << component
+                  << " | NumVertices: " << mesh->NumVertices << std::endl;
         
         if (mesh->NumVertices < 3) continue;
         
@@ -94,9 +99,11 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
             if (result.has_value())
             {
                 float t = (*result - RayOrigin).Length(); // distance along ray
+                std::cout << "    -> Hit at distance " << t << std::endl;
                 if (t < closestHit)
                 {
                     closestHit = t;
+                    std::cout << "    -> Closest so far (was " << closestHit << ")" << std::endl;
                     hit = true;
                     closestComponent = component;
                 }
