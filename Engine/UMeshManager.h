@@ -2,8 +2,9 @@
 
 #include "UMesh.h"
 #include "URenderer.h"
+#include "UEngineSubsystem.h"
 
-class UMeshManager
+class UMeshManager : UEngineSubsystem
 {
 private:
 	std::unordered_map<std::string, UMesh*> meshes;

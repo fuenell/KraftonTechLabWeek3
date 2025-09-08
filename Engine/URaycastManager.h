@@ -6,8 +6,9 @@
 #include "USphereComp.h"
 #include "UTriangleComp.h"
 #include "FVertexPosColor.h"
+#include "UEngineSubsystem.h"
 
-class URaycastManager
+class URaycastManager : UEngineSubsystem
 {
 public:
     URaycastManager();

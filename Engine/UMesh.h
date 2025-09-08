@@ -2,10 +2,11 @@
 #pragma once
 #include "stdafx.h"
 #include "FVertexPosColor.h"
+#include "UObject.h"
 
 struct FVertexPosColor4; // 전방 선언
 
-class UMesh
+class UMesh : public UObject
 {
 private:
 	bool isInitialized = false;

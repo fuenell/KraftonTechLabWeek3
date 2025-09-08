@@ -156,6 +156,9 @@
     <ClCompile Include="Vector4.h">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="UEngineSubsystem.cpp">
+      <Filter>Engine\Subsystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -286,6 +289,9 @@
     </ClInclude>
     <ClInclude Include="ImguiConsole.h">
       <Filter>External</Filter>
+    </ClInclude>
+    <ClInclude Include="UEngineSubsystem.h">
+      <Filter>Engine\Subsystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
