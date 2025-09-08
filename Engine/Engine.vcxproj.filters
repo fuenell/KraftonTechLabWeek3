@@ -308,6 +308,9 @@
     <ClInclude Include="USceneComponentPropertyWindow.h">
       <Filter>Engine\UI</Filter>
     </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
