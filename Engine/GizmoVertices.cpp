@@ -8,53 +8,53 @@ const float coneRadius = 0.3;		// 원뿔 반지름
 
 const TArray<FVertexPosColor> gizmo_arrow_vertices =
 {
-	// 원기둥 바닥 (총 8개 삼각형)
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
+	// 원기둥 바닥 (총 8개 삼각형, 정점 순서 뒤집힘)
+	{ cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, 0.0f, 1, 1, 1, 1 },
 
 	// 원기둥 옆면 (총 16개 삼각형)
-	{ cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, cylRadius, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 }, { 0.0f, cylHeight, cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
-	{ -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 },
-	{ -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -cylRadius, 1, 1, 1, 1 },
-	{ 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 }, { 0.0f, cylHeight, -cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 },
-	{ cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
-	{ cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ 0.0f, cylHeight, cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 },
+	{ -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, cylRadius, 1, 1, 1, 1 }, { 0.0f, 0.0f, cylRadius, 1, 1, 1, 1 },
+	{ -cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ -cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
+	{ -cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ 0.0f, cylHeight, -cylRadius, 1, 1, 1, 1 }, { -cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 },
+	{ cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -cylRadius, 1, 1, 1, 1 }, { 0.0f, 0.0f, -cylRadius, 1, 1, 1, 1 },
+	{ cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -cylRadius, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, 0.0f, -cylRadius * 0.7071f, 1, 1, 1, 1 },
+	{ cylRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { cylRadius * 0.7071f, cylHeight, -cylRadius * 0.7071f, 1, 1, 1, 1 }, { cylRadius, 0.0f, 0.0f, 1, 1, 1, 1 },
 
-	// 원뿔 밑면 (추가됨, 총 8개 삼각형)
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 },
+	// 원뿔 밑면 (추가됨, 총 8개 삼각형, 정점 순서 뒤집힘)
+	{ coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
+	{ coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, 0.0f, 1, 1, 1, 1 },
 
-	// 원뿔 옆면 (총 8개 삼각형)
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 },
-	{ 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }
+	// 원뿔 옆면 (총 8개 삼각형, 정점 순서 다시 뒤집힘)
+	{ coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 },
+	{ coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 },
+	{ 0.0f, cylHeight, coneRadius, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 },
+	{ -coneRadius * 0.7071f, cylHeight, coneRadius * 0.7071f, 1, 1, 1, 1 }, { -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 },
+	{ -coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 },
+	{ -coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 },
+	{ 0.0f, cylHeight, -coneRadius, 1, 1, 1, 1 }, { coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 },
+	{ coneRadius * 0.7071f, cylHeight, -coneRadius * 0.7071f, 1, 1, 1, 1 }, { coneRadius, cylHeight, 0.0f, 1, 1, 1, 1 }, { 0.0f, cylHeight + coneHeight, 0.0f, 1, 1, 1, 1 }
 };
 
 TArray<FVertexPosColor> GridGenerator::CreateGridVertices(float gridSize, int gridCount)

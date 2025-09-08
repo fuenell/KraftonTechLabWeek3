@@ -30,9 +30,12 @@ public:
     void Update(UCamera* camera);
 
     // bool RayIntersectsMesh(UPrimitiveComponent& primitive, float& tHit);
-    bool RayIntersectsMeshes(UCamera* camera, TArray<UPrimitiveComponent*> primitives, UPrimitiveComponent*& hitPrimitive);
-    std::optional<FVector>  RayIntersectsTriangle(FVector triangleVertices[3]);
+    // bool RayIntersectsMeshes(UCamera* camera, TArray<FRaycastTarget> targets);
+    template <typename T>
+    bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent);
     
+    std::optional<FVector> RayIntersectsTriangle(FVector triangleVertices[3]);
+
 private:
     URenderer* Renderer;
     UInputManager* InputManager;
@@ -42,6 +45,6 @@ private:
 
     FVector GetRaycastOrigin(UCamera* camera);
     FVector GetRaycastDirection(UCamera* camera);
-    
+
     FVector TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world);
 };

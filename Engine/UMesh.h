@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include "FVertexPosColor.h"
 #include "UObject.h"
+#include "Vector4.h"
 
 struct FVertexPosColor4; // 전방 선언
 
@@ -28,4 +29,5 @@ public:
 	void Init(ID3D11Device* device);
 
 	bool IsInitialized() const { return isInitialized; }
+
 };

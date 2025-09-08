@@ -486,4 +486,20 @@ struct FMatrix
     //    FMatrix T = FMatrix::TranslationRow(t.X, t.Y, t.Z);
     //    return S * R * T;
     //}
+
+    static float DegreeToRadian(float degree)
+    {
+        return degree * (3.14159265358979323846f / 180.0f);
+    }
+
+    static FMatrix SRTRowEuler(const FVector& t, const FVector& eulerXYZ, const FVector& s)
+    {
+        FMatrix S = Scale(s.X, s.Y, s.Z);
+        FMatrix Rx = RotationXRow(DegreeToRadian(eulerXYZ.X));
+        FMatrix Ry = RotationYRow(DegreeToRadian(eulerXYZ.Y));
+        FMatrix Rz = RotationZRow(DegreeToRadian(eulerXYZ.Z));
+        FMatrix R = Rx * Ry * Rz;               // 필요에 따라 오일러 순서 변경 가능
+        FMatrix T = TranslationRow(t.X, t.Y, t.Z);
+        return S * R * T;                        // row 규약 핵심
+    }
 };
