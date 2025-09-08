@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GizmoVertices.cpp" />
+    <ClCompile Include="ImGuiWindowWrapper.cpp" />
     <ClCompile Include="ImGui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -192,6 +193,7 @@
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="UControlPanel.cpp" />
     <ClCompile Include="UDefaultScene.cpp" />
     <ClCompile Include="UEngineSubsystem.cpp" />
     <ClCompile Include="UGizmoArrowComp.cpp" />
@@ -199,6 +201,7 @@
     <ClCompile Include="UGizmoGridComp.cpp" />
     <ClCompile Include="UGizmoManager.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
+    <ClCompile Include="USceneComponentPropertyWindow.cpp" />
     <ClCompile Include="USceneManager.cpp" />
     <ClCompile Include="URaycastManager.cpp" />
     <ClCompile Include="EditorApplication.cpp" />
@@ -218,6 +221,7 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="UCamera.h" />
     <ClInclude Include="FVertexPosColor.h" />
     <ClInclude Include="GizmoVertices.h" />
@@ -236,12 +240,14 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="UControlPanel.h" />
     <ClInclude Include="UDefaultScene.h" />
     <ClInclude Include="UEngineSubsystem.h" />
     <ClInclude Include="UGizmoArrowComp.h" />
     <ClInclude Include="UGizmoComponent.h" />
     <ClInclude Include="UGizmoGridComp.h" />
     <ClInclude Include="UGizmoManager.h" />
+    <ClInclude Include="USceneComponentPropertyWindow.h" />
     <ClInclude Include="USceneManager.h" />
     <ClInclude Include="URaycastManager.h" />
     <ClInclude Include="EditorApplication.h" />

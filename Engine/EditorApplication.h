@@ -3,6 +3,8 @@
 #include "UApplication.h"
 #include "USphereComp.h"
 #include "URaycastManager.h"
+#include "UControlPanel.h"
+#include "USceneComponentPropertyWindow.h"
 
 // Simple application that inherits from UApplication
 class EditorApplication : public UApplication
@@ -10,6 +12,11 @@ class EditorApplication : public UApplication
 private:
 	UGizmoManager gizmoManager;
 	TArray<USceneComponent*> sceneComponents;
+
+	USceneComponent* selectedSceneComponent;
+
+	UControlPanel* controlPanel;
+	USceneComponentPropertyWindow* propertyWindow;
 
 	bool bIsMouseButtonDown = false;
 	

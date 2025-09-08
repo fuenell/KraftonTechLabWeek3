@@ -21,6 +21,8 @@ public:
         return "USceneComponent";
     }
 
+	virtual bool IsManageable() { return false; }
+
 	// 위치와 스케일 설정 함수들
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }
 	void SetScale(const FVector& scl) { RelativeScale3D = scl; }
