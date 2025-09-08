@@ -61,8 +61,11 @@ void EditorApplication::Update(float deltaTime)
             }
         }
 
+        // std::cout << "gizmos.size() : " << gizmos.size();
+        // std::cout << " primitives.size() : " << primitives.size() << std::endl;
         if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo))
         {
+            // std::cout << "hitGizmo : " << hitGizmo << std::endl;
             if (auto target = gizmoManager.GetTarget())
             {
                 target->bIsSelected = true;
@@ -285,8 +288,8 @@ void EditorApplication::RenderGUI()
     ImGui::End();
 
     bool isConsoleOpen = false;
-    static ImguiConsole imguiConsole;
-    imguiConsole.Draw("Console", &isConsoleOpen);
+    // static ImguiConsole imguiConsole;
+    GConsole.Draw("Console", &isConsoleOpen);
 }
 
 bool EditorApplication::OnInitialize()
