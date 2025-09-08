@@ -126,7 +126,7 @@ void UGizmoManager::BeginDrag(UCamera* camera, EAxis selectedAxis)
 	m_MovementPlane.PointOnPlane = m_DragStartLocation;
 
 	FVector axisDir = GetAxisVector(m_SelectedAxis);
-	FVector camToObjectDir = (m_DragStartLocation - camera->GetPosition()).GetNormalized();
+	FVector camToObjectDir = (m_DragStartLocation - camera->GetLocation()).GetNormalized();
 
 	// 이동 축과 시선 벡터에 동시에 수직인 벡터를 찾고,
 	// 다시 외적하여 평면의 법선 벡터를 계산

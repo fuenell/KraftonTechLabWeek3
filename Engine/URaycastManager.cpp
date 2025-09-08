@@ -220,7 +220,7 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 
     // 4단계: 방향 벡터 계산
     FRay resultRay;
-    resultRay.Origin = camera->GetPosition(); // 카메라의 월드 위치
+    resultRay.Origin = camera->GetLocation(); // 카메라의 월드 위치
     resultRay.Direction = (worldPos - resultRay.Origin).GetNormalized();
 
     return resultRay;

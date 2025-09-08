@@ -11,16 +11,13 @@ struct FMatrix
     float M[4][4];
     // ===== 생성/기본 =====
     FMatrix() { SetIdentity(); }
-
-	// 대각 행렬(모든 대각 원소가 동일한 값 v일 때는 스칼라 행렬)로 초기화 (대각선에 값, 나머지는 0)
+    // 대각 행렬(모든 대각 원소가 동일한 값 v일 때는 스칼라 행렬)로 초기화 (대각선에 값, 나머지는 0)
     FMatrix(float v) { for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) M[r][c] = (r == c) ? v : 0.0f; }
-
     static FMatrix IdentityMatrix() { FMatrix t; t.SetIdentity(); return t; }
     void SetIdentity() {
         for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) M[r][c] = (r == c) ? 1.0f : 0.0f;
     }
     static const FMatrix Identity; // 정의는 .cpp에: const FMatrix FMatrix::Identity = FMatrix::IdentityMatrix();
-
     // ===== 행렬 기본 연산 =====
     static FMatrix Multiply(const FMatrix& A, const FMatrix& B) {
         FMatrix R(0.0f);
@@ -64,13 +61,11 @@ struct FMatrix
     }
     
     FMatrix operator*(const FMatrix& B) const { return Multiply(*this, B); }
-
     static FMatrix Transpose(const FMatrix& A) {
         FMatrix T(0.0f);
         for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) T.M[r][c] = A.M[c][r];
         return T;
     }
-
     // ===== 벡터 변환 (column-vector / row-vector) =====
     // Column-vector: v' = M * [x y z w]^T
     FVector TransformPoint(const FVector& p, float w = 1.0f) const {
@@ -110,7 +105,6 @@ struct FMatrix
         float w = v.X * M[0][3] + v.Y * M[1][3] + v.Z * M[2][3] + v.W * M[3][3];
         return FVector4(x, y, z, w);
     }
-
     // ===== 행렬 성질/도구 =====
     static float Det3(float a00, float a01, float a02,
         float a10, float a11, float a12,
@@ -120,7 +114,6 @@ struct FMatrix
             - a01 * (a10 * a22 - a12 * a20)
             + a02 * (a10 * a21 - a11 * a20);
     }
-
     float Determinant() const {
         const float a00 = M[0][0], a01 = M[0][1], a02 = M[0][2], a03 = M[0][3];
         const float a10 = M[1][0], a11 = M[1][1], a12 = M[1][2], a13 = M[1][3];
@@ -133,7 +126,6 @@ struct FMatrix
         float c3 = Det3(a10, a11, a12, a20, a21, a22, a30, a31, a32);
         return a00 * c0 - a01 * c1 + a02 * c2 - a03 * c3;
     }
-
     static FMatrix Adjugate(const FMatrix& A) {
         FMatrix C; // cofactor matrix, then transpose
         const float a00 = A.M[0][0], a01 = A.M[0][1], a02 = A.M[0][2], a03 = A.M[0][3];
@@ -166,7 +158,6 @@ struct FMatrix
         for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) C.M[r][c] = cof[c][r];
         return C;
     }
-
     static FMatrix Inverse(const FMatrix& A, bool* ok = nullptr) {
         float det = A.Determinant();
         if (ok) *ok = (det != 0.0f);
@@ -190,10 +181,9 @@ struct FMatrix
         return true;
     }
     // 정규직교(orthonormal): 위 + 각 축 길이 1
-	// 사실 위의 IsOrthogonal 검사에서 이미 각 축 길이 1인지 확인하므로 동일하긴 하다.
-	// 벡터 집합에서는 직교와 정규 직교가 다르지만, 행렬에서는 직교 행렬이 곧 정규직교 행렬이다.
+    // 사실 위의 IsOrthogonal 검사에서 이미 각 축 길이 1인지 확인하므로 동일하긴 하다.
+    // 벡터 집합에서는 직교와 정규 직교가 다르지만, 행렬에서는 직교 행렬이 곧 정규직교 행렬이다.
     bool IsOrthonormal(float eps = 1e-4f) const { return IsOrthogonal(eps); }
-
     // 정규(normal) 행렬 (그래픽스 관례): 법선 변환용 N = (M^{-1})^T 의 상단 3x3
     static FMatrix NormalMatrix(const FMatrix& Model) {
         FMatrix inv = Inverse(Model);
@@ -204,7 +194,6 @@ struct FMatrix
         n.M[3][3] = 1.0f;
         return n;
     }
-
     // ===== 기본 변환 생성 =====
     static FMatrix Translation(float tx, float ty, float tz) {
         FMatrix T = IdentityMatrix();
@@ -342,25 +331,6 @@ struct FMatrix
         V.M[3][3] = 1;
         return V;
     }
-    //static FMatrix LookAtRHRow(const FVector& eye, const FVector& target, const FVector& up) {
-    //    FVector f = (eye - target).GetNormalized();  // f = -forward
-    //    FVector r = up.Cross(f).GetNormalized();     // right
-    //    FVector u = r.Cross(f);                      // up
-
-    //    FMatrix V = FMatrix::IdentityMatrix();
-
-    //    // ✅ rows = [r; u; f]   (f = -forward 이므로 결과적으로 [right; up; -forward])
-    //    V.M[0][0] = r.X; V.M[0][1] = r.Y; V.M[0][2] = r.Z; V.M[0][3] = 0.0f;
-    //    V.M[1][0] = u.X; V.M[1][1] = u.Y; V.M[1][2] = u.Z; V.M[1][3] = 0.0f;
-    //    V.M[2][0] = f.X; V.M[2][1] = f.Y; V.M[2][2] = f.Z; V.M[2][3] = 0.0f;
-
-    //    // row-vector 규약 translation
-    //    V.M[3][0] = -(eye.Dot(r));
-    //    V.M[3][1] = -(eye.Dot(u));
-    //    V.M[3][2] = -(eye.Dot(f)); // (= +eye·forward)
-    //    V.M[3][3] = 1.0f;
-    //    return V;
-    //}
     static FMatrix LookAtLH(const FVector& eye, const FVector& target, const FVector& up) {
         // f = normalize(target - eye)
         FVector f(eye.X - target.X, eye.Y - target.Y, eye.Z - target.Z); // -forward
@@ -436,6 +406,7 @@ struct FMatrix
         P.M[3][2] = (zn * zf) / (zn - zf);
         return P;
     }
+
     static FMatrix PerspectiveFovLH(float fovY, float aspect, float zNear, float zFar) {
         float f = 1.0f / tanf(fovY * 0.5f);
         FMatrix P(0.0f);
@@ -476,7 +447,6 @@ struct FMatrix
         O.M[3][3] = 1.0f;
         return O;
     }
-
     // ===== TRS 조합 (모델 행렬) =====
     // Column-vector 기준: M = T * R * S (v' = M * v)
     static FMatrix TRS(const FVector& t, const FVector& rRadXYZ, const FVector& s) {

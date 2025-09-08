@@ -102,25 +102,25 @@ void UControlPanel::CameraManagementSection()
     }
     else
     {
-        camera->SetPerspectiveDegrees(camera->GetFovYDegrees(),
+        camera->SetPerspectiveDegrees(camera->GetFOV(),
             camera->GetAspect(), camera->GetNearZ(), camera->GetFarZ());
     }
 
     // === FOV (perspective일 때만 활성화) ===
-    float fovDeg = camera->GetFovYDegrees();
+    float fovDeg = camera->GetFOV();
     float tableWidth = ImGui::GetContentRegionAvail().x;
     ImGui::SetNextItemWidth(tableWidth * 0.75f);
     ImGui::BeginDisabled(isOrthogonal);
     if (ImGui::InputFloat("##fov", &fovDeg, 0.0f, 0.0f, "%.3f"))
     {
-        camera->SetFovYDegrees(fovDeg); // proj 재빌드 내부에서 함
+        camera->SetFOV(fovDeg); // proj 재빌드 내부에서 함
     }
     ImGui::EndDisabled();
     ImGui::SameLine();
     ImGui::Text("FOV");
 
     // === 위치 ===
-    FVector pos = camera->GetPosition();
+    FVector pos = camera->GetLocation();
     float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
 
     // === 회전(Yaw, Pitch, Roll=0 표기) ===
@@ -164,10 +164,10 @@ void UControlPanel::CameraManagementSection()
 
     // === 변경사항을 카메라에 반영 ===
     // 위치
-    camera->SetPosition(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+    camera->SetLocation(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
 
     // 회전 (roll은 무시)
     float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
     float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
-    camera->SetYawPitch(newYawRad, newPitchRad);
+    //camera->SetYawPitch(newYawRad, newPitchRad);
 }
