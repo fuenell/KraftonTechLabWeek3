@@ -102,11 +102,11 @@ void EditorApplication::RenderGUI()
     {
         std::filesystem::path _path("./data/");
         std::filesystem::create_directory(_path);
-        GetSceneManager().SaveScene(_path.string() + std::string(sceneName));
+        GetSceneManager().SaveScene(_path.string() + std::string(sceneName) + ".json");
     }
     if (ImGui::Button("Load scene"))
     {
-        GetSceneManager().LoadScene("./data/" + std::string(sceneName));
+        GetSceneManager().LoadScene("./data/" + std::string(sceneName) + ".json");
     }
 
     ImGui::Separator();
@@ -240,7 +240,7 @@ void EditorApplication::RenderGUI()
 
     ImGui::Begin("Memory Stats");
     ImGui::Text("Allocated Object Count : %d", UEngineStatics::GetTotalAllocationCount());
-    ImGui::Text("Allocated Object Bytes : %d", UObject::GUObjectArray.size());
+    ImGui::Text("Allocated Object Bytes : %d", UEngineStatics::GetTotalAllocationBytes());
     ImGui::End();
 
     bool isConsoleOpen = false;

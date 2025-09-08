@@ -73,7 +73,8 @@ void UScene::AddObject(USceneComponent* obj)
 	if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
 	{
 		primitive->Init(meshManager);
-		++primitiveCount;
+		if (obj->CountOnInspector())
+			++primitiveCount;
 	}
 }
 
@@ -82,14 +83,16 @@ json::JSON UScene::Serialize() const
 	json::JSON result;
 	// UScene 특성에 맞는 JSON 구성
 	result["Version"] = version;
-	result["NextUUID"] = 8;
+	result["NextUUID"] = std::to_string(UEngineStatics::GetNextUUID());
 	int validCount = 0;
 	for (UObject* object : objects)
 	{
+		if (object == nullptr) continue;
 		json::JSON _json = object->Serialize();
 		if (!_json.IsNull())
 		{
-			result["Primitives"][std::to_string(validCount)] = _json;
+			//result["Primitives"][std::to_string(validCount)] = _json;
+			result["Primitives"][std::to_string(object->UUID)] = _json;
 			++validCount;
 		}
 	}
@@ -104,17 +107,21 @@ bool UScene::Deserialize(const json::JSON& data)
 	objects.clear();
 	json::JSON primitivesJson = data.at("Primitives");
 
+	UEngineStatics::SetUUIDGeneration(false);
 	for (auto& primitiveJson : primitivesJson.ObjectRange())
 	{
 
-		int index = stoi(primitiveJson.first);
+		uint32 uuid = stoi(primitiveJson.first);
 		json::JSON _data = primitiveJson.second;
 
-		USceneComponent* component = USceneComponentFactory::Create(_data.at("Type").ToString(), _data);
+		USceneComponent* component = USceneComponentFactory::Create(_data.at("Type").ToString(), _data, uuid);
 
 		//AddObject(component);
 		objects.push_back(component);
+		if (component->CountOnInspector())
+			++primitiveCount;
 	}
+	UEngineStatics::SetUUIDGeneration(true);
 
 	USceneComponent* gizmoGrid = new UGizmoGridComp(
 		{ 0.3f, 0.3f, 0.3f },
@@ -122,6 +129,10 @@ bool UScene::Deserialize(const json::JSON& data)
 		{ 0.2f, 0.2f, 0.2f }
 	);
 	objects.push_back(gizmoGrid);
+
+	std::string uuidStr = data.at("NextUUID").ToString();
+
+	UEngineStatics::SetNextUUID((uint32)stoi(uuidStr));
 
 	return true;
 }

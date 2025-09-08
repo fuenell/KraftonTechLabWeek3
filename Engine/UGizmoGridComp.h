@@ -17,4 +17,9 @@ public:
 	void Draw(URenderer& renderer) override;
 
 	std::string GetType() const override { return "GizmoGrid"; }
+	
+	json::JSON Serialize() const override
+	{
+		return json::JSON();
+	}
 };

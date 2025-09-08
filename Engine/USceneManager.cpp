@@ -60,9 +60,25 @@ void USceneManager::LoadScene(const std::string& path)
 
 void USceneManager::SaveScene(const std::string& path)
 {
+	std::filesystem::path fsPath(path);
+
+	if (std::filesystem::exists(fsPath))
+	{
+		std::ifstream file(path);
+		if (file)
+		{
+			std::stringstream buffer;
+			buffer << file.rdbuf();
+			json::JSON sceneData = json::JSON::Load(buffer.str());
+
+			currentScene->SetVersion(sceneData["Version"].ToInt() + 1);
+		}
+	}
+
 	json::JSON sceneData = currentScene->Serialize();
 
 	std::ofstream file(path);
+
 	if (!file)
 	{
 		// Log error: failed to open file

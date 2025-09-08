@@ -11,10 +11,11 @@ private:
 	// 회전도 원하면 유지
 	float yaw = 0, pitch = 0, roll = 0;
 
-	static USceneComponent* Create(json::JSON data)
+	static USceneComponent* Create(json::JSON data, uint32 uuid)
 	{
-		USceneComponent* newInstance = new USphereComp();
+		USceneComponent* newInstance = new USphereComp(uuid);
 		newInstance->Deserialize(data);
+		newInstance->SetUUID(uuid);
 
 		return newInstance;
 	}
