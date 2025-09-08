@@ -161,7 +161,7 @@ std::optional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVe
 FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world)
 {
     FVector4 pos4(vertex.x, vertex.y, vertex.z, vertex.w);
-    FVector4 worldPos4 = FMatrix::MultiplyVector(world, pos4);
+    FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
     return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
 }
 

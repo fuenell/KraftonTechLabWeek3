@@ -44,6 +44,25 @@ struct FMatrix
         return R;
     }
     
+    // 행우선
+    static FVector4 MultiplyVectorRow(FVector4 v, FMatrix m)
+    {
+        FVector4 R(0, 0, 0, 0);
+
+        // 루프 순서 변경: j가 바깥쪽, i가 안쪽
+        for (int j = 0; j < 4; j++) // 결과 벡터의 각 성분(x, y, z, w)을 계산
+        {
+            for (int i = 0; i < 4; i++) // 입력 벡터와 행렬의 한 '열'을 순회
+            {
+                // R[j]는 결과 벡터의 j번째 성분 (예: j=0이면 x)
+                // v[i]는 입력 벡터의 i번째 성분 (예: i=0이면 x)
+                // m.M[i][j]는 행렬의 i행 j열 성분
+                R[j] += v[i] * m.M[i][j];
+            }
+        }
+        return R;
+    }
+    
     FMatrix operator*(const FMatrix& B) const { return Multiply(*this, B); }
 
     static FMatrix Transpose(const FMatrix& A) {
