@@ -40,36 +40,36 @@ void URaycastManager::Update(UCamera* camera)
     RayOrigin = GetRaycastOrigin(camera);
     RayDirection = GetRaycastDirection(camera);
 
-    float closestHit = 1e30f; // start with "infinity"
-    UPrimitiveComponent* closestPrimitive = nullptr;
-    
-    for (UObject* object : GUObjectArray)
-    {
-        UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
-        if (!primitive) continue;
-
-        float tHit = 0.0f;
-        if (RayIntersectsMesh(camera, primitive->GetMesh(), primitive->GetWorldTransform(), tHit))
-        {
-            if (tHit < closestHit)
-            {
-                closestHit = tHit;
-                closestPrimitive = primitive;
-            }
-        }
-    }
-
-    for (UObject* object : GUObjectArray)
-    {
-        UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
-        if (primitive) primitive->bIsSelected = false;
-    }
-    
-    if (closestPrimitive)
-    {
-        closestPrimitive->bIsSelected = true;
-        std::cout << "Closest hit at distance: " << closestHit << std::endl;
-    }
+    // float closestHit = 1e30f; // start with "infinity"
+    // UPrimitiveComponent* closestPrimitive = nullptr;
+    //
+    // for (UObject* object : GUObjectArray)
+    // {
+    //     UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
+    //     if (!primitive) continue;
+    //
+    //     float tHit = 0.0f;
+    //     if (RayIntersectsMesh(camera, primitive->GetMesh(), primitive->GetWorldTransform()))
+    //     {
+    //         if (tHit < closestHit)
+    //         {
+    //             closestHit = tHit;
+    //             closestPrimitive = primitive;
+    //         }
+    //     }
+    // }
+    //
+    // for (UObject* object : GUObjectArray)
+    // {
+    //     UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
+    //     if (primitive) primitive->bIsSelected = false;
+    // }
+    //
+    // if (closestPrimitive)
+    // {
+    //     closestPrimitive->bIsSelected = true;
+    //     std::cout << "Closest hit at distance: " << closestHit << std::endl;
+    // }
 }
 
 FVector URaycastManager::GetRaycastOrigin(UCamera* camera)
@@ -106,56 +106,52 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
     return {rayDirection.X, rayDirection.Y, rayDirection.Z};
 }
 
-bool URaycastManager::RayIntersectsMesh(UCamera* camera, UMesh* mesh, const FMatrix& worldTransform, float& tHit)
+bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<UPrimitiveComponent*> primitives, UPrimitiveComponent*& hitPrimitive)
 {
-    if (!mesh) return false;
-    if (mesh->NumVertices < 3)
-        return false;
+    MouseX = static_cast<float>(InputManager->GetMouseX());
+    MouseY = static_cast<float>(InputManager->GetMouseY());
+
+    RayOrigin = GetRaycastOrigin(camera);
+    RayDirection = GetRaycastDirection(camera);
     
     bool hit = false;
-    float closestT = FLT_MAX;
-
-    // std::cout << "=== Ray-Mesh Intersection Debug ===" << std::endl;
-    // std::cout << "Ray Origin: " << RayOrigin.X << " " << RayOrigin.Y << " " << RayOrigin.Z << std::endl;
-    // std::cout << "Ray Direction: " << RayDirection.X << " " << RayDirection.Y << " " << RayDirection.Z << std::endl;
-    // std::cout << "camera forward: " << Camera->GetForward().X << " " << Camera->GetForward().Y << " " << Camera->GetForward().Z << std::endl;
-
-    for (int i = 0; i + 2 < mesh->NumVertices; i += 3)
+    float closestHit = FLT_MAX;
+    UPrimitiveComponent* closestPrimitive = nullptr;
+    
+    for (UPrimitiveComponent* primitive : primitives)
     {
-        FVector triangleVertices[3] = {
-            TransformVertexToWorld(mesh->Vertices[i], worldTransform),
-            TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform),
-            TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform)
-        };
-    
-        // std::cout << "\nTriangle " << i / 3 << ":" << std::endl;
-        // std::cout << "  v0: " << triangleVertices[0].X << " " << triangleVertices[0].Y << " " << triangleVertices[0].Z << std::endl;
-        // std::cout << "  v1: " << triangleVertices[1].X << " " << triangleVertices[1].Y << " " << triangleVertices[1].Z << std::endl;
-        // std::cout << "  v2: " << triangleVertices[2].X << " " << triangleVertices[2].Y << " " << triangleVertices[2].Z << std::endl;
-    
-        auto result = RayIntersectsTriangle(triangleVertices);
-        if (result.has_value())
+        UMesh* mesh = primitive->GetMesh();
+        FMatrix worldTransform = primitive->GetWorldTransform();
+        
+        if (mesh->NumVertices < 3) continue;
+        
+        for (int i = 0; i + 2 < mesh->NumVertices; i += 3)
         {
-            float t = (*result - RayOrigin).Length(); // distance along ray
-            if (t < closestT)
+            FVector triangleVertices[3] = {
+                TransformVertexToWorld(mesh->Vertices[i], worldTransform),
+                TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform),
+                TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform)
+            };
+        
+            auto result = RayIntersectsTriangle(triangleVertices);
+            if (result.has_value())
             {
-                closestT = t;
-                hit = true;
+                float t = (*result - RayOrigin).Length(); // distance along ray
+                if (t < closestHit)
+                {
+                    closestHit = t;
+                    hit = true;
+                    closestPrimitive = primitive;
+                }
             }
-        }
-        else
-        {
-            // std::cout << "  --> No intersection with this triangle" << std::endl;
         }
     }
 
     if (hit)
     {
-        tHit = closestT;
-        return true;
+        hitPrimitive = closestPrimitive;
     }
-
-    return false;
+    return hit;
 }
 
 
