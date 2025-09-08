@@ -1,13 +1,10 @@
 ﻿#pragma once
-#include "UPrimitiveComponent.h"
+#include "UGizmoComponent.h"
 
-class UGizmoArrowComp : public UPrimitiveComponent
+class UGizmoArrowComp : public UGizmoComponent
 {
 public:
-	using UPrimitiveComponent::UPrimitiveComponent;
-
-	void UpdatePhysics(float t, bool bUsingGravity, float restitution) override;
-	bool OnCollision(UPrimitiveComponent* other, float restitution) override;
+	using UGizmoComponent::UGizmoComponent;
 
 	void UpdateConstantBuffer(URenderer& renderer) override;
 	void Draw(URenderer& renderer) override;

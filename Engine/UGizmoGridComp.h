@@ -1,15 +1,17 @@
 ﻿#pragma once
+#include "stdafx.h"
+#include "UGizmoComponent.h"
+#include "URenderer.h"
 #include "UPrimitiveComponent.h"
+#include "FVertexPosColor.h"
+#include "Vector.h"
 
-class FMesh;
+class URenderer;
 
-class UGizmoGridComp : public UPrimitiveComponent
+class UGizmoGridComp : public UGizmoComponent
 {
 public:
-	using UPrimitiveComponent::UPrimitiveComponent;
-
-	void UpdatePhysics(float t, bool bUsingGravity, float restitution) override;
-	bool OnCollision(UPrimitiveComponent* other, float restitution) override;
+	using UGizmoComponent::UGizmoComponent;
 
 	void UpdateConstantBuffer(URenderer& renderer) override;
 	void Draw(URenderer& renderer) override;

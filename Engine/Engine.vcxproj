@@ -195,6 +195,7 @@
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="UDefaultScene.cpp" />
     <ClCompile Include="UGizmoArrowComp.cpp" />
+    <ClCompile Include="UGizmoComponent.cpp" />
     <ClCompile Include="UGizmoGridComp.cpp" />
     <ClCompile Include="UGizmoManager.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="UDefaultScene.h" />
     <ClInclude Include="UGizmoArrowComp.h" />
+    <ClInclude Include="UGizmoComponent.h" />
     <ClInclude Include="UGizmoGridComp.h" />
     <ClInclude Include="UGizmoManager.h" />
     <ClInclude Include="USceneManager.h" />
