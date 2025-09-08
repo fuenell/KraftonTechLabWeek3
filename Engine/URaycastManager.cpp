@@ -30,48 +30,6 @@ URaycastManager::~URaycastManager()
     InputManager   = nullptr;
 }
 
-void URaycastManager::Update(UCamera* camera)
-{
-    if (!InputManager->IsMouseButtonDown(0)) return;
-    
-    MouseX = static_cast<float>(InputManager->GetMouseX());
-    MouseY = static_cast<float>(InputManager->GetMouseY());
-
-    RayOrigin = GetRaycastOrigin(camera);
-    RayDirection = GetRaycastDirection(camera);
-
-    // float closestHit = 1e30f; // start with "infinity"
-    // UPrimitiveComponent* closestPrimitive = nullptr;
-    //
-    // for (UObject* object : GUObjectArray)
-    // {
-    //     UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
-    //     if (!primitive) continue;
-    //
-    //     float tHit = 0.0f;
-    //     if (RayIntersectsMesh(camera, primitive->GetMesh(), primitive->GetWorldTransform()))
-    //     {
-    //         if (tHit < closestHit)
-    //         {
-    //             closestHit = tHit;
-    //             closestPrimitive = primitive;
-    //         }
-    //     }
-    // }
-    //
-    // for (UObject* object : GUObjectArray)
-    // {
-    //     UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
-    //     if (primitive) primitive->bIsSelected = false;
-    // }
-    //
-    // if (closestPrimitive)
-    // {
-    //     closestPrimitive->bIsSelected = true;
-    //     std::cout << "Closest hit at distance: " << closestHit << std::endl;
-    // }
-}
-
 FVector URaycastManager::GetRaycastOrigin(UCamera* camera)
 {
     return camera->GetLocation();
@@ -97,12 +55,10 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
     rayViewDir.Normalize();
 
     // convert the camera-space ray direction to world direction
-    // FMatrix V = Camera.GetView();
     FMatrix V = FMatrix::LookAtRH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
     V = FMatrix::Inverse(V);
     FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
-
-    // std::cout << "ray direction: " << rayDirection.X << " " << rayDirection.Y << " " << rayDirection.Z << std::endl;
+    
     return {rayDirection.X, rayDirection.Y, rayDirection.Z};
 }
 

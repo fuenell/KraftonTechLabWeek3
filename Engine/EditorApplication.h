@@ -10,6 +10,9 @@ class EditorApplication : public UApplication
 private:
 	UGizmoManager gizmoManager;
 	TArray<USceneComponent*> sceneComponents;
+
+	bool bIsMouseButtonDown = false;
+	
 public:
 	EditorApplication() = default;
 	~EditorApplication() = default;

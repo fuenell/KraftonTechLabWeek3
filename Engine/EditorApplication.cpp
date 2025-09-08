@@ -14,54 +14,71 @@ void EditorApplication::Update(float deltaTime)
     // Basic update logic
     UApplication::Update(deltaTime);
 
-    UGizmoComponent* gizmoHit = nullptr;
-    UPrimitiveComponent* sceneHit = nullptr;
-    // 아무것도 선택되지 않음
-
-    if (GetInputManager().IsMouseButtonDown(0))
-    {
-        gizmoManager.SetTarget(nullptr);
-        if (gizmoManager.Raycast(&GetRaycastManager(), *gizmoHit))
-        {
-            // Gizmo가 선택되었으므로 여기서 처리 종료
-            // SelectGizmoHandle(gizmoHit);
-        }
-        // 2순위: 게임 오브젝트
-        else
-        {
-            TArray<UPrimitiveComponent*> primitives;
-
-            for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
-            {
-                if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
-                {
-                    if (primitive->GetMesh())
-                    {
-                        primitives.push_back(primitive);
-                    }
-                }
-            }
-
-            GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, sceneHit);
-
-            for (UObject* object : GetSceneManager().GetScene()->GetObjects())
-            {
-                UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
-                if (primitive) primitive->bIsSelected = false;
-            }
-            
-            if (sceneHit)
-            {
-                gizmoManager.SetTarget(sceneHit);
-                sceneHit->bIsSelected = true;
-            }
-        }
-    }
-
-    // Exit on ESC key
     if (GetInputManager().IsKeyDown(VK_ESCAPE))
     {
         RequestExit();
+    }
+
+    UGizmoComponent* hitGizmo = nullptr;
+    UPrimitiveComponent* hitPrimitive = nullptr;
+
+    if (GetInputManager().IsMouseButtonReleased(0))
+    {
+        bIsMouseButtonDown = false;
+        return;   
+    }
+    
+    if (bIsMouseButtonDown)
+    {
+        // 드래그 하고 있을때
+
+        return;
+    }
+    
+    if (GetInputManager().IsMouseButtonPressed(0))
+    {
+        bIsMouseButtonDown = true;
+
+        TArray<UPrimitiveComponent*> primitives;
+        TArray<UGizmoComponent*> gizmos;
+
+        TArray<UGizmoComponent*>& g = gizmoManager.GetRaycastableGizmos();
+        if (g.size() > 0)
+        {
+            for (UGizmoComponent* gizmo : g)
+            {
+                gizmos.push_back(gizmo);
+                gizmo->bIsSelected = false;
+            }   
+        }
+
+        for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
+        {
+            if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+            {
+                if (primitive->GetMesh()) primitives.push_back(primitive);
+                primitive->bIsSelected = false;
+            }
+        }
+
+        if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo))
+        {
+            if (auto target = gizmoManager.GetTarget())
+            {
+                target->bIsSelected = true;
+                hitGizmo->bIsSelected = true;
+            }
+        }
+        else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive))
+        {
+            gizmoManager.SetTarget(hitPrimitive);
+            hitPrimitive->bIsSelected = true;
+        }
+        else
+        {
+            gizmoManager.SetTarget(nullptr);
+        }
+        // }
     }
 }
 

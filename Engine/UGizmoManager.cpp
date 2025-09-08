@@ -58,7 +58,17 @@ void UGizmoManager::SetTarget(UPrimitiveComponent* target)
 	targetObject = target;
 }
 
-bool UGizmoManager::Raycast(URaycastManager* rayCastManager, UGizmoComponent& out)
+TArray<UGizmoComponent*>& UGizmoManager::GetRaycastableGizmos()
+{
+	if (targetObject == nullptr)
+	{
+		static TArray<UGizmoComponent*> emptyArray; // lives for the whole program
+		return emptyArray;
+	}
+	return transformGizmoPrimitives;
+}
+
+bool UGizmoManager::IsRaycastHit(URaycastManager* rayCastManager, UGizmoComponent& out)
 {
 	// for (UMesh* gizmoMesh : transformGizmoPrimitives)
 	// {
