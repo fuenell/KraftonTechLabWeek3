@@ -15,6 +15,7 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 UMeshManager::UMeshManager()
 {
 	meshes["Sphere"] = CreateSphereMesh();
+	meshes["Plane"] = CreatePlaneMesh();
 	meshes["GizmoArrow"] = CreateGizmoArrowMesh();
 	meshes["GizmoGrid"] = CreateGizmoGridMesh();
 }
@@ -64,6 +65,11 @@ UMesh* UMeshManager::RetrieveMesh(std::string meshName)
 UMesh* UMeshManager::CreateSphereMesh()
 {
 	return CreateMeshInternal(sphere_vertices);
+}
+
+UMesh* UMeshManager::CreatePlaneMesh()
+{
+	return CreateMeshInternal(test);
 }
 
 UMesh* UMeshManager::CreateGizmoArrowMesh()

@@ -218,7 +218,7 @@
     <ClCompile Include="UGUI.cpp" />
     <ClCompile Include="UInputManager.cpp" />
     <ClCompile Include="URenderer.cpp" />
-    <ClCompile Include="UTriangleComp.cpp" />
+    <ClCompile Include="UPlaneComp.cpp" />
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
@@ -267,7 +267,7 @@
     <ClInclude Include="UInputManager.h" />
     <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="URenderer.h" />
-    <ClInclude Include="UTriangleComp.h" />
+    <ClInclude Include="UPlaneComp.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>

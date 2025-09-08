@@ -17,10 +17,8 @@ public:
 
 	bool bIsSelected = false;
 
-	virtual void UpdatePhysics(float t, bool bUsingGravity, float restitution) = 0;
 	virtual void Draw(URenderer& renderer);
 	virtual void UpdateConstantBuffer(URenderer& renderer);
-	virtual bool OnCollision(UPrimitiveComponent* other, float restitution) = 0;
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드

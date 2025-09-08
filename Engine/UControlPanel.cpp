@@ -5,6 +5,16 @@
 #include "USceneManager.h"
 #include "UScene.h"
 
+UControlPanel::UControlPanel(USceneManager* sceneManager)
+    : ImGuiWindowWrapper("Jungle Control Panel"), SceneManager(sceneManager)
+{
+    registeredTypes = USceneComponentFactory::GetRegisteredTypes();
+    for (const auto& registeredType : registeredTypes)
+    {
+        choices.push_back(registeredType.c_str());
+    }
+}
+
 void UControlPanel::RenderContent()
 {
     PrimaryInformationSection();
@@ -26,10 +36,7 @@ void UControlPanel::PrimaryInformationSection()
 
 void UControlPanel::SpawnPrimitiveSection()
 {
-    const char* choices[] = {
-        "Sphere"
-    };
-    ImGui::Combo("Primitive", &primitiveChoiceIndex, choices, sizeof(choices) / sizeof(const char*));
+    ImGui::Combo("Primitive", &primitiveChoiceIndex, choices.data(), static_cast<int>(choices.size()));
 
     int objectCount = SceneManager->GetScene()->GetObjectCount();
     if (ImGui::Button("Spawn"))
@@ -37,17 +44,22 @@ void UControlPanel::SpawnPrimitiveSection()
         USceneComponent* sceneComponent = USceneComponentFactory::Create(choices[primitiveChoiceIndex]);
         if (sceneComponent != nullptr)
         {
-            sceneComponent->SetPosition(FVector(
-                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
-            ));
-            sceneComponent->SetScale(FVector(
-                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
-            ));
-            SceneManager->GetScene()->AddObject(sceneComponent);
+        sceneComponent->SetPosition(FVector(
+            -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+            -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+            -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
+        ));
+        sceneComponent->SetScale(FVector(
+            0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
+            0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
+            0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
+        ));
+        sceneComponent->SetRotation(FVector(
+            -90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
+            -90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
+            -90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
+        ));
+        SceneManager->GetScene()->AddObject(sceneComponent);
         }
     }
     ImGui::SameLine();
