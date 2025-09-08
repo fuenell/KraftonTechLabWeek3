@@ -9,24 +9,24 @@
 class UCamera;
 class URaycastManager;
 
-class UScene : ISerializable
+class UScene : public UObject
 {
 protected:
     int backBufferWidth, backBufferHeight;
     int version;
     int primitiveCount;
     bool isInitialized;
-    TArray<UObject*> objects;
+    TArray<USceneComponent*> objects;
 
     // Reference from outside
     URenderer* renderer;
     UMeshManager* meshManager;
     UInputManager* inputManager;
+    //URaycastManager* RaycastManager;
+    //UGizmoManager* GizmoManager;
 
     //UScene owns camera
     UCamera* camera;
-    URaycastManager* RaycastManager;
-    UGizmoManager* GizmoManager;
 
     virtual void RenderGUI() {}
     virtual void OnShutdown() {}
@@ -45,12 +45,13 @@ public:
 
     static UScene* Create(json::JSON data);
 
-    void AddObject(UObject* obj);
+    void AddObject(USceneComponent* obj);
 
     json::JSON Serialize() const override;
 
     bool Deserialize(const json::JSON& data) override;
-
+    
+    const TArray<USceneComponent*>& GetObjects() const { return objects; }
     UCamera* GetCamera() { return camera; }
     URenderer* GetRenderer() { return renderer; }
     UInputManager* GetInputManager() { return inputManager; }

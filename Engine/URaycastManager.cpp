@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "URaycastManager.h"
 #include "Vector.h"
 #include "URenderer.h"
@@ -6,7 +6,6 @@
 
 URaycastManager::URaycastManager()
     : Renderer(nullptr),
-      Camera(nullptr),
       InputManager(nullptr),
       RayOrigin(FVector(0,0,0)),
       RayDirection(FVector(0,0,0)),
@@ -17,7 +16,6 @@ URaycastManager::URaycastManager()
 
 URaycastManager::URaycastManager(URenderer* renderer, UCamera* camera, UInputManager* inputManager)
     : Renderer(renderer),
-      Camera(camera),
       InputManager(inputManager),
       RayOrigin(FVector(0,0,0)),
       RayDirection(FVector(0,0,0)),
@@ -29,19 +27,18 @@ URaycastManager::URaycastManager(URenderer* renderer, UCamera* camera, UInputMan
 URaycastManager::~URaycastManager()
 {
     Renderer = nullptr;
-    Camera   = nullptr;
     InputManager   = nullptr;
 }
 
-void URaycastManager::Update()
+void URaycastManager::Update(UCamera* camera)
 {
     if (!InputManager->IsMouseButtonDown(0)) return;
     
     MouseX = static_cast<float>(InputManager->GetMouseX());
     MouseY = static_cast<float>(InputManager->GetMouseY());
 
-    RayOrigin = GetRaycastOrigin();
-    RayDirection = GetRaycastDirection();
+    RayOrigin = GetRaycastOrigin(camera);
+    RayDirection = GetRaycastDirection(camera);
 
     float closestHit = 1e30f; // start with "infinity"
     UPrimitiveComponent* closestPrimitive = nullptr;
@@ -52,7 +49,7 @@ void URaycastManager::Update()
         if (!primitive) continue;
 
         float tHit = 0.0f;
-        if (RayIntersectsMesh(primitive->GetMesh(), primitive->GetWorldTransform(), tHit))
+        if (RayIntersectsMesh(camera, primitive->GetMesh(), primitive->GetWorldTransform(), tHit))
         {
             if (tHit < closestHit)
             {
@@ -75,14 +72,14 @@ void URaycastManager::Update()
     }
 }
 
-FVector URaycastManager::GetRaycastOrigin()
+FVector URaycastManager::GetRaycastOrigin(UCamera* camera)
 {
-    return Camera->GetLocation();
+    return camera->GetLocation();
 }
 
-FVector URaycastManager::GetRaycastDirection()
+FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 {
-    float CameraFOV = Camera->GetFOV();
+    float CameraFOV = camera->GetFOV();
 
     // convert the mouse coords to Normalized Device Coordinates (NDC)
     int width = 0, height = 0;
@@ -101,7 +98,7 @@ FVector URaycastManager::GetRaycastDirection()
 
     // convert the camera-space ray direction to world direction
     // FMatrix V = Camera.GetView();
-    FMatrix V = FMatrix::LookAtRH(Camera->GetLocation(), Camera->GetLocation() + Camera->GetForward(), Camera->GetUp());
+    FMatrix V = FMatrix::LookAtRH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
     V = FMatrix::Inverse(V);
     FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
 
@@ -109,7 +106,7 @@ FVector URaycastManager::GetRaycastDirection()
     return {rayDirection.X, rayDirection.Y, rayDirection.Z};
 }
 
-bool URaycastManager::RayIntersectsMesh(UMesh* mesh, const FMatrix& worldTransform, float& tHit)
+bool URaycastManager::RayIntersectsMesh(UCamera* camera, UMesh* mesh, const FMatrix& worldTransform, float& tHit)
 {
     if (!mesh) return false;
     if (mesh->NumVertices < 3)

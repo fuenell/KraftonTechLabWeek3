@@ -5,7 +5,9 @@
 #include "UGUI.h"
 #include "UTimeManager.h"
 #include "UMeshManager.h"
+#include "URaycastManager.h"
 #include "USceneManager.h"
+#include "UGizmoManager.h"
 
 class UApplication
 {
@@ -18,6 +20,8 @@ private:
 	UTimeManager timeManager;
 	UMeshManager meshManager;
 	USceneManager sceneManager;
+	URaycastManager raycastManager;
+	UGizmoManager gizmoManager;
 
 	// Application state
 	bool bIsRunning;

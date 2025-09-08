@@ -8,8 +8,11 @@ class UPrimitiveComponent;
 class UGizmoManager
 {
 public:
-	UGizmoManager(UMeshManager* meshMgr);
+	UGizmoManager();
+
 	~UGizmoManager();
+
+	bool Initialize(UMeshManager* meshManager);
 
 	// 기즈모가 조작할 대상 객체를 설정합니다.
 	void SetTarget(UPrimitiveComponent* target);
@@ -21,7 +24,7 @@ public:
 	void Draw(URenderer& renderer);
 
 private:
-	UMeshManager* meshManager;
+	UMeshManager* MeshManager;
 	UPrimitiveComponent* targetObject = nullptr; // 현재 선택된 객체
 
 	// 역할에 따라 프리미티브를 분리해서 저장합니다.

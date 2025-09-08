@@ -14,28 +14,33 @@ public:
     URaycastManager(URenderer* renderer, UCamera* camera, UInputManager* inputManager);
     ~URaycastManager();
 
+    bool Initialize(URenderer* renderer, UInputManager* inputManager)
+    {
+        if (!renderer || !inputManager) return false;
+        Renderer = renderer;
+        InputManager = inputManager;
+        return true;
+    }
+
     void SetRenderer(URenderer* renderer) { Renderer = renderer; }
-    void SetCamera(UCamera* camera) { Camera = camera; }
     void SetInputManager(UInputManager* inputManager) { InputManager = inputManager; }
 
     // TODO: remove this and call RayIntersectsMesh elsewhere
-    void Update();
+    void Update(UCamera* camera);
 
     // bool RayIntersectsMesh(UPrimitiveComponent& primitive, float& tHit);
-    bool RayIntersectsMesh(UMesh* mesh, const FMatrix& worldTransform, float& tHit);
+    bool RayIntersectsMesh(UCamera* camera, UMesh* mesh, const FMatrix& worldTransform, float& tHit);
     std::optional<FVector>  RayIntersectsTriangle(FVector triangleVertices[3]);
     
 private:
     URenderer* Renderer;
-    UCamera* Camera;
     UInputManager* InputManager;
 
-    float MouseX;
-    float MouseY;
+    float MouseX, MouseY;
     FVector RayOrigin, RayDirection;
 
-    FVector GetRaycastOrigin();
-    FVector GetRaycastDirection();
+    FVector GetRaycastOrigin(UCamera* camera);
+    FVector GetRaycastDirection(UCamera* camera);
     
     FVector TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world);
 };

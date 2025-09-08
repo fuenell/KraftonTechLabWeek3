@@ -83,6 +83,16 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
         MessageBox(hWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
         return false;
     }
+    if (!raycastManager.Initialize(&renderer, &inputManager))
+    {
+        MessageBox(hWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
+    if (!gizmoManager.Initialize(&meshManager))
+    {
+        MessageBox(hWnd, L"Failed to initialize gizmo manager", L"Engine Error", MB_OK | MB_ICONERROR);
+        return false;
+    }
 
     if (!gui.Initialize(hWnd, renderer.GetDevice(), renderer.GetDeviceContext()))
     {
@@ -148,7 +158,23 @@ void UApplication::Update(float deltaTime)
     // Base class update - can be overridden by derived classes
     // Update core engine systems here if needed
 
-    GetSceneManager().GetScene()->Update(deltaTime);
+    gizmoManager.SetTarget(nullptr);
+    for (UObject* obj : sceneManager.GetScene()->GetObjects())
+    {
+        // 일단 표준 RTTI 사용
+        if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+        {
+            if (primitive->bIsSelected)
+            {
+                gizmoManager.SetTarget(primitive);
+                break;
+            }
+        }
+    }
+
+    raycastManager.Update(GetSceneManager().GetScene()->GetCamera());
+
+    sceneManager.GetScene()->Update(deltaTime);
 }
 
 void UApplication::Render()
@@ -156,10 +182,8 @@ void UApplication::Render()
     // Base class render - handles GUI rendering
     // Derived classes should call this after their rendering
 
-    // Render engine GUI
-
-
-    GetSceneManager().GetScene()->Render();
+    gizmoManager.Draw(renderer);
+    sceneManager.GetScene()->Render();
 }
 
 bool UApplication::CreateMainWindow(HINSTANCE hInstance)
