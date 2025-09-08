@@ -1,8 +1,10 @@
 ﻿#pragma once
+#include "UEngineSubsystem.h"
+
 class UScene;
 class UApplication;
 
-class USceneManager 
+class USceneManager : UEngineSubsystem
 {
 private:
     UApplication* application;

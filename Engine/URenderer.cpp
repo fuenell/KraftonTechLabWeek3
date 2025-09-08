@@ -24,7 +24,7 @@ URenderer::~URenderer()
 	Release();
 }
 
-bool URenderer::Create(HWND windowHandle)
+bool URenderer::Initialize(HWND windowHandle)
 {
 	if (bIsInitialized)
 		return true;

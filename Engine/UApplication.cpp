@@ -54,7 +54,7 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 		return false;
 	}
 
-	if (!renderer.Create(hWnd))
+	if (!renderer.Initialize(hWnd))
 	{
 		MessageBox(hWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;

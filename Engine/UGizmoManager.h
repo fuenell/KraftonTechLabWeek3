@@ -2,11 +2,12 @@
 #include "UPrimitiveComponent.h"
 #include "UGizmoComponent.h"
 #include "URaycastManager.h"
+#include "UEngineSubsystem.h"
 
 class UMeshManager; // 전방 선언
 class URenderer;
 
-class UGizmoManager
+class UGizmoManager : UEngineSubsystem
 {
 public:
 	UGizmoManager();

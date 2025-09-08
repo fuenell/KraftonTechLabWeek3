@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "UMesh.h"
 #include "Matrix.h"
+#include "UEngineSubsystem.h"
 
 // URenderer.h or cpp 상단
 struct CBTransform
@@ -12,7 +13,7 @@ struct CBTransform
     float padding[3];
 };
 
-class URenderer
+class URenderer : UEngineSubsystem
 {
 private:
     // Core D3D11 objects
@@ -52,7 +53,7 @@ public:
     ~URenderer();
 
     // Initialization and cleanup
-    bool Create(HWND windowHandle);
+    bool Initialize(HWND windowHandle);
     bool CreateShader();
     bool CreateRasterizerState();
     bool CreateConstantBuffer();

@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "stdafx.h"
+#include "UEngineSubsystem.h"
 
-class UInputManager
+class UInputManager : UEngineSubsystem
 {
 private:
     // Key states

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "FVertexPosColor.h"
-#include "Globals.h"
+#include "TArray.h"
 
 extern const TArray<FVertexPosColor> gizmo_arrow_vertices;
 

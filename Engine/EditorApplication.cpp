@@ -242,6 +242,12 @@ void EditorApplication::RenderGUI()
 
     ImGui::End();
 
+
+    ImGui::Begin("Memory Stats");
+    ImGui::Text("Allocated Object Count : %d", UEngineStatics::GetTotalAllocationCount());
+    ImGui::Text("Allocated Object Bytes : %d", UObject::GUObjectArray.size());
+    ImGui::End();
+
     bool isConsoleOpen = false;
     static ImguiConsole imguiConsole;
     imguiConsole.Draw("Console", &isConsoleOpen);

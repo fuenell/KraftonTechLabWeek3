@@ -2,7 +2,7 @@
 
 #pragma once
 #include "FVertexPosColor.h"
-#include "Globals.h"
+#include "TArray.h"
 
 inline FVertexPosColor test[] = {
 	 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // Top - Red

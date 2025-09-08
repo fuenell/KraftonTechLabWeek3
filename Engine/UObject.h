@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "UEngineStatics.h"
-#include "Globals.h"
+#include "TArray.h"
 #include "ISerializable.h"
 
 typedef int int32;
@@ -8,22 +8,44 @@ typedef unsigned int uint32;
 
 class UObject : ISerializable
 {
+private:
+    static TArray<uint32> FreeIndices;
+    static uint32 NextFreshIndex;
+
 public:
+    static TArray<UObject*> GUObjectArray;
+
     uint32 UUID;
     uint32 InternalIndex;
-    
+
     UObject()
     {
         UUID = UEngineStatics::GenUUID();
-        InternalIndex = static_cast<uint32>(GUObjectArray.size());
-        GUObjectArray.push_back(this);
+
+        // 방법 1: 빠른 추가 - 재사용 인덱스 우선 사용
+        if (!FreeIndices.empty())
+        {
+            // 삭제된 슬롯 재사용 (O(1))
+            InternalIndex = FreeIndices.back();
+            FreeIndices.pop_back();
+            GUObjectArray[InternalIndex] = this;
+        }
+        else
+        {
+            // 새 슬롯 할당 (O(1) amortized)
+            InternalIndex = NextFreshIndex++;
+            GUObjectArray.push_back(this);
+        }
     }
 
     virtual ~UObject()
     {
-        // Remove from GUObjectArray (optional: compact array)
-        // For now, just mark as nullptr
-        GUObjectArray[InternalIndex] = nullptr;
+        // 방법 1: 빠른 삭제 - nullptr 마킹 + 인덱스 재사용 큐에 추가
+        if (InternalIndex < GUObjectArray.size() && GUObjectArray[InternalIndex] == this)
+        {
+            GUObjectArray[InternalIndex] = nullptr;  // O(1)
+            FreeIndices.push_back(InternalIndex);    // O(1)
+        }
     }
 
     virtual bool CountOnInspector() {
@@ -41,6 +63,17 @@ public:
     {
         UEngineStatics::RemoveAllocation(size);
         ::operator delete(ptr);
+    }
+
+    // 배치 new/delete도 오버라이드 (필요한 경우)
+    void* operator new(size_t size, void* ptr)
+    {
+        return ptr;  // placement new는 메모리 추적 안함
+    }
+
+    void operator delete(void* ptr, void* place)
+    {
+        // placement delete는 아무것도 안함
     }
 
     json::JSON Serialize() const override

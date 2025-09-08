@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <math.h>
 #include "Vector.h"
-#include "Globals.h"
+#include "TArray.h"
 
 struct FVertexPosColor
 {
