@@ -721,28 +721,31 @@ void URenderer::SetViewProj(const FMatrix& V, const FMatrix& P)
 	// 여기서는 상수버퍼 업로드 안 함 (오브젝트에서 M과 합쳐서 업로드)
 }
 
-void URenderer::SetModel(const FMatrix& M, bool bIsSelected)
+void URenderer::SetModel(const FMatrix& M, const FVector4& color, bool bIsSelected)
 {
 	// per-object: MVP = M * VP
 	FMatrix MVP = M * mVP;
 	CopyRowMajor(mCBData.MVP, MVP);
+	memcpy(mCBData.MeshColor, &color, sizeof(float) * 4);
 	mCBData.IsSelected = bIsSelected ? 1.0f : 0.0f;
 	UpdateConstantBuffer(&mCBData, sizeof(mCBData));
 }
 
-
-D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int winW, int winH) const {
+D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int winW, int winH) const
+{
 	D3D11_VIEWPORT vp{};
 	vp.MinDepth = 0.0f; vp.MaxDepth = 1.0f;
 
 	float wa = (winH > 0) ? (float)winW / (float)winH : targetAspect;
-	if (wa > targetAspect) {
+	if (wa > targetAspect)
+	{
 		vp.Height = (float)winH;
 		vp.Width = vp.Height * targetAspect;
 		vp.TopLeftY = 0.0f;
 		vp.TopLeftX = 0.5f * (winW - vp.Width);
 	}
-	else {
+	else
+	{
 		vp.Width = (float)winW;
 		vp.Height = vp.Width / targetAspect;
 		vp.TopLeftX = 0.0f;

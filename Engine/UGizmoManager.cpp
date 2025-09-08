@@ -35,6 +35,10 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 		return false;
 	}
 
+	arrowX->SetColor((1, 0, 0, 1));
+	arrowY->SetColor((0, 1, 0, 1));
+	arrowZ->SetColor((0, 0, 1, 1));
+
 	// --- 2. 이동 기즈모(화살표) 생성 ---
 	bool gridArrowSuccess = true;
 

@@ -16,17 +16,21 @@ public:
 
 	bool bIsSelected = false;
 
-	virtual void Draw(URenderer& renderer) = 0;
-	virtual void UpdateConstantBuffer(URenderer& renderer) = 0;
 	virtual ~UGizmoComponent() {}
 
-	// 별도의 초기화 메서드
 	bool Init(UMeshManager* meshManager);
 	std::string GetType() const override { return "UGizmoComponent"; }
 	bool CountOnInspector() override { return true; }
 
+	virtual void Draw(URenderer& renderer);
+	virtual void UpdateConstantBuffer(URenderer& renderer);
+
 	UMesh* GetMesh() { return mesh; }
+
+	void SetColor(const FVector4& newColor) { Color = newColor; }
+	FVector4 GetColor() const { return Color; }
 
 protected:
 	UMesh* mesh;
+	FVector4 Color = { 1, 1, 1, 1 };
 };
