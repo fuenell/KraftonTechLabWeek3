@@ -193,7 +193,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Matrix.cpp" />
-    <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="UControlPanel.cpp" />
     <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UDefaultScene.cpp" />
