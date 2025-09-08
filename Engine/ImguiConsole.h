@@ -358,6 +358,9 @@ struct ImguiConsole
     }
 };
 
+extern ImguiConsole GConsole;
+#define UE_LOG(fmt, ...) GConsole.AddLog(fmt, ##__VA_ARGS__)
+
 static void ShowExampleAppConsole(bool* p_open)
 {
     static ImguiConsole console;

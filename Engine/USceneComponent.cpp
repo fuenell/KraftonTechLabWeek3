@@ -6,6 +6,7 @@
 FMatrix USceneComponent::GetWorldTransform()
 {
     return FMatrix::TRS(RelativeLocation, RelativeRotation, RelativeScale3D);
+    // return FMatrix::SRTRowEuler(RelativeLocation, RelativeRotation, RelativeScale3D);
 }
 
 json::JSON USceneComponent::Serialize() const
