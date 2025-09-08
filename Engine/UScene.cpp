@@ -181,11 +181,11 @@ void UScene::Update(float deltaTime)
 	{
 		dx += 1.0f; // 우
 	}
-	if (inputManager->IsKeyDown('Q'))
+	if (inputManager->IsKeyDown('E'))
 	{
 		dz += 1.0f; // 상
 	}
-	if (inputManager->IsKeyDown('E'))
+	if (inputManager->IsKeyDown('Q'))
 	{
 		dz -= 1.0f; // 하
 	}
@@ -224,7 +224,7 @@ bool UScene::OnInitialize()
 	  sphere = new USphereComp(sharedSphereMesh, { 0.0f, 0.0f, 0.5f }, { 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f });
 	  sphere2 = new USphereComp(gridMesh);
 	  */
-	
+
 	return true;
 }
 
