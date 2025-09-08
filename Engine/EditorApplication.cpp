@@ -7,8 +7,8 @@
 #include "UScene.h"
 #include "UDefaultScene.h"
 #include "URaycastManager.h"
+#include "UGizmoArrowComp.h"
 
-// Simple application that inherits from UApplication
 void EditorApplication::Update(float deltaTime)
 {
     // Basic update logic
@@ -24,21 +24,21 @@ void EditorApplication::Update(float deltaTime)
 
     if (GetInputManager().IsMouseButtonReleased(0))
     {
-        bIsMouseButtonDown = false;
-        return;   
-    }
-    
-    if (bIsMouseButtonDown)
-    {
-        // 드래그 하고 있을때
-
+        gizmoManager.EndDrag();
+        bIsGizmoDragging = false;
         return;
     }
-    
+
+    // 드래그 하고 있을때
+    if (bIsGizmoDragging)
+    {
+        FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
+        gizmoManager.UpdateDrag(ray);
+        return;
+    }
+
     if (GetInputManager().IsMouseButtonPressed(0))
     {
-        bIsMouseButtonDown = true;
-
         TArray<UPrimitiveComponent*> primitives;
         TArray<UGizmoComponent*> gizmos;
 
@@ -49,7 +49,7 @@ void EditorApplication::Update(float deltaTime)
             {
                 gizmos.push_back(gizmo);
                 gizmo->bIsSelected = false;
-            }   
+            }
         }
 
         for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
@@ -61,12 +61,18 @@ void EditorApplication::Update(float deltaTime)
             }
         }
 
+        // std::cout << "gizmos.size() : " << gizmos.size();
+        // std::cout << " primitives.size() : " << primitives.size() << std::endl;
         if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo))
         {
+            // std::cout << "hitGizmo : " << hitGizmo << std::endl;
             if (auto target = gizmoManager.GetTarget())
             {
                 target->bIsSelected = true;
                 hitGizmo->bIsSelected = true;
+                UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo);
+                gizmoManager.BeginDrag(GetSceneManager().GetScene()->GetCamera(), arrow->Axis);
+                bIsGizmoDragging = true;
                 if (target->IsManageable())
                     propertyWindow->SetTarget(target);
             }
@@ -103,8 +109,8 @@ void EditorApplication::RenderGUI()
     ImGui::End();
 
     bool isConsoleOpen = false;
-    static ImguiConsole imguiConsole;
-    imguiConsole.Draw("Console", &isConsoleOpen);
+    // static ImguiConsole imguiConsole;
+    GConsole.Draw("Console", &isConsoleOpen);
 }
 
 bool EditorApplication::OnInitialize()
