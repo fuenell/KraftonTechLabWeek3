@@ -34,7 +34,7 @@ void SimpleApplication::Update(float deltaTime)
         const float pitchPerPx = baseSens * deltaTime;  // 상하
 
         // Z-up + RH + row 에 맞춘 Yaw(세계 Z), Pitch(카메라 Right)
-        //camera.AddYawPitch(mdx * yawPerPx, mdy * pitchPerPx);
+        camera.AddYawPitch(mdx * yawPerPx, mdy * pitchPerPx);
     }
 
     // ====== 이동 입력 ======
@@ -60,7 +60,7 @@ void SimpleApplication::Update(float deltaTime)
         // 구 그리기
     //GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
      static float t = 0.0f; t += 0.016f;
-    sphere->SetPosition({ 0.1f * t, 0,  0});
+    sphere->SetPosition({ 0.1f * t, 0, 0 });
     // 예: 초당 Yaw 30도 회전
     /*sphere->AddRotationEulerDeg(30.0f * deltaTime, 0.0f , 0.0f);*/
 }
@@ -202,7 +202,7 @@ void SimpleApplication::RenderGUI()
         camera.GetBasis(r, f, u);
 
         ImGui::Separator();
-        ImGui::Text("Camera Axes (world-space)");
+        ImGui::Text("Camera Axes (local-space)");
         if (ImGui::BeginTable("CamAxes", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
             ImGui::TableSetupColumn("Axis");
             ImGui::TableSetupColumn("X");
@@ -278,7 +278,7 @@ bool SimpleApplication::OnInitialize()
     width = 0.0f;
 	height = 0.0f;
 	camera = UCamera();
-    camera.LookAt({ 0, 5 ,0 }, { 0,0,0 }, { 0,0,1 });
+    camera.LookAt({ 10, 0 , 0 }, { 0,0,0 }, { 0,0,1 });
     // Factory에서 공유 Mesh 생성
     UMesh* sharedSphereMesh = UMeshFactory::CreateSphereMesh(GetRenderer());
 
