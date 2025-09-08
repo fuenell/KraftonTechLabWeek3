@@ -17,40 +17,46 @@ void EditorApplication::Update(float deltaTime)
     UGizmoComponent* gizmoHit = nullptr;
     UPrimitiveComponent* sceneHit = nullptr;
     // 아무것도 선택되지 않음
-    gizmoManager.SetTarget(nullptr);
 
-    if (gizmoManager.Raycast(&GetRaycastManager(), *gizmoHit))
+    if (GetInputManager().IsMouseButtonDown(0))
     {
-        // Gizmo가 선택되었으므로 여기서 처리 종료
-        // SelectGizmoHandle(gizmoHit);
-    }
-    // 2순위: 게임 오브젝트
-    else
-    {
-        TArray<UPrimitiveComponent*> primitives;
-
-        for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
+        gizmoManager.SetTarget(nullptr);
+        if (gizmoManager.Raycast(&GetRaycastManager(), *gizmoHit))
         {
-            if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+            // Gizmo가 선택되었으므로 여기서 처리 종료
+            // SelectGizmoHandle(gizmoHit);
+        }
+        // 2순위: 게임 오브젝트
+        else
+        {
+            TArray<UPrimitiveComponent*> primitives;
+
+            for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
             {
-                if (primitive->GetMesh())
+                if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
                 {
-                    primitives.push_back(primitive);
+                    if (primitive->GetMesh())
+                    {
+                        primitives.push_back(primitive);
+                    }
                 }
             }
-        }
 
-        if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, sceneHit))
-        {
-            gizmoManager.SetTarget(sceneHit);
+            GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, sceneHit);
+
+            for (UObject* object : GetSceneManager().GetScene()->GetObjects())
+            {
+                UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(object);
+                if (primitive) primitive->bIsSelected = false;
+            }
+            
+            if (sceneHit)
+            {
+                gizmoManager.SetTarget(sceneHit);
+                sceneHit->bIsSelected = true;
+            }
         }
-        
-        // 게임 오브젝트가 선택됨
-        // SelectGameObject(sceneHit.HitActor);
     }
-
-
-    GetRaycastManager().Update(GetSceneManager().GetScene()->GetCamera());
 
     // Exit on ESC key
     if (GetInputManager().IsKeyDown(VK_ESCAPE))
@@ -61,9 +67,8 @@ void EditorApplication::Update(float deltaTime)
 
 void EditorApplication::Render()
 {
-    UApplication::Render();
-
     gizmoManager.Draw(GetRenderer());
+    UApplication::Render();
 }
 
 void EditorApplication::RenderGUI()
@@ -235,6 +240,12 @@ void EditorApplication::RenderGUI()
         ImGui::EndTable();
     }
 
+    ImGui::End();
+
+
+    ImGui::Begin("Memory Stats");
+    ImGui::Text("Allocated Object Count : %d", UEngineStatics::GetTotalAllocationCount());
+    ImGui::Text("Allocated Object Bytes : %d", UObject::GUObjectArray.size());
     ImGui::End();
 
     bool isConsoleOpen = false;

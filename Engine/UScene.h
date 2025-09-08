@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "ISerializable.h"
-#include "Globals.h"
+#include "TArray.h"
 #include "UMeshManager.h"
 #include "USceneManager.h"
 #include "json.hpp"

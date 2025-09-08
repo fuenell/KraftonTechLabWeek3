@@ -106,7 +106,8 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
     return {rayDirection.X, rayDirection.Y, rayDirection.Z};
 }
 
-bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<UPrimitiveComponent*> primitives, UPrimitiveComponent*& hitPrimitive)
+template <typename T>
+bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent)
 {
     MouseX = static_cast<float>(InputManager->GetMouseX());
     MouseY = static_cast<float>(InputManager->GetMouseY());
@@ -116,12 +117,12 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<UPrimitiveComp
     
     bool hit = false;
     float closestHit = FLT_MAX;
-    UPrimitiveComponent* closestPrimitive = nullptr;
+    T* closestComponent = nullptr;
     
-    for (UPrimitiveComponent* primitive : primitives)
+    for (T* component : components)
     {
-        UMesh* mesh = primitive->GetMesh();
-        FMatrix worldTransform = primitive->GetWorldTransform();
+        UMesh* mesh = component->GetMesh();
+        FMatrix worldTransform = component->GetWorldTransform();
         
         if (mesh->NumVertices < 3) continue;
         
@@ -141,7 +142,7 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<UPrimitiveComp
                 {
                     closestHit = t;
                     hit = true;
-                    closestPrimitive = primitive;
+                    closestComponent = component;
                 }
             }
         }
@@ -149,10 +150,13 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<UPrimitiveComp
 
     if (hit)
     {
-        hitPrimitive = closestPrimitive;
+        hitComponent = closestComponent;
     }
     return hit;
 }
+
+template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&);
+template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&);
 
 
 std::optional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertices[3])
