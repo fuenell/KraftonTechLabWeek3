@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "stdafx.h"
 
-class UTimeManager
+class UTimeManager : UObject
 {
 private:
     // High precision timing

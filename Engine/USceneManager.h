@@ -2,7 +2,7 @@
 class UScene;
 class UApplication;
 
-class USceneManager
+class USceneManager 
 {
 private:
     UApplication* application;
