@@ -195,6 +195,7 @@
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="UControlPanel.cpp" />
+    <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UDefaultScene.cpp" />
     <ClCompile Include="UEngineSubsystem.cpp" />
     <ClCompile Include="UGizmoArrowComp.cpp" />
@@ -222,7 +223,9 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
+    <ClInclude Include="PlaneVertices.h" />
     <ClInclude Include="UCamera.h" />
     <ClInclude Include="FVertexPosColor.h" />
     <ClInclude Include="GizmoVertices.h" />
@@ -242,6 +245,7 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="UControlPanel.h" />
+    <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UDefaultScene.h" />
     <ClInclude Include="UEngineSubsystem.h" />
     <ClInclude Include="UGizmoArrowComp.h" />
