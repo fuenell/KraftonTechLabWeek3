@@ -19,13 +19,16 @@ public:
 	// 기즈모가 조작할 대상 객체를 설정합니다.
 	void SetTarget(UPrimitiveComponent* target);
 
-	bool Raycast(URaycastManager* rayCastManager, UGizmoComponent& out);
+	bool IsRaycastHit(URaycastManager* rayCastManager, UGizmoComponent& out);
 
 	//// 매 프레임 호출되어 입력을 처리하고 기즈모의 상태를 갱신합니다.
 	//void Update(const InputManager& input, const Camera& camera, float deltaTime);
 
 	// 매 프레임 호출되어 기즈모를 화면에 그립니다.
 	void Draw(URenderer& renderer);
+
+	UPrimitiveComponent* GetTarget() { return targetObject; }
+	TArray<UGizmoComponent*>& GetRaycastableGizmos();
 
 private:
 	UMeshManager* MeshManager;
