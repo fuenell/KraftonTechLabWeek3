@@ -110,11 +110,12 @@ bool UScene::Deserialize(const json::JSON& data)
 	UEngineStatics::SetUUIDGeneration(false);
 	for (auto& primitiveJson : primitivesJson.ObjectRange())
 	{
-
 		uint32 uuid = stoi(primitiveJson.first);
 		json::JSON _data = primitiveJson.second;
 
-		USceneComponent* component = USceneComponentFactory::Create(_data.at("Type").ToString(), _data, uuid);
+		USceneComponent* component = USceneComponentFactory::Create(_data.at("Type").ToString());
+		component->Deserialize(_data);
+		component->SetUUID(uuid);
 
 		//AddObject(component);
 		objects.push_back(component);

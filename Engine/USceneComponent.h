@@ -36,22 +36,22 @@ public:
 
 class USceneComponentFactory
 {
-	static std::unordered_map<std::string, std::function<USceneComponent* (json::JSON, uint32)>>& GetCreators()
+	static std::unordered_map<std::string, std::function<USceneComponent* ()>>& GetCreators()
 	{
-		static std::unordered_map<std::string, std::function<USceneComponent* (json::JSON, uint32)>> creators;
+		static std::unordered_map<std::string, std::function<USceneComponent* ()>> creators;
 		return creators;
 	}
 public:
-	static void Register(const std::string& typeName, std::function<USceneComponent* (json::JSON, uint32)> creator)
+	static void Register(const std::string& typeName, std::function<USceneComponent* ()> creator)
 	{
 		GetCreators()[typeName] = creator;
 	}
 
-	static USceneComponent* Create(const std::string& typeName, json::JSON data, uint32 uuid)
+	static USceneComponent* Create(const std::string& typeName)
 	{
 		auto& creators = GetCreators();
 		auto it = creators.find(typeName);
-		return (it != creators.end()) ? it->second(data, uuid) : nullptr;
+		return (it != creators.end()) ? it->second() : nullptr;
 	}
 
 	// 등록된 타입 목록 조회 (디버깅용)

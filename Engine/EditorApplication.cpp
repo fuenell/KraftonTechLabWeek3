@@ -84,13 +84,30 @@ void EditorApplication::RenderGUI()
 
     static int currentItem = 0;
     int value = GetSceneManager().GetScene()->GetObjectCount();
+
     const char* choices[] = {
-        "a", "b"
+        "Sphere"
     };
 
-
     ImGui::Combo("Primitive", &currentItem, choices, sizeof(choices) / sizeof(const char*));
-    ImGui::Button("Spawn");
+    if (ImGui::Button("Spawn"))
+    {
+        USceneComponent* sceneComponent = USceneComponentFactory::Create(choices[currentItem]);
+        if (sceneComponent != nullptr)
+        {
+            sceneComponent->SetPosition(FVector(
+                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
+            ));
+            sceneComponent->SetScale(FVector(
+                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
+                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
+                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
+            ));
+            GetSceneManager().GetScene()->AddObject(sceneComponent);
+        }
+    }
     ImGui::SameLine();
 
     ImGui::BeginDisabled();
