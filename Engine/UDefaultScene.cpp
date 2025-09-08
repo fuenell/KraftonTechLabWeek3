@@ -7,7 +7,6 @@ void UDefaultScene::Update(float deltaTime)
     UScene::Update(deltaTime);
     static float t = 0.0f;
     t += deltaTime;
-    RaycastManager->Update(*GetInputManager());
 }
 
 bool UDefaultScene::OnInitialize()
@@ -17,8 +16,6 @@ bool UDefaultScene::OnInitialize()
     USphereComp* sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f });
 
     AddObject(sphere);
-
-    RaycastManager = new URaycastManager(GetRenderer(), GetCamera());
 
 	return true;
 }

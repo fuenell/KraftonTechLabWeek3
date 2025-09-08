@@ -46,8 +46,6 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 		}
 	}
 
-	GizmoManager = new UGizmoManager(meshManager);
-
 	return true;
 }
 
@@ -58,7 +56,7 @@ UScene* UScene::Create(json::JSON data)
 	return scene;
 }
 
-void UScene::AddObject(UObject* obj)
+void UScene::AddObject(USceneComponent* obj)
 {
 	// 런타임에서만 사용 - Scene이 Initialize된 후에 호출할 것
 	assert(meshManager != nullptr && "AddObject should only be called after Scene initialization");
@@ -143,8 +141,6 @@ void UScene::Render()
 			primitive->Draw(*renderer);
 		}
 	}
-
-	GizmoManager->Draw(*renderer);
 }
 
 void UScene::Update(float deltaTime)
@@ -199,20 +195,6 @@ void UScene::Update(float deltaTime)
 	float len = sqrtf(dx * dx + dy * dy + dz * dz);
 	if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
 	camera->MoveLocal(dx, dy, dz, deltaTime, boost);
-
-	GizmoManager->SetTarget(nullptr);
-	for (UObject* obj : objects)
-	{
-		// 일단 표준 RTTI 사용
-		if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
-		{
-			if (primitive->bIsSelected)
-			{
-				GizmoManager->SetTarget(primitive);
-				break;
-			}
-		}
-	}
 
 	// Basic rendering - nothing for now
 	// 3D objects would be rendered here

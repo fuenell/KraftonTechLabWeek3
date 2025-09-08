@@ -1,18 +1,25 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "URaycastManager.h"
 #include "Vector.h"
 #include "URenderer.h"
 #include "UScene.h"
 
-void URaycastManager::Update(UInputManager& input)
+bool URaycastManager::Initialize(URenderer* renderer)
+{
+    Renderer = renderer;
+
+    return true;
+}
+
+void URaycastManager::Update(UCamera* camera, UInputManager& input)
 {
     if (!input.IsMouseButtonDown(0)) return;
     
     MouseX = static_cast<float>(input.GetMouseX());
     MouseY = static_cast<float>(input.GetMouseY());
 
-    RayOrigin = GetRaycastOrigin();
-    RayDirection = GetRaycastDirection();
+    RayOrigin = GetRaycastOrigin(camera);
+    RayDirection = GetRaycastDirection(camera);
 
     float tHit;
     for (UObject* object : GUObjectArray)
@@ -31,14 +38,14 @@ void URaycastManager::Update(UInputManager& input)
     }
 }
 
-FVector URaycastManager::GetRaycastOrigin()
+FVector URaycastManager::GetRaycastOrigin(UCamera * camera)
 {
-    return Camera->GetLocation();
+    return camera->GetLocation();
 }
 
-FVector URaycastManager::GetRaycastDirection()
+FVector URaycastManager::GetRaycastDirection(UCamera * camera)
 {
-    float CameraFOV = Camera->GetFOV();
+    float CameraFOV = camera->GetFOV();
 
     // convert the mouse coords to Normalized Device Coordinates (NDC)
     int width = 0, height = 0;
@@ -57,7 +64,7 @@ FVector URaycastManager::GetRaycastDirection()
 
     // convert the camera-space ray direction to world direction
     // FMatrix V = Camera.GetView();
-    FMatrix V = FMatrix::LookAtRH(Camera->GetLocation(), Camera->GetLocation() + Camera->GetForward(), Camera->GetUp());
+    FMatrix V = FMatrix::LookAtRH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
     V = FMatrix::Inverse(V);
     FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
 

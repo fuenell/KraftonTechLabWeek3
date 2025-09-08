@@ -6,31 +6,45 @@
 #include "UGizmoArrowComp.h"
 #include "UGizmoGridComp.h"
 
-UGizmoManager::UGizmoManager(UMeshManager* meshMgr) : meshManager(meshMgr)
+UGizmoManager::UGizmoManager()
 {
-	// --- 1. 그리드 생성 ---
-	// 그리드는 항상 원점에 고정
-	gridPrimitive = new UGizmoGridComp();
-	gridPrimitive->Init(meshManager);
-
-	// --- 2. 이동 기즈모(화살표) 생성 ---
-	UGizmoArrowComp* arrowX = new UGizmoArrowComp();
-	arrowX->Init(meshManager);
-	UGizmoArrowComp* arrowY = new UGizmoArrowComp();
-	arrowY->Init(meshManager);
-	UGizmoArrowComp* arrowZ = new UGizmoArrowComp();
-	arrowZ->Init(meshManager);
-
-	arrowX->SetRotation({ 0.0f, 0.0f, 90.0f });
-	arrowY->SetRotation({ -90.0f, 0.0f, 0.0f });
-
-	transformGizmoPrimitives.push_back(arrowX);
-	transformGizmoPrimitives.push_back(arrowY);
-	transformGizmoPrimitives.push_back(arrowZ);
 }
 
 UGizmoManager::~UGizmoManager()
 {
+}
+
+bool UGizmoManager::Initialize(UMeshManager* meshManager)
+{
+	// --- 1. 그리드 생성 ---
+	// 그리드는 항상 원점에 고정
+	gridPrimitive = new UGizmoGridComp();
+
+	UGizmoArrowComp* arrowX = new UGizmoArrowComp();
+	UGizmoArrowComp* arrowY = new UGizmoArrowComp();
+	UGizmoArrowComp* arrowZ = new UGizmoArrowComp();
+
+	if (!gridPrimitive->Init(meshManager) || !arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager))
+	{
+		delete gridPrimitive;
+		delete arrowX;
+		delete arrowY;
+		delete arrowZ;
+		return false;
+	}
+
+	// --- 2. 이동 기즈모(화살표) 생성 ---
+	bool gridArrowSuccess = true;
+
+	arrowX->SetRotation({ 0.0f, 0.0f, 90.0f });
+	arrowY->SetRotation({ -90.0f, 0.0f, 0.0f });
+	arrowZ->SetRotation({ 0.0f, 90.0f, 0.0f });
+
+	transformGizmoPrimitives.push_back(arrowX);
+	transformGizmoPrimitives.push_back(arrowZ);
+	transformGizmoPrimitives.push_back(arrowY);
+
+	return true;
 }
 
 void UGizmoManager::SetTarget(UPrimitiveComponent* target)
