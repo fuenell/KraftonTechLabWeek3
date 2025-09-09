@@ -221,6 +221,8 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
 	isDragging = true;
 	selectedAxis = axis;
 	dragStartLocation = targetObject->GetPosition();
+	dragStartRotation = targetObject->GetRotation();
+	dragStartScale = targetObject->GetScale();
 
 	// --- 이동 평면 생성 ---
 	movementPlane.PointOnPlane = dragStartLocation;
@@ -257,7 +259,18 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 	FVector newPosition = dragStartLocation + axisDir * projectedLength;
 
 	// --- 3. Target 액터 위치 업데이트 ---
-	targetObject->SetPosition(newPosition + dragOffset);
+	switch (translationType)
+	{
+	case ETranslationType::Location:
+		targetObject->SetPosition(newPosition + dragOffset);
+		break;
+	case ETranslationType::Rotation:
+		targetObject->SetPosition(newPosition + dragOffset);
+		break;
+	case ETranslationType::Scale:
+		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));
+		break;
+	}
 }
 
 void UGizmoManager::EndDrag()

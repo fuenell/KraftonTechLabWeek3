@@ -55,6 +55,8 @@ private:
 
 	// 드래그 계산을 위해 저장해두는 정보
 	FVector dragStartLocation;    // 드래그 시작 시 Target의 월드 위치
+	FVector dragStartRotation;
+	FVector dragStartScale;
 	FPlane movementPlane;         // 계산된 이동 평면
 
 	// 유틸리티 함수
