@@ -30,6 +30,8 @@ public:
 	}
 	UScene* CreateDefaultScene() override;
 
+	void OnSceneChange() override;
+
 protected:
 	void Update(float deltaTime) override;
 	void Render() override;

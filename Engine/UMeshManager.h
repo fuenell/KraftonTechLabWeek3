@@ -20,6 +20,8 @@ public:
 
 	// 기본 메쉬 생성 함수들
 	UMesh* CreateSphereMesh();
+	UMesh* CreatePlaneMesh();
+	UMesh* CreateCubeMesh();
 	UMesh* CreateGizmoArrowMesh();
 	UMesh* CreateGizmoGridMesh();
 };

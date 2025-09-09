@@ -1,6 +1,9 @@
 ﻿#include "stdafx.h"
 #include "UMeshManager.h"
 #include "GizmoVertices.h"
+#include "Sphere.h"
+#include "PlaneVertices.h"
+#include "CubeVertices.h"
 
 UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 	D3D_PRIMITIVE_TOPOLOGY primitiveType)
@@ -15,6 +18,8 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 UMeshManager::UMeshManager()
 {
 	meshes["Sphere"] = CreateSphereMesh();
+	meshes["Plane"] = CreatePlaneMesh();
+	meshes["Cube"] = CreateCubeMesh();
 	meshes["GizmoArrow"] = CreateGizmoArrowMesh();
 	meshes["GizmoGrid"] = CreateGizmoGridMesh();
 }
@@ -64,6 +69,16 @@ UMesh* UMeshManager::RetrieveMesh(std::string meshName)
 UMesh* UMeshManager::CreateSphereMesh()
 {
 	return CreateMeshInternal(sphere_vertices);
+}
+
+UMesh* UMeshManager::CreatePlaneMesh()
+{
+	return CreateMeshInternal(plane_vertices);
+}
+
+UMesh* UMeshManager::CreateCubeMesh()
+{
+	return CreateMeshInternal(cube_vertices);
 }
 
 UMesh* UMeshManager::CreateGizmoArrowMesh()

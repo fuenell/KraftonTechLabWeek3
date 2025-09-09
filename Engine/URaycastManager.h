@@ -3,7 +3,7 @@
 #include "UCamera.h"
 #include "UInputManager.h"
 #include "UPrimitiveComponent.h"
-#include "UTriangleComp.h"
+#include "UPlaneComp.h"
 #include "FVertexPosColor.h"
 #include "UEngineSubsystem.h"
 

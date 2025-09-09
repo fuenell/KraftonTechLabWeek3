@@ -7,6 +7,8 @@ class UControlPanel : public ImGuiWindowWrapper
 	USceneManager* SceneManager;
 	
 	// Spawn Primitive Section
+	std::vector<std::string> registeredTypes;
+	std::vector<const char*> choices;
 	int primitiveChoiceIndex = 0;
 
 	// Scene Management Section
@@ -16,10 +18,7 @@ class UControlPanel : public ImGuiWindowWrapper
 
 
 public:
-	UControlPanel(USceneManager* sceneManager) : ImGuiWindowWrapper("Jungle Control Panel")
-	{
-		SceneManager = sceneManager;
-	}
+	UControlPanel(USceneManager* sceneManager);
 	void RenderContent() override;
 	void PrimaryInformationSection();
 	void SpawnPrimitiveSection();

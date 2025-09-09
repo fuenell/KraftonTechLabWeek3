@@ -321,7 +321,7 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
 
 bool UApplication::OnInitialize()
 {
-	return GetSceneManager().GetScene()->OnInitialize();
+	return true;
 
 }
 

@@ -5,14 +5,14 @@
 #include "FVertexPosColor.h"
 #include "Vector.h"
 
-class USphereComp : public UPrimitiveComponent
+class UCubeComp : public UPrimitiveComponent
 {
 private:
-	static inline std::string type = "Sphere";
+	static inline std::string type = "Cube";
 
 	static USceneComponent* Create()
 	{
-		USceneComponent* newInstance = new USphereComp();
+		USceneComponent* newInstance = new UCubeComp();
 
 		return newInstance;
 	}
@@ -32,7 +32,7 @@ private:
 	bool IsManageable() override { return true; }
 
 public:
-	USphereComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 })
+	UCubeComp(FVector pos = { 0, 0, 0 }, FVector rot = { 0, 0, 0 }, FVector scl = { 1, 1, 1 })
 		:UPrimitiveComponent(pos, rot, scl)
 	{
 	}

@@ -117,54 +117,68 @@ void UGizmoManager::Draw(URenderer& renderer)
 	}
 }
 
-void UGizmoManager::BeginDrag(UCamera* camera, EAxis selectedAxis)
+//레이와 이동 평면의 3D 교차점 찾기
+FVector UGizmoManager::FindCirclePlaneIntersection(const FRay& ray, const FPlane& plane)
 {
-	m_bIsDragging = true;
-	m_SelectedAxis = selectedAxis;
-	m_DragStartLocation = targetObject->GetPosition();
+	float denominator = ray.Direction.Dot(plane.Normal);
+
+	// 레이가 평면과 평행에 가까우면 계산 오류 방지
+	if (abs(denominator) < 0.0001f) return { 0,0,0 };
+
+	float t = (plane.PointOnPlane - ray.Origin).Dot(plane.Normal) / denominator;
+	FVector intersectionPoint = ray.Origin + ray.Direction * t;
+
+	return intersectionPoint;
+}
+
+void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
+{
+	isDragging = true;
+	selectedAxis = axis;
+	dragStartLocation = targetObject->GetPosition();
 
 	// --- 이동 평면 생성 ---
-	m_MovementPlane.PointOnPlane = m_DragStartLocation;
+	movementPlane.PointOnPlane = dragStartLocation;
 
-	FVector axisDir = GetAxisVector(m_SelectedAxis);
-	FVector camToObjectDir = (m_DragStartLocation - camera->GetPosition()).GetNormalized();
+	FVector axisDir = GetAxisVector(selectedAxis);
+	FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).GetNormalized();
 
 	// 이동 축과 시선 벡터에 동시에 수직인 벡터를 찾고,
 	// 다시 외적하여 평면의 법선 벡터를 계산
 	FVector tempVec = axisDir.Cross(camToObjectDir);
-	m_MovementPlane.Normal = axisDir.Cross(tempVec).GetNormalized();
+	movementPlane.Normal = axisDir.Cross(tempVec).GetNormalized();
+
+	// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
+	FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+	FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
+	float projectedLength = startToIntersectionVec.Dot(axisDir);
+	FVector newPosition = dragStartLocation + axisDir * projectedLength;
+
+	dragOffset = dragStartLocation - newPosition;
 }
 
 void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 {
-	if (!m_bIsDragging) return;
+	if (!isDragging) return;
 
 	// --- 1. 마우스 레이와 이동 평면의 3D 교차점 찾기 ---
-	float denominator = mouseRay.Direction.Dot(m_MovementPlane.Normal);
-
-	// 레이가 평면과 평행에 가까우면 계산 오류 방지
-	if (abs(denominator) < 0.0001f) return;
-
-	float t = (m_MovementPlane.PointOnPlane - mouseRay.Origin).Dot(m_MovementPlane.Normal) / denominator;
-	FVector intersectionPoint = mouseRay.Origin + mouseRay.Direction * t;
-
+	FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
 
 	// --- 2. 3D 교차점을 이동 축으로 투영하기 ---
-	FVector startToIntersectionVec = intersectionPoint - m_DragStartLocation;
-	FVector axisDir = GetAxisVector(m_SelectedAxis);
+	FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
+	FVector axisDir = GetAxisVector(selectedAxis);
 
 	float projectedLength = startToIntersectionVec.Dot(axisDir);
-
-	FVector newPosition = m_DragStartLocation + axisDir * projectedLength;
+	FVector newPosition = dragStartLocation + axisDir * projectedLength;
 
 	// --- 3. Target 액터 위치 업데이트 ---
-	targetObject->SetPosition(newPosition);
+	targetObject->SetPosition(newPosition + dragOffset);
 }
 
 void UGizmoManager::EndDrag()
 {
-	m_bIsDragging = false;
-	m_SelectedAxis = EAxis::None;
+	isDragging = false;
+	selectedAxis = EAxis::None;
 }
 
 FVector UGizmoManager::GetAxisVector(EAxis axis)

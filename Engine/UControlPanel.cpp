@@ -4,6 +4,18 @@
 #include "UCamera.h"
 #include "USceneManager.h"
 #include "UScene.h"
+#include "UDefaultScene.h"
+
+
+UControlPanel::UControlPanel(USceneManager* sceneManager)
+    : ImGuiWindowWrapper("Jungle Control Panel"), SceneManager(sceneManager)
+{
+    registeredTypes = USceneComponentFactory::GetRegisteredTypes();
+    for (const auto& registeredType : registeredTypes)
+    {
+        choices.push_back(registeredType.c_str());
+    }
+}
 
 void UControlPanel::RenderContent()
 {
@@ -26,10 +38,7 @@ void UControlPanel::PrimaryInformationSection()
 
 void UControlPanel::SpawnPrimitiveSection()
 {
-    const char* choices[] = {
-        "Sphere"
-    };
-    ImGui::Combo("Primitive", &primitiveChoiceIndex, choices, sizeof(choices) / sizeof(const char*));
+    ImGui::Combo("Primitive", &primitiveChoiceIndex, choices.data(), static_cast<int>(choices.size()));
 
     int objectCount = SceneManager->GetScene()->GetObjectCount();
     if (ImGui::Button("Spawn"))
@@ -37,17 +46,22 @@ void UControlPanel::SpawnPrimitiveSection()
         USceneComponent* sceneComponent = USceneComponentFactory::Create(choices[primitiveChoiceIndex]);
         if (sceneComponent != nullptr)
         {
-            sceneComponent->SetPosition(FVector(
-                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-                -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
-            ));
-            sceneComponent->SetScale(FVector(
-                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-                0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
-            ));
-            SceneManager->GetScene()->AddObject(sceneComponent);
+        sceneComponent->SetPosition(FVector(
+            -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+            -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
+            -5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
+        ));
+        sceneComponent->SetScale(FVector(
+            0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
+            0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
+            0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
+        ));
+        sceneComponent->SetRotation(FVector(
+            -90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
+            -90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
+            -90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
+        ));
+        SceneManager->GetScene()->AddObject(sceneComponent);
         }
     }
     ImGui::SameLine();
@@ -64,23 +78,35 @@ void UControlPanel::SceneManagementSection()
     if (ImGui::Button("New scene"))
     {
         // TODO : Make New Scene
+        SceneManager->SetScene(new UDefaultScene());
+        
     }
 
     if (ImGui::Button("Save scene") && strcmp(sceneName, "") != 0)
     {
         std::filesystem::path _path("./data/");
         std::filesystem::create_directory(_path);
-        SceneManager->SaveScene(_path.string() + std::string(sceneName) + ".json");
+        SceneManager->SaveScene(_path.string() + std::string(sceneName) + ".Scene");
     }
     if (ImGui::Button("Load scene") && strcmp(sceneName, "") != 0)
     {
-        SceneManager->LoadScene("./data/" + std::string(sceneName) + ".json");
+        SceneManager->LoadScene("./data/" + std::string(sceneName) + ".Scene");
     }
 }
 
 void UControlPanel::CameraManagementSection()
 {
     UCamera* camera = SceneManager->GetScene()->GetCamera();
+    // 카메라 정보
+    FVector pos = camera->GetLocation();
+	float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
+    FVector eulDeg = camera->GetEulerXYZDeg();
+    float eulerXYZ[3] = { eulDeg.X, eulDeg.Y, eulDeg.Z };
+
+    // --- 테이블 UI ---
+    bool locCommitted = false;
+    bool rotCommitted = false;
+
     bool isOrthogonal = camera->IsOrtho();
     ImGui::Checkbox("Orthogonal", &isOrthogonal);
     if (isOrthogonal)
@@ -90,36 +116,25 @@ void UControlPanel::CameraManagementSection()
     }
     else
     {
-        camera->SetPerspectiveDegrees(camera->GetFovYDegrees(),
+        camera->SetPerspectiveDegrees(camera->GetFOV(),
             camera->GetAspect(), camera->GetNearZ(), camera->GetFarZ());
     }
 
     // === FOV (perspective일 때만 활성화) ===
-    float fovDeg = camera->GetFovYDegrees();
+    float fovDeg = camera->GetFOV();
     float tableWidth = ImGui::GetContentRegionAvail().x;
     ImGui::SetNextItemWidth(tableWidth * 0.75f);
     ImGui::BeginDisabled(isOrthogonal);
     if (ImGui::InputFloat("##fov", &fovDeg, 0.0f, 0.0f, "%.3f"))
     {
-        camera->SetFovYDegrees(fovDeg); // proj 재빌드 내부에서 함
+        camera->SetFOV(fovDeg); // proj 재빌드 내부에서 함
     }
     ImGui::EndDisabled();
     ImGui::SameLine();
     ImGui::Text("FOV");
 
-    // === 위치 ===
-    FVector pos = camera->GetPosition();
-    float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
 
-    // === 회전(Yaw, Pitch, Roll=0 표기) ===
-    float yawZ = 0.f, pitch = 0.f;
-    camera->GetYawPitch(yawZ, pitch);
-    float cameraRotation[3] = {
-        yawZ * 180.0f / 3.14159265f, // deg
-        pitch * 180.0f / 3.14159265f, // deg
-        0.0f // roll 고정
-    };
-
+    // --- Euler(XYZ) 편집 ---
     // 나머지는 테이블로
     if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None))
     {
@@ -131,6 +146,8 @@ void UControlPanel::CameraManagementSection()
             ImGui::SetNextItemWidth(-1);
             ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
                 &cameraLocation[i], 0.0f, 0.0f, "%.3f");
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                locCommitted = true;
         }
         ImGui::TableSetColumnIndex(3);
         ImGui::Text("Camera Location");
@@ -142,7 +159,9 @@ void UControlPanel::CameraManagementSection()
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
             ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
-                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
+                &eulerXYZ[i], 0.0f, 0.0f, "%.3f");
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                rotCommitted = true;
         }
         ImGui::TableSetColumnIndex(3);
         ImGui::Text("Camera Rotation");
@@ -152,10 +171,12 @@ void UControlPanel::CameraManagementSection()
 
     // === 변경사항을 카메라에 반영 ===
     // 위치
-    camera->SetPosition(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+    // === 변경사항을 카메라에 '커밋 시'만 반영 ===
+    if (locCommitted) {
+        camera->SetLocation(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+    }
 
-    // 회전 (roll은 무시)
-    float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
-    float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
-    camera->SetYawPitch(newYawRad, newPitchRad);
+    if (rotCommitted) {
+        camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
+    }
 }
