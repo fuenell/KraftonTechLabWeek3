@@ -180,7 +180,6 @@ struct FQuaternion
 
         return FVector(r.X, r.Y, r.Z);
     }
-
     // === COLUMNS are axes (row-vector) ===
     // col0 = q·(+X) = Right
     FMatrix ToMatrixRow() const {
@@ -283,12 +282,97 @@ struct FQuaternion
         // X=rx, Y=ry, Z=rz (라디안)
         return FVector(rx, ry, rz);
     }
-
     FVector ToEulerXYZ_Deg() const {
         FVector r = ToEulerXYZ();
         const float R2D = 180.0f / (float)PI;
         return FVector(r.X * R2D, r.Y * R2D, r.Z * R2D);
     }
+    FQuaternion RotatedWorldAxisAngle(const FVector& worldAxis, float radians) const
+    {
+        FQuaternion qW = FromAxisAngle(worldAxis, radians);
+        return (qW * *this).Normalized();
+    }
+    // In-place 버전
+    void RotateWorldAxisAngleInPlace(const FVector& worldAxis, float radians)
+    {
+        *this = RotatedWorldAxisAngle(worldAxis, radians);
+    }
+
+    // 월드 오일러(X→Y→Z)로 누적: q' = (Rx * Ry * Rz) * q
+    FQuaternion RotatedWorldEulerXYZ(float rx, float ry, float rz) const
+    {
+        FQuaternion qx = FromAxisAngle(FVector(1, 0, 0), rx);
+        FQuaternion qy = FromAxisAngle(FVector(0, 1, 0), ry);
+        FQuaternion qz = FromAxisAngle(FVector(0, 0, 1), rz);
+        FQuaternion qW = qx * qy * qz;
+        return (qW * *this).Normalized();
+    }
+    void RotateWorldEulerXYZInPlace(float rx, float ry, float rz)
+    {
+        *this = RotatedWorldEulerXYZ(rx, ry, rz);
+    }
+
+    // 월드 Yaw/Pitch/Roll 누적 (Z=Yaw, X=Pitch, Y=Roll; Z-up, Forward=+Y 규약)
+    // 합성: Rz(yaw) * Rx(pitch) * Ry(roll)
+    FQuaternion RotatedWorldYawPitchRoll(float yawZ, float pitchX, float rollY) const
+    {
+        FQuaternion qz = FromAxisAngle(FVector(0, 0, 1), yawZ);
+        FQuaternion qx = FromAxisAngle(FVector(1, 0, 0), pitchX);
+        FQuaternion qy = FromAxisAngle(FVector(0, 1, 0), rollY);
+        return (qz * qx * qy * *this).Normalized();
+    }
+    void RotateWorldYawPitchRollInPlace(float yawZ, float pitchX, float rollY)
+    {
+        *this = RotatedWorldYawPitchRoll(yawZ, pitchX, rollY);
+    }
+
+    // ============================================================
+    // 월드 축 기준 누적 회전 (도 단위) — GUI용
+    // ============================================================
+    FQuaternion RotatedWorldAxisAngleDeg(const FVector& worldAxis, float degrees) const
+    {
+        return RotatedWorldAxisAngle(worldAxis, ToRad(degrees));
+    }
+    void RotateWorldAxisAngleDegInPlace(const FVector& worldAxis, float degrees)
+    {
+        *this = RotatedWorldAxisAngleDeg(worldAxis, degrees);
+    }
+
+    FQuaternion RotatedWorldEulerXYZDeg(float degX, float degY, float degZ) const
+    {
+        return RotatedWorldEulerXYZ(ToRad(degX), ToRad(degY), ToRad(degZ));
+    }
+    void RotateWorldEulerXYZDegInPlace(float degX, float degY, float degZ)
+    {
+        *this = RotatedWorldEulerXYZDeg(degX, degY, degZ);
+    }
+
+    FQuaternion RotatedWorldYawPitchRollDeg(float yawZ_deg, float pitchX_deg, float rollY_deg) const
+    {
+        return RotatedWorldYawPitchRoll(ToRad(yawZ_deg), ToRad(pitchX_deg), ToRad(rollY_deg));
+    }
+    void RotateWorldYawPitchRollDegInPlace(float yawZ_deg, float pitchX_deg, float rollY_deg)
+    {
+        *this = RotatedWorldYawPitchRollDeg(yawZ_deg, pitchX_deg, rollY_deg);
+    }
+
+    // ============================================================
+    // 편의: 월드 축 단일 축(라디안) 회전
+    // ============================================================
+    FQuaternion RotatedWorldX(float radians) const { return RotatedWorldAxisAngle(FVector(1, 0, 0), radians); }
+    FQuaternion RotatedWorldY(float radians) const { return RotatedWorldAxisAngle(FVector(0, 1, 0), radians); }
+    FQuaternion RotatedWorldZ(float radians) const { return RotatedWorldAxisAngle(FVector(0, 0, 1), radians); }
+    void RotateWorldXInPlace(float radians) { *this = RotatedWorldX(radians); }
+    void RotateWorldYInPlace(float radians) { *this = RotatedWorldY(radians); }
+    void RotateWorldZInPlace(float radians) { *this = RotatedWorldZ(radians); }
+
+    // 도 단위 단일 축
+    FQuaternion RotatedWorldXDeg(float deg) const { return RotatedWorldX(ToRad(deg)); }
+    FQuaternion RotatedWorldYDeg(float deg) const { return RotatedWorldY(ToRad(deg)); }
+    FQuaternion RotatedWorldZDeg(float deg) const { return RotatedWorldZ(ToRad(deg)); }
+    void RotateWorldXDegInPlace(float deg) { *this = RotatedWorldXDeg(deg); }
+    void RotateWorldYDegInPlace(float deg) { *this = RotatedWorldYDeg(deg); }
+    void RotateWorldZDegInPlace(float deg) { *this = RotatedWorldZDeg(deg); }
 };
 
 // 모델행렬 (row-vector): M = S * R * T
