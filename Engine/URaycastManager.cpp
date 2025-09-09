@@ -7,115 +7,117 @@
 #include "UScene.h"
 
 URaycastManager::URaycastManager()
-    : Renderer(nullptr),
-      InputManager(nullptr),
-      RayOrigin(FVector(0,0,0)),
-      RayDirection(FVector(0,0,0)),
-      MouseX(0),
-      MouseY(0)
+	: Renderer(nullptr),
+	InputManager(nullptr),
+	RayOrigin(FVector(0, 0, 0)),
+	RayDirection(FVector(0, 0, 0)),
+	MouseX(0),
+	MouseY(0)
 {
 }
 
 URaycastManager::URaycastManager(URenderer* renderer, UCamera* camera, UInputManager* inputManager)
-    : Renderer(renderer),
-      InputManager(inputManager),
-      RayOrigin(FVector(0,0,0)),
-      RayDirection(FVector(0,0,0)),
-      MouseX(0),
-      MouseY(0)
+	: Renderer(renderer),
+	InputManager(inputManager),
+	RayOrigin(FVector(0, 0, 0)),
+	RayDirection(FVector(0, 0, 0)),
+	MouseX(0),
+	MouseY(0)
 {
 }
 
 URaycastManager::~URaycastManager()
 {
-    Renderer = nullptr;
-    InputManager   = nullptr;
+	Renderer = nullptr;
+	InputManager = nullptr;
 }
 
 FVector URaycastManager::GetRaycastOrigin(UCamera* camera)
 {
-    return camera->GetLocation();
+	return camera->GetLocation();
 }
 
 FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 {
-    float CameraFOV = camera->GetFOV();
+	float CameraFOV = camera->GetFOV();
 
-    // convert the mouse coords to Normalized Device Coordinates (NDC)
-    int width = 0, height = 0;
-    Renderer->GetBackBufferSize(width, height);
-    float ndcX = (2.0f * MouseX) / static_cast<float>(width) - 1.0f;
-    float ndcY = 1.0f - (2.0f * MouseY) / static_cast<float>(height);
+	// convert the mouse coords to Normalized Device Coordinates (NDC)
+	int width = 0, height = 0;
+	Renderer->GetBackBufferSize(width, height);
+	float ndcX = (2.0f * MouseX) / static_cast<float>(width) - 1.0f;
+	float ndcY = 1.0f - (2.0f * MouseY) / static_cast<float>(height);
 
-    // get the camera-space ray direction
-    // assume the camera is 1.0f units of distance away from the screen
-    float aspect = static_cast<float>(width) / static_cast<float>(height);
-    FVector rayViewDir;
-    rayViewDir.X = ndcX * tan(CameraFOV / 2.0f) * aspect;
-    rayViewDir.Y = ndcY * tan(CameraFOV / 2.0f);
-    rayViewDir.Z = -1.0f; // points forward in Camera space
-    rayViewDir.Normalize();
+	// get the camera-space ray direction
+	// assume the camera is 1.0f units of distance away from the screen
+	float aspect = static_cast<float>(width) / static_cast<float>(height);
+	FVector rayViewDir;
+	rayViewDir.X = ndcX * tan(CameraFOV / 2.0f) * aspect;
+	rayViewDir.Y = ndcY * tan(CameraFOV / 2.0f);
+	rayViewDir.Z = -1.0f; // points forward in Camera space
+	rayViewDir.Normalize();
 
-    // convert the camera-space ray direction to world direction
-    FMatrix V = FMatrix::LookAtRH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
-    V = FMatrix::Inverse(V);
-    FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
-    
-    return {rayDirection.X, rayDirection.Y, rayDirection.Z};
+	// convert the camera-space ray direction to world direction
+	FMatrix V = FMatrix::LookAtRH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
+	V = FMatrix::Inverse(V);
+	FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
+
+	return { rayDirection.X, rayDirection.Y, rayDirection.Z };
 }
 
 template <typename T>
 bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent)
 {
-    MouseX = static_cast<float>(InputManager->GetMouseX());
-    MouseY = static_cast<float>(InputManager->GetMouseY());
+	MouseX = static_cast<float>(InputManager->GetMouseX());
+	MouseY = static_cast<float>(InputManager->GetMouseY());
 
-    RayOrigin = GetRaycastOrigin(camera);
-    RayDirection = GetRaycastDirection(camera);
-    
-    bool hit = false;
-    float closestHit = FLT_MAX;
-    T* closestComponent = nullptr;
-    
-    for (T* component : components)
-    {
-        UMesh* mesh = component->GetMesh();
-        FMatrix worldTransform = component->GetWorldTransform();
+	FRay ray = CreateRayFromScreenPosition(camera);
 
-        std::cout << "\nChecking component: " << component
-                  << " | NumVertices: " << mesh->NumVertices << std::endl;
-        
-        if (mesh->NumVertices < 3) continue;
-        
-        for (int i = 0; i + 2 < mesh->NumVertices; i += 3)
-        {
-            FVector triangleVertices[3] = {
-                TransformVertexToWorld(mesh->Vertices[i], worldTransform),
-                TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform),
-                TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform)
-            };
-        
-            auto result = RayIntersectsTriangle(triangleVertices);
-            if (result.has_value())
-            {
-                float t = (*result - RayOrigin).Length(); // distance along ray
-                std::cout << "    -> Hit at distance " << t << std::endl;
-                if (t < closestHit)
-                {
-                    closestHit = t;
-                    std::cout << "    -> Closest so far (was " << closestHit << ")" << std::endl;
-                    hit = true;
-                    closestComponent = component;
-                }
-            }
-        }
-    }
+	RayOrigin = ray.Origin;
+	RayDirection = ray.Direction;
 
-    if (hit)
-    {
-        hitComponent = closestComponent;
-    }
-    return hit;
+	bool hit = false;
+	float closestHit = FLT_MAX;
+	T* closestComponent = nullptr;
+
+	for (T* component : components)
+	{
+		UMesh* mesh = component->GetMesh();
+		FMatrix worldTransform = component->GetWorldTransform();
+
+		std::cout << "\nChecking component: " << component
+			<< " | NumVertices: " << mesh->NumVertices << std::endl;
+
+		if (mesh->NumVertices < 3) continue;
+
+		for (int i = 0; i + 2 < mesh->NumVertices; i += 3)
+		{
+			FVector triangleVertices[3] = {
+				TransformVertexToWorld(mesh->Vertices[i], worldTransform),
+				TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform),
+				TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform)
+			};
+
+			auto result = RayIntersectsTriangle(triangleVertices);
+			if (result.has_value())
+			{
+				float t = (*result - RayOrigin).Length(); // distance along ray
+				std::cout << "    -> Hit at distance " << t << std::endl;
+				if (t < closestHit)
+				{
+					closestHit = t;
+					std::cout << "    -> Closest so far (was " << closestHit << ")" << std::endl;
+					hit = true;
+					closestComponent = component;
+				}
+			}
+		}
+	}
+
+	if (hit)
+	{
+		hitComponent = closestComponent;
+	}
+	return hit;
 }
 
 template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&);
@@ -124,45 +126,45 @@ template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*
 
 std::optional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertices[3])
 {
-    constexpr float epsilon = std::numeric_limits<float>::epsilon();
-    
-    FVector edge1 = triangleVertices[1] - triangleVertices[0];
-    FVector edge2 = triangleVertices[2] - triangleVertices[0];
-    FVector ray_cross_e2 = RayDirection.Cross(edge2);
-    float det = edge1.Dot(ray_cross_e2);
+	constexpr float epsilon = std::numeric_limits<float>::epsilon();
 
-    if (det > -epsilon && det < epsilon)
-        return {};    // This ray is parallel to this triangle.
+	FVector edge1 = triangleVertices[1] - triangleVertices[0];
+	FVector edge2 = triangleVertices[2] - triangleVertices[0];
+	FVector ray_cross_e2 = RayDirection.Cross(edge2);
+	float det = edge1.Dot(ray_cross_e2);
 
-    float inv_det = 1.0f / det;
-    FVector s = RayOrigin - triangleVertices[0];
-    float u = inv_det * s.Dot(ray_cross_e2);
+	if (det > -epsilon && det < epsilon)
+		return {};    // This ray is parallel to this triangle.
 
-    if ((u < 0 && abs(u) > epsilon) || (u > 1 && abs(u-1) > epsilon))
-        return {};
+	float inv_det = 1.0f / det;
+	FVector s = RayOrigin - triangleVertices[0];
+	float u = inv_det * s.Dot(ray_cross_e2);
 
-    FVector s_cross_e1 = s.Cross(edge1);
-    float v = inv_det * RayDirection.Dot(s_cross_e1);
+	if ((u < 0 && abs(u) > epsilon) || (u > 1 && abs(u - 1) > epsilon))
+		return {};
 
-    if ((v < 0 && abs(v) > epsilon) || (u + v > 1 && abs(u + v - 1) > epsilon))
-        return {};
+	FVector s_cross_e1 = s.Cross(edge1);
+	float v = inv_det * RayDirection.Dot(s_cross_e1);
 
-    // At this stage we can compute t to find out where the intersection point is on the line.
-    float t = inv_det * edge2.Dot(s_cross_e1);
+	if ((v < 0 && abs(v) > epsilon) || (u + v > 1 && abs(u + v - 1) > epsilon))
+		return {};
 
-    if (t > epsilon) // ray intersection
-    {
-        return FVector(RayOrigin + RayDirection * t);
-    }
-    else // This means that there is a line intersection but not a ray intersection.
-        return {};
+	// At this stage we can compute t to find out where the intersection point is on the line.
+	float t = inv_det * edge2.Dot(s_cross_e1);
+
+	if (t > epsilon) // ray intersection
+	{
+		return FVector(RayOrigin + RayDirection * t);
+	}
+	else // This means that there is a line intersection but not a ray intersection.
+		return {};
 }
 
 FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world)
 {
-    FVector4 pos4(vertex.x, vertex.y, vertex.z, vertex.w);
-    FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
-    return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
+	FVector4 pos4(vertex.x, vertex.y, vertex.z, vertex.w);
+	FVector4 worldPos4 = FMatrix::MultiplyVectorRow(pos4, world);
+	return FVector(worldPos4.X, worldPos4.Y, worldPos4.Z);
 }
 
 // bool RaycastManager::RayIntersectsSphere(FVector& rayOrigin, FVector& rayDirection, USphereComp& sphere, float& tHit)
@@ -199,29 +201,31 @@ FVector URaycastManager::TransformVertexToWorld(const FVertexPosColor4& vertex, 
 // 현재 클릭한 마우스 위치와 카메라를 기준으로 ray 생성
 FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 {
-    MouseX = static_cast<float>(InputManager->GetMouseX());
-    MouseY = static_cast<float>(InputManager->GetMouseY());
+	MouseX = static_cast<float>(InputManager->GetMouseX());
+	MouseY = static_cast<float>(InputManager->GetMouseY());
 
-    int viewportWidth = 0, viewportHeight = 0;
-    Renderer->GetBackBufferSize(viewportWidth, viewportHeight);
+	int viewportWidth = 0, viewportHeight = 0;
+	Renderer->GetBackBufferSize(viewportWidth, viewportHeight);
 
-    // 1단계: Screen -> NDC
-    FVector ndcPos;
-    ndcPos.X = (MouseX / viewportWidth) * 2.0f - 1.0f;
-    ndcPos.Y = 1.0f - (MouseY / viewportHeight) * 2.0f;
-    ndcPos.Z = 0.0f; // Near Plane
+	// 1단계: Screen -> NDC
+	FVector ndcPos;
+	ndcPos.X = (MouseX / viewportWidth) * 2.0f - 1.0f;
+	ndcPos.Y = 1.0f - (MouseY / viewportHeight) * 2.0f;
+	ndcPos.Z = 0.0f; // Near Plane
 
-    FMatrix invProjectionMatrix = FMatrix::Inverse(camera->GetProj());
-    FVector viewPos = invProjectionMatrix.TransformPointRow(ndcPos);
+	FMatrix invProjectionMatrix = FMatrix::Inverse(camera->GetProj());
+	FVector viewPos = invProjectionMatrix.TransformPointRow(ndcPos);
 
-    // 3단계: View -> World
-    FMatrix invViewMatrix = FMatrix::Inverse(camera->GetView());
-    FVector worldPos = invViewMatrix.TransformPointRow(viewPos);
+	// 3단계: View -> World
+	FMatrix invViewMatrix = FMatrix::Inverse(camera->GetView());
+	FVector worldPos = invViewMatrix.TransformPointRow(viewPos);
 
-    // 4단계: 방향 벡터 계산
-    FRay resultRay;
-    resultRay.Origin = camera->GetLocation(); // 카메라의 월드 위치
-    resultRay.Direction = (worldPos - resultRay.Origin).GetNormalized();
+	// 4단계: 방향 벡터 계산
+	FRay resultRay;
+	resultRay.Origin = camera->GetLocation(); // 카메라의 월드 위치
+	resultRay.Direction = (worldPos - resultRay.Origin).GetNormalized();
 
-    return resultRay;
+	//UE_LOG("%f %f %f / %f %f %f", resultRay.Origin.X, resultRay.Origin.Y, resultRay.Origin.Z, resultRay.Direction.X, resultRay.Direction.Y, resultRay.Direction.Z);
+
+	return resultRay;
 }

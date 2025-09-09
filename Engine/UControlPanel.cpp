@@ -4,6 +4,7 @@
 #include "UCamera.h"
 #include "USceneManager.h"
 #include "UScene.h"
+#include "UDefaultScene.h"
 
 
 UControlPanel::UControlPanel(USceneManager* sceneManager)
@@ -77,17 +78,19 @@ void UControlPanel::SceneManagementSection()
     if (ImGui::Button("New scene"))
     {
         // TODO : Make New Scene
+        SceneManager->SetScene(new UDefaultScene());
+        
     }
 
     if (ImGui::Button("Save scene") && strcmp(sceneName, "") != 0)
     {
         std::filesystem::path _path("./data/");
         std::filesystem::create_directory(_path);
-        SceneManager->SaveScene(_path.string() + std::string(sceneName) + ".json");
+        SceneManager->SaveScene(_path.string() + std::string(sceneName) + ".Scene");
     }
     if (ImGui::Button("Load scene") && strcmp(sceneName, "") != 0)
     {
-        SceneManager->LoadScene("./data/" + std::string(sceneName) + ".json");
+        SceneManager->LoadScene("./data/" + std::string(sceneName) + ".Scene");
     }
 }
 

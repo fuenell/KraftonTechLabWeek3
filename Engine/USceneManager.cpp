@@ -32,6 +32,8 @@ void USceneManager::SetScene(UScene* scene)
 		&application->GetRenderer(),
 		&application->GetMeshManager(),
 		&application->GetInputManager());
+
+	application->OnSceneChange();
 }
 
 void USceneManager::RequestExit()

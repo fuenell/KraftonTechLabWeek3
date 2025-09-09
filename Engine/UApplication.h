@@ -68,6 +68,7 @@ public:
 	bool IsRunning() const { return bIsRunning; }
 	void RequestExit() { bIsRunning = false; }
 	virtual UScene* CreateDefaultScene();
+	virtual void OnSceneChange() {}
 
 protected:
 	// Internal methods
