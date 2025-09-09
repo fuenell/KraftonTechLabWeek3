@@ -31,6 +31,17 @@ public:
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }
 	void SetScale(const FVector& scl) { RelativeScale3D = scl; }
 	void SetRotation(const FVector& rot) { RelativeQuaternion = FQuaternion::FromEulerXYZDeg(rot); }
+	void AddQuaternion(const FVector& axis, const float deg, const bool isWorldAxis = false)
+	{
+		if (isWorldAxis)
+		{
+			RelativeQuaternion.RotateWorldAxisAngleInPlace(axis, deg);
+		}
+		else
+		{
+			RelativeQuaternion.RotateLocalAxisAngleInPlace(axis, deg);
+		}
+	}
 	void SetQuaternion(const FQuaternion quat) { RelativeQuaternion = quat; }
 	void ResetQuaternion()
 	{

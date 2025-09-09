@@ -307,7 +307,7 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 		targetObject->SetPosition(newPosition + dragOffset);
 		break;
 	case ETranslationType::Rotation:
-		targetObject->SetRotation(dragStartRotation + ((newPosition - dragStartLocation + dragOffset) * 45));
+		targetObject->AddQuaternion(GetAxisVector(selectedAxis), (newPosition - dragStartLocation + dragOffset).Length() * 0.1f, isWorldSpace);
 		break;
 	case ETranslationType::Scale:
 		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));
