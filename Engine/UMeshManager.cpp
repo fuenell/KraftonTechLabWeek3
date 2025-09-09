@@ -61,7 +61,7 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	return true;
 }
 
-UMesh* UMeshManager::RetrieveMesh(std::string meshName)
+UMesh* UMeshManager::RetrieveMesh(FString meshName)
 {
 	auto itr = meshes.find(meshName);
 	if (itr == meshes.end()) return nullptr;

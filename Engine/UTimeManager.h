@@ -15,7 +15,7 @@ private:
 	double totalTime;
 
 	// Frame rate management
-	int targetFPS;
+	int32 targetFPS;
 	double targetFrameTime;
 
 public:
@@ -23,7 +23,7 @@ public:
 	~UTimeManager();
 
 	// Initialization
-	bool Initialize(int fps = 60);
+	bool Initialize(int32 fps = 60);
 
 	// Frame timing
 	void BeginFrame();
@@ -33,8 +33,8 @@ public:
 	// Basic getters
 	double GetDeltaTime() const { return deltaTime; }
 	double GetTotalTime() const { return totalTime; }
-	int GetTargetFPS() const { return targetFPS; }
+	int32 GetTargetFPS() const { return targetFPS; }
 
 	// Basic settings
-	void SetTargetFPS(int fps);
+	void SetTargetFPS(int32 fps);
 };

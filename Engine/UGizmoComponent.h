@@ -23,7 +23,7 @@ public:
 	}
 
 	bool Init(UMeshManager* meshManager);
-	std::string GetType() const override { return "UGizmoComponent"; }
+	FString GetType() const override { return "UGizmoComponent"; }
 	bool CountOnInspector() override { return true; }
 
 	FMatrix GetWorldTransform() override;

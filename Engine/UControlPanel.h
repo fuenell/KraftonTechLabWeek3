@@ -7,9 +7,9 @@ class UControlPanel : public ImGuiWindowWrapper
 	USceneManager* SceneManager;
 	
 	// Spawn Primitive Section
-	std::vector<std::string> registeredTypes;
-	std::vector<const char*> choices;
-	int primitiveChoiceIndex = 0;
+	TArray<FString> registeredTypes;
+	TArray<const char*> choices;
+	int32 primitiveChoiceIndex = 0;
 
 	// Scene Management Section
 	char sceneName[256] = "";

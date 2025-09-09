@@ -42,7 +42,7 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 	float CameraFOV = camera->GetFOV();
 
 	// convert the mouse coords to Normalized Device Coordinates (NDC)
-	int width = 0, height = 0;
+	int32 width = 0, height = 0;
 	Renderer->GetBackBufferSize(width, height);
 	float ndcX = (2.0f * MouseX) / static_cast<float>(width) - 1.0f;
 	float ndcY = 1.0f - (2.0f * MouseY) / static_cast<float>(height);
@@ -89,7 +89,7 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 
 		if (mesh->NumVertices < 3) continue;
 
-		for (int i = 0; i + 2 < mesh->NumVertices; i += 3)
+		for (int32 i = 0; i + 2 < mesh->NumVertices; i += 3)
 		{
 			FVector triangleVertices[3] = {
 				TransformVertexToWorld(mesh->Vertices[i], worldTransform),
@@ -204,7 +204,7 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 	MouseX = static_cast<float>(InputManager->GetMouseX());
 	MouseY = static_cast<float>(InputManager->GetMouseY());
 
-	int viewportWidth = 0, viewportHeight = 0;
+	int32 viewportWidth = 0, viewportHeight = 0;
 	Renderer->GetBackBufferSize(viewportWidth, viewportHeight);
 
 	// 1단계: Screen -> NDC

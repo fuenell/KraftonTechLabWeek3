@@ -9,5 +9,5 @@ public:
 
 	EAxis Axis = EAxis::None;
 
-	std::string GetType() const override { return "GizmoRotationHandle"; }
+	FString GetType() const override { return "GizmoRotationHandle"; }
 };

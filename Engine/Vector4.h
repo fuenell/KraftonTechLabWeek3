@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "Vector.h"
+#include "UEngineStatics.h"
 
 struct FVector4
 {
@@ -10,7 +11,7 @@ struct FVector4
     float W;
     FVector4(float _x = 0, float _y = 0, float _z = 0, float _w = 1) : X(_x), Y(_y), Z(_z), W(_w) {}
 
-    float& operator[](int index)
+    float& operator[](int32 index)
     {
         switch (index)
         {

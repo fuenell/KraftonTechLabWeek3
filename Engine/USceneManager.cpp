@@ -50,7 +50,7 @@ void USceneManager::RequestExit()
 }
 
 
-void USceneManager::LoadScene(const std::string& path)
+void USceneManager::LoadScene(const FString& path)
 {
 	std::ifstream file(path);
 	if (!file)
@@ -66,7 +66,7 @@ void USceneManager::LoadScene(const std::string& path)
 	SetScene(UScene::Create(sceneData));
 }
 
-void USceneManager::SaveScene(const std::string& path)
+void USceneManager::SaveScene(const FString& path)
 {
 	std::filesystem::path fsPath(path);
 

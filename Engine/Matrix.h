@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Vector.h"
 #include "Vector4.h"
-
+#include "UEngineStatics.h"
 
 //struct FQuaternion; // 전방 선언
 
@@ -12,20 +12,20 @@ struct FMatrix
 	// ===== 생성/기본 =====
 	FMatrix() { SetIdentity(); }
 	// 대각 행렬(모든 대각 원소가 동일한 값 v일 때는 스칼라 행렬)로 초기화 (대각선에 값, 나머지는 0)
-	FMatrix(float v) { for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) M[r][c] = (r == c) ? v : 0.0f; }
+	FMatrix(float v) { for (int32 r = 0; r < 4; ++r) for (int32 c = 0; c < 4; ++c) M[r][c] = (r == c) ? v : 0.0f; }
 	static FMatrix IdentityMatrix() { FMatrix t; t.SetIdentity(); return t; }
 	void SetIdentity()
 	{
-		for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) M[r][c] = (r == c) ? 1.0f : 0.0f;
+		for (int32 r = 0; r < 4; ++r) for (int32 c = 0; c < 4; ++c) M[r][c] = (r == c) ? 1.0f : 0.0f;
 	}
 	static const FMatrix Identity; // 정의는 .cpp에: const FMatrix FMatrix::Identity = FMatrix::IdentityMatrix();
 	// ===== 행렬 기본 연산 =====
 	static FMatrix Multiply(const FMatrix& A, const FMatrix& B)
 	{
 		FMatrix R(0.0f);
-		for (int r = 0; r < 4; ++r)
-			for (int c = 0; c < 4; ++c)
-				for (int k = 0; k < 4; ++k)
+		for (int32 r = 0; r < 4; ++r)
+			for (int32 c = 0; c < 4; ++c)
+				for (int32 k = 0; k < 4; ++k)
 					R.M[r][c] += A.M[r][k] * B.M[k][c];
 		return R;
 	}
@@ -33,9 +33,9 @@ struct FMatrix
 	static FVector4 MultiplyVector(FMatrix m, FVector4 v)
 	{
 		FVector4 R(0, 0, 0, 0);
-		for (int i = 0; i < 4; i++)
+		for (int32 i = 0; i < 4; i++)
 		{
-			for (int j = 0; j < 4; j++)
+			for (int32 j = 0; j < 4; j++)
 			{
 				R[i] += m.M[i][j] * v[j];
 			}
@@ -49,9 +49,9 @@ struct FMatrix
 		FVector4 R(0, 0, 0, 0);
 
 		// 루프 순서 변경: j가 바깥쪽, i가 안쪽
-		for (int j = 0; j < 4; j++) // 결과 벡터의 각 성분(x, y, z, w)을 계산
+		for (int32 j = 0; j < 4; j++) // 결과 벡터의 각 성분(x, y, z, w)을 계산
 		{
-			for (int i = 0; i < 4; i++) // 입력 벡터와 행렬의 한 '열'을 순회
+			for (int32 i = 0; i < 4; i++) // 입력 벡터와 행렬의 한 '열'을 순회
 			{
 				// R[j]는 결과 벡터의 j번째 성분 (예: j=0이면 x)
 				// v[i]는 입력 벡터의 i번째 성분 (예: i=0이면 x)
@@ -66,7 +66,7 @@ struct FMatrix
 	static FMatrix Transpose(const FMatrix& A)
 	{
 		FMatrix T(0.0f);
-		for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) T.M[r][c] = A.M[c][r];
+		for (int32 r = 0; r < 4; ++r) for (int32 c = 0; c < 4; ++c) T.M[r][c] = A.M[c][r];
 		return T;
 	}
 	// ===== 벡터 변환 (column-vector / row-vector) =====
@@ -165,7 +165,7 @@ struct FMatrix
 		cof[3][3] = Det3(a00, a01, a02, a10, a11, a12, a20, a21, a22);
 
 		// adjugate = transpose of cofactor
-		for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) C.M[r][c] = cof[c][r];
+		for (int32 r = 0; r < 4; ++r) for (int32 c = 0; c < 4; ++c) C.M[r][c] = cof[c][r];
 		return C;
 	}
 	static FMatrix Inverse(const FMatrix& A, bool* ok = nullptr)
@@ -175,7 +175,7 @@ struct FMatrix
 		if (det == 0.0f) { FMatrix Z(0.0f); return Z; }
 		FMatrix adj = Adjugate(A);
 		const float invDet = 1.0f / det;
-		for (int r = 0; r < 4; ++r) for (int c = 0; c < 4; ++c) adj.M[r][c] *= invDet;
+		for (int32 r = 0; r < 4; ++r) for (int32 c = 0; c < 4; ++c) adj.M[r][c] *= invDet;
 		return adj;
 	}
 
@@ -186,7 +186,7 @@ struct FMatrix
 	{
 		FMatrix Rt = Transpose(*this);
 		FMatrix I = Rt * (*this);
-		for (int r = 0; r < 3; ++r) for (int c = 0; c < 3; ++c)
+		for (int32 r = 0; r < 3; ++r) for (int32 c = 0; c < 3; ++c)
 		{
 			float target = (r == c) ? 1.0f : 0.0f;
 			if (fabsf(I.M[r][c] - target) > eps) return false;

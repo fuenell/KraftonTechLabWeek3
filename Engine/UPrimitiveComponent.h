@@ -23,7 +23,7 @@ public:
 
 	// 별도의 초기화 메서드
 	virtual bool Init(UMeshManager* meshManager);
-	std::string GetType() const override { return "UPrimitiveComponent"; }
+	FString GetType() const override { return "UPrimitiveComponent"; }
 
 	bool CountOnInspector() override { return true; }
 

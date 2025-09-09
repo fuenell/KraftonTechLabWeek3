@@ -19,7 +19,7 @@ public:
 
 	virtual FMatrix GetWorldTransform();
 
-	virtual std::string GetType() const
+	virtual FString GetType() const
 	{
 		return "USceneComponent";
 	}
@@ -44,18 +44,18 @@ public:
 
 class USceneComponentFactory
 {
-	static std::unordered_map<std::string, std::function<USceneComponent* ()>>& GetCreators()
+	static std::unordered_map<FString, std::function<USceneComponent* ()>>& GetCreators()
 	{
-		static std::unordered_map<std::string, std::function<USceneComponent* ()>> creators;
+		static std::unordered_map<FString, std::function<USceneComponent* ()>> creators;
 		return creators;
 	}
 public:
-	static void Register(const std::string& typeName, std::function<USceneComponent* ()> creator)
+	static void Register(const FString& typeName, std::function<USceneComponent* ()> creator)
 	{
 		GetCreators()[typeName] = creator;
 	}
 
-	static USceneComponent* Create(const std::string& typeName)
+	static USceneComponent* Create(const FString& typeName)
 	{
 		auto& creators = GetCreators();
 		auto it = creators.find(typeName);
@@ -63,9 +63,9 @@ public:
 	}
 
 	// 등록된 타입 목록 조회 (디버깅용)
-	static std::vector<std::string> GetRegisteredTypes()
+	static TArray<FString> GetRegisteredTypes()
 	{
-		std::vector<std::string> types;
+		TArray<FString> types;
 		for (const auto& pair : GetCreators())
 		{
 			types.push_back(pair.first);

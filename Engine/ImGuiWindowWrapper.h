@@ -1,14 +1,15 @@
 ﻿#pragma once
 #include "stdafx.h"
+#include "UEngineStatics.h"
 #include <string>
 
 class ImGuiWindowWrapper
 {
 private:
-    std::string WindowName;
+    FString WindowName;
 
 public:
-    ImGuiWindowWrapper(std::string windowName) : WindowName(windowName) {}
+    ImGuiWindowWrapper(FString windowName) : WindowName(windowName) {}
 
     void Render()
     {

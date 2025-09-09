@@ -37,5 +37,5 @@ protected:
 	void Render() override;
 	void RenderGUI() override;
 	bool OnInitialize() override;
-	void OnResize(int width, int height) override;
+	void OnResize(int32 width, int32 height) override;
 };
