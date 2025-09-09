@@ -16,7 +16,7 @@ struct FQuaternion
     // (x,y,z,w) with w = scalar
     // 즉, 쿼터니언은 W가 실수부이고 x, y, z는 허수부이다.
     float X, Y, Z, W;
-
+     
     FQuaternion(float x = 0, float y = 0, float z = 0, float w = 1) : X(x), Y(y), Z(z), W(w) {}
 
     static FQuaternion Identity() { return FQuaternion(0, 0, 0, 1); }
@@ -121,30 +121,35 @@ struct FQuaternion
     // TODO : 오브젝트에 쓰려면 조정이 필요함. 카메라 전용이었어서 잘 작동하지 않을 수 있음
     static FQuaternion LookRotation(const FVector& fwd, const FVector& up)
     {
-        // 1) 우리 카메라 규약 맞추기
-        //    Forward = q·(-Y) 이어야 하므로,
-        //    쿼터니언을 만들 때는 "local -Y 가 fwd 로 가게" 맞춘다.
         FVector F = fwd; F.Normalize();
-        FVector Uref = up; Uref.Normalize();
-        // fwd ‖ up 방지
-        if (fabsf(F.Dot(Uref)) > 0.999f) {
-            Uref = (fabsf(F.Z) < 0.9f) ? FVector(0, 0, 1) : FVector(0, 1, 0);
+
+        // 1) up을 F에 직교하도록 정규화(Gram-Schmidt)
+        FVector Uref = up;
+        if (Uref.Length() < 1e-12f) Uref = FVector(0, 0, 1);
+        // U = up - proj_up_on_F
+        FVector U = (Uref - F * F.Dot(Uref));
+        float uLen2 = U.Length();
+        if (uLen2 < 1e-12f) {
+            // fwd ≈ up 인 경우 대체 업벡터 선택
+            U = (fabsf(F.Z) < 0.9f) ? FVector(0, 0, 1) : FVector(1, 0, 0);
+            U = (U - F * F.Dot(U));
         }
+        U.Normalize();
 
-        // RH, Z-up 기준: Right = up × forward, Up = forward × right
-        FVector R = Uref.Cross(F).GetNormalized();   // ★ up × f
-        FVector U = F.Cross(R).GetNormalized();      // ★ f × r
-        // row-vector 규약: "열"에 축을 넣는다.
-        // col0 = q·(+X) = Right = R
-        // col1 = q·(+Y) = -Forward = -F
-        // col2 = q·(+Z) = Up = U
+        // 2) RH 유지: R = U × F, U = F × R
+        FVector R = F.Cross(U).GetNormalized();
+        U = R.Cross(F).GetNormalized(); // 재직교(수치안정)
+
+        // 3) 열에 축을 넣는다 (columns are axes)
         FMatrix M = FMatrix::IdentityMatrix();
-        M.M[0][0] = R.X;   M.M[1][0] = R.Y;   M.M[2][0] = R.Z;
-        M.M[0][1] = -F.X;  M.M[1][1] = -F.Y;  M.M[2][1] = -F.Z;
-        M.M[0][2] = U.X;   M.M[1][2] = U.Y;   M.M[2][2] = U.Z;
+        // col0 = Right = R
+        M.M[0][0] = R.X; M.M[0][1] = F.X; M.M[0][2] = U.X;
+        // col1 = Forward = +F   ★ 오브젝트는 +Y가 전방
+        M.M[1][0] = R.Y; M.M[1][1] = F.Y; M.M[2][1] = U.Y;
+        // col2 = Up = U
+        M.M[2][0] = R.Z; M.M[1][2] = F.Z; M.M[2][2] = U.Z;
 
-        // 3) 행렬 → 쿼터니언 변환
-		return FQuaternion::FromMatrixRow(M).Normalized();
+        return FQuaternion::FromMatrixRow(M).Normalized();
     }
 
     // 두 벡터 a→b 회전
@@ -224,6 +229,7 @@ struct FQuaternion
             q.Y = (m01 + m10) / s;
             q.Z = (m02 + m20) / s;
         }
+
         else if (m11 > m22) {
             float s = sqrtf(1.0f + m11 - m00 - m22) * 2.0f;
             q.W = (m02 - m20) / s;

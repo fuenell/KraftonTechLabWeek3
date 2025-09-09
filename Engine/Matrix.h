@@ -307,6 +307,9 @@ struct FMatrix
         V.M[3][0] = 0;   V.M[3][1] = 0;   V.M[3][2] = 0;   V.M[3][3] = 1;
         return V;
     }
+    // 틀린수식
+    // 외적이랑 s,u,f 순서가 틀렸음.
+    // 두개가 틀려서 잘나오게 된 것
     static FMatrix LookAtRHRow(const FVector& eye, const FVector& target, const FVector& up) {
         FVector f(eye.X - target.X, eye.Y - target.Y, eye.Z - target.Z); // -forward
         f.Normalize();
@@ -468,13 +471,6 @@ struct FMatrix
         FMatrix T = TranslationRow(t.X, t.Y, t.Z);
         return S * R * T;                        // row 규약 핵심
     }
-    // 쿼터니언 용
-    //static FMatrix TRSRow(const FVector& t, const FQuaternion& q, const FVector& s) {
-    //    FMatrix S = FMatrix::Scale(s.X, s.Y, s.Z);
-    //    FMatrix R = q.ToMatrix();  // RH 회전행렬 블록 
-    //    FMatrix T = FMatrix::TranslationRow(t.X, t.Y, t.Z);
-    //    return S * R * T;
-    //}
 
     static float DegreeToRadian(float degree)
     {
