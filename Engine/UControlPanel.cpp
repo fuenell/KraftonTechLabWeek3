@@ -85,11 +85,11 @@ void UControlPanel::SceneManagementSection()
     {
         std::filesystem::path _path("./data/");
         std::filesystem::create_directory(_path);
-        SceneManager->SaveScene(_path.string() + std::string(sceneName) + ".json");
+        SceneManager->SaveScene(_path.string() + std::string(sceneName) + ".Scene");
     }
     if (ImGui::Button("Load scene") && strcmp(sceneName, "") != 0)
     {
-        SceneManager->LoadScene("./data/" + std::string(sceneName) + ".json");
+        SceneManager->LoadScene("./data/" + std::string(sceneName) + ".Scene");
     }
 }
 
