@@ -8,6 +8,7 @@
 #include "UDefaultScene.h"
 #include "URaycastManager.h"
 #include "UGizmoArrowComp.h"
+#include "UGizmoScaleHandleComp.h"
 
 void EditorApplication::Update(float deltaTime)
 {
@@ -17,6 +18,11 @@ void EditorApplication::Update(float deltaTime)
 	if (GetInputManager().IsKeyDown(VK_ESCAPE))
 	{
 		RequestExit();
+	}
+
+	if (GetInputManager().IsKeyPressed(VK_SPACE))
+	{
+		gizmoManager.NextTranslation();
 	}
 
 	UGizmoComponent* hitGizmo = nullptr;
@@ -75,8 +81,20 @@ void EditorApplication::Update(float deltaTime)
 				UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo);
 
 				FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
-				gizmoManager.BeginDrag(ray, arrow->Axis);
-				bIsGizmoDragging = true;
+
+				// UGizmoArrowComp로 캐스팅 시도
+				if (UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo))
+				{
+					gizmoManager.BeginDrag(ray, arrow->Axis);
+					bIsGizmoDragging = true;
+				}
+				// UGizmoScaleHandleComp로 캐스팅 시도
+				else if (UGizmoScaleHandleComp* scaleHandle = dynamic_cast<UGizmoScaleHandleComp*>(hitGizmo))
+				{
+					gizmoManager.BeginDrag(ray, scaleHandle->Axis); // 스케일 드래그 시작 로직 추가
+					bIsGizmoDragging = true;
+				}
+
 				if (target->IsManageable())
 					propertyWindow->SetTarget(target);
 			}
@@ -98,64 +116,64 @@ void EditorApplication::Update(float deltaTime)
 
 void EditorApplication::Render()
 {
-    gizmoManager.Draw(GetRenderer());
-    UApplication::Render();
+	gizmoManager.Draw(GetRenderer());
+	UApplication::Render();
 }
 
 void EditorApplication::RenderGUI()
 {
-    controlPanel->Render();
-    propertyWindow->Render();
+	controlPanel->Render();
+	propertyWindow->Render();
 
-    ImGui::Begin("Memory Stats");
-    ImGui::Text("Allocated Object Count : %d", UEngineStatics::GetTotalAllocationCount());
-    ImGui::Text("Allocated Object Bytes : %d", UEngineStatics::GetTotalAllocationBytes());
-    ImGui::End();
+	ImGui::Begin("Memory Stats");
+	ImGui::Text("Allocated Object Count : %d", UEngineStatics::GetTotalAllocationCount());
+	ImGui::Text("Allocated Object Bytes : %d", UEngineStatics::GetTotalAllocationBytes());
+	ImGui::End();
 
-    bool isConsoleOpen = false;
-    // static ImguiConsole imguiConsole;
-    GConsole.Draw("Console", &isConsoleOpen);
+	bool isConsoleOpen = false;
+	// static ImguiConsole imguiConsole;
+	GConsole.Draw("Console", &isConsoleOpen);
 }
 
 bool EditorApplication::OnInitialize()
 {
-    UApplication::OnInitialize();
-    // 리사이즈/초기화
+	UApplication::OnInitialize();
+	// 리사이즈/초기화
 
-    controlPanel = new UControlPanel(&GetSceneManager());
-    propertyWindow = new USceneComponentPropertyWindow();
+	controlPanel = new UControlPanel(&GetSceneManager());
+	propertyWindow = new USceneComponentPropertyWindow();
 
-    if (!gizmoManager.Initialize(&GetMeshManager()))
-    {
-        MessageBox(GetWindowHandle(), L"Failed to initialize gizmo manager", L"Engine Error", MB_OK | MB_ICONERROR);
-        return false;
-    }
+	if (!gizmoManager.Initialize(&GetMeshManager()))
+	{
+		MessageBox(GetWindowHandle(), L"Failed to initialize gizmo manager", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
 
-    return true;
+	return true;
 }
 
 
 void EditorApplication::OnResize(int width, int height)
 {
-    UScene* scene = GetSceneManager().GetScene();
-    if (scene == nullptr) return;
+	UScene* scene = GetSceneManager().GetScene();
+	if (scene == nullptr) return;
 
-    UCamera* camera = scene->GetCamera();
-    if (camera == nullptr) return;
+	UCamera* camera = scene->GetCamera();
+	if (camera == nullptr) return;
 
-    camera->SetPerspectiveDegrees(
-        camera->GetFOV(),
-        (height > 0) ? (float)width / (float)height : 1.0f,
-        camera->GetNearZ(),
-        camera->GetFarZ());
+	camera->SetPerspectiveDegrees(
+		camera->GetFOV(),
+		(height > 0) ? (float)width / (float)height : 1.0f,
+		camera->GetNearZ(),
+		camera->GetFarZ());
 }
 
 UScene* EditorApplication::CreateDefaultScene()
 {
-    return new UDefaultScene();
+	return new UDefaultScene();
 }
 
 void EditorApplication::OnSceneChange()
 {
-    propertyWindow->SetTarget(nullptr);
+	propertyWindow->SetTarget(nullptr);
 }

@@ -78,9 +78,6 @@
     <ClCompile Include="USceneComponent.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
-    <ClCompile Include="USphereComp.cpp">
-      <Filter>Engine\Core\Component</Filter>
-    </ClCompile>
     <ClCompile Include="Math.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -90,13 +87,7 @@
     <ClCompile Include="GizmoVertices.cpp">
       <Filter>Engine\Core\Mesh</Filter>
     </ClCompile>
-    <ClCompile Include="UGizmoArrowComp.cpp">
-      <Filter>Engine\Core\Component</Filter>
-    </ClCompile>
     <ClCompile Include="UGizmoComponent.cpp">
-      <Filter>Engine\Core\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="UGizmoGridComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
     <ClCompile Include="UMesh.cpp">
@@ -161,6 +152,7 @@
     </ClCompile>
     <ClCompile Include="ImguiConsole.cpp" />
     <ClCompile Include="UPlaneComp.cpp" />
+    <ClCompile Include="UCubeComp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -305,6 +297,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="UPlaneComp.h" />
+    <ClInclude Include="CubeVertices.h" />
+    <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="UCubeComp.h" />
+    <ClInclude Include="UGizmoScaleHandleComp.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

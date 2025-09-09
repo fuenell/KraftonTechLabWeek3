@@ -7,6 +7,7 @@
 #include "UGizmoArrowComp.h"
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
+#include "UGizmoScaleHandleComp.h"
 
 UGizmoManager::UGizmoManager()
 {
@@ -15,11 +16,21 @@ UGizmoManager::UGizmoManager()
 UGizmoManager::~UGizmoManager()
 {
 	delete gridPrimitive;
-	for (auto gizmo : transformGizmoPrimitives)
+	for (auto gizmo : locationGizmos)
 	{
 		delete gizmo;
 	}
-	transformGizmoPrimitives.clear();
+	locationGizmos.clear();
+	for (auto gizmo : rotationGizmos)
+	{
+		delete gizmo;
+	}
+	rotationGizmos.clear();
+	for (auto gizmo : scaleGizmos)
+	{
+		delete gizmo;
+	}
+	scaleGizmos.clear();
 }
 
 bool UGizmoManager::Initialize(UMeshManager* meshManager)
@@ -28,6 +39,8 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	// 그리드는 항상 원점에 고정
 	gridPrimitive = new UGizmoGridComp();
 
+	// =================================================
+
 	UGizmoArrowComp* arrowX = new UGizmoArrowComp();
 	arrowX->Axis = EAxis::X;
 	UGizmoArrowComp* arrowY = new UGizmoArrowComp();
@@ -35,29 +48,54 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	UGizmoArrowComp* arrowZ = new UGizmoArrowComp();
 	arrowZ->Axis = EAxis::Z;
 
-	if (!gridPrimitive->Init(meshManager) || !arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager))
-	{
-		delete gridPrimitive;
-		delete arrowX;
-		delete arrowY;
-		delete arrowZ;
-		return false;
-	}
-
 	arrowX->SetColor({ 1, 0, 0, 1 });
 	arrowY->SetColor({ 0, 1, 0, 1 });
 	arrowZ->SetColor({ 0, 0, 1, 1 });
-
-	// --- 2. 이동 기즈모(화살표) 생성 ---
-	bool gridArrowSuccess = true;
 
 	arrowX->SetRotation({ 0.0f, 0.0f, -90.0f });
 	arrowY->SetRotation({ 0.0f, 90.0f, 0.0f });
 	arrowZ->SetRotation({ 90.0f, 0.0f, 0.0f });
 
-	transformGizmoPrimitives.push_back(arrowX);
-	transformGizmoPrimitives.push_back(arrowZ);
-	transformGizmoPrimitives.push_back(arrowY);
+	locationGizmos.push_back(arrowX);
+	locationGizmos.push_back(arrowZ);
+	locationGizmos.push_back(arrowY);
+
+	// =================================================
+
+	UGizmoScaleHandleComp* scaleX = new UGizmoScaleHandleComp();
+	scaleX->Axis = EAxis::X;
+	UGizmoScaleHandleComp* scaleY = new UGizmoScaleHandleComp();
+	scaleY->Axis = EAxis::Y;
+	UGizmoScaleHandleComp* scaleZ = new UGizmoScaleHandleComp();
+	scaleZ->Axis = EAxis::Z;
+
+	scaleX->SetColor({ 1, 0, 0, 1 });
+	scaleY->SetColor({ 0, 1, 0, 1 });
+	scaleZ->SetColor({ 0, 0, 1, 1 });
+
+	scaleX->SetRotation({ 0.0f, 0.0f, -90.0f });
+	scaleY->SetRotation({ 0.0f, 90.0f, 0.0f });
+	scaleZ->SetRotation({ 90.0f, 0.0f, 0.0f });
+
+	scaleGizmos.push_back(scaleX);
+	scaleGizmos.push_back(scaleZ);
+	scaleGizmos.push_back(scaleY);
+
+	if (!gridPrimitive->Init(meshManager) || !arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager)
+		|| !scaleX->Init(meshManager) || !scaleY->Init(meshManager) || !scaleZ->Init(meshManager))
+	{
+		delete gridPrimitive;
+
+		delete arrowX;
+		delete arrowY;
+		delete arrowZ;
+
+		delete scaleX;
+		delete scaleY;
+		delete scaleZ;
+
+		return false;
+	}
 
 	return true;
 }
@@ -74,20 +112,23 @@ TArray<UGizmoComponent*>& UGizmoManager::GetRaycastableGizmos()
 		static TArray<UGizmoComponent*> emptyArray; // lives for the whole program
 		return emptyArray;
 	}
-	return transformGizmoPrimitives;
-}
 
-bool UGizmoManager::IsRaycastHit(URaycastManager* rayCastManager, UGizmoComponent& out)
-{
-	// for (UMesh* gizmoMesh : transformGizmoPrimitives)
-	// {
-	// 	if (FMath::IntersectRayMesh(ray, gizmoMesh, m_ActiveGizmo->GetWorldTransform(), hitResult))
-	// 	{
-	// 		// Gizmo에 특화된 결과 처리
-	// 		return true;
-	// 	}
-	// }
-	return false;
+	// 현재 모드에 따라 올바른 기즈모를 그립니다.
+	TArray<UGizmoComponent*>* currentGizmos = nullptr;
+
+	switch (translationType)
+	{
+	case ETranslationType::Location:
+		currentGizmos = &locationGizmos;
+		break;
+	case ETranslationType::Rotation:
+		currentGizmos = &rotationGizmos;
+		break;
+	case ETranslationType::Scale:
+		currentGizmos = &scaleGizmos;
+		break;
+	}
+	return *currentGizmos;
 }
 
 void UGizmoManager::Draw(URenderer& renderer)
@@ -99,13 +140,31 @@ void UGizmoManager::Draw(URenderer& renderer)
 	}
 
 	// --- 파트 2: 타겟이 있을 때만 그리는 요소 ---
-	if (targetObject != nullptr)
-	{
-		// 타겟의 현재 위치를 가져옵니다.
-		FVector targetPosition = targetObject->GetPosition();
 
-		// 모든 트랜스폼 기즈모 파츠(화살표들)를 순회하며 위치를 업데이트하고 그립니다.
-		for (auto gizmoPart : transformGizmoPrimitives)
+	if (targetObject == nullptr) return;
+
+	// 타겟의 위치를 가져옵니다.
+	FVector targetPosition = targetObject->GetPosition();
+
+	// 현재 모드에 따라 올바른 기즈모를 그립니다.
+	TArray<UGizmoComponent*>* currentGizmos = nullptr;
+
+	switch (translationType)
+	{
+	case ETranslationType::Location:
+		currentGizmos = &locationGizmos;
+		break;
+	case ETranslationType::Rotation:
+		currentGizmos = &rotationGizmos;
+		break;
+	case ETranslationType::Scale:
+		currentGizmos = &scaleGizmos;
+		break;
+	}
+
+	if (currentGizmos)
+	{
+		for (auto gizmoPart : *currentGizmos)
 		{
 			if (gizmoPart)
 			{
@@ -113,6 +172,31 @@ void UGizmoManager::Draw(URenderer& renderer)
 				gizmoPart->Draw(renderer);
 			}
 		}
+	}
+}
+
+void UGizmoManager::NextTranslation()
+{
+	if (isDragging)
+	{
+		UE_LOG("Now Dragging");
+		return;
+	}
+
+	switch (translationType)
+	{
+	case ETranslationType::Location:
+		translationType = ETranslationType::Rotation;
+		UE_LOG("Rotation");
+		break;
+	case ETranslationType::Rotation:
+		translationType = ETranslationType::Scale;
+		UE_LOG("Scale");
+		break;
+	case ETranslationType::Scale:
+		translationType = ETranslationType::Location;
+		UE_LOG("Location");
+		break;
 	}
 }
 

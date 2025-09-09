@@ -9,6 +9,8 @@ class URenderer;
 
 enum class EAxis { None, X, Y, Z };
 
+enum class ETranslationType { Location, Rotation, Scale };
+
 struct FPlane
 {
 	FVector PointOnPlane;
@@ -27,13 +29,10 @@ public:
 	// 기즈모가 조작할 대상 객체를 설정합니다.
 	void SetTarget(UPrimitiveComponent* target);
 
-	bool IsRaycastHit(URaycastManager* rayCastManager, UGizmoComponent& out);
-
-	//// 매 프레임 호출되어 입력을 처리하고 기즈모의 상태를 갱신합니다.
-	//void Update(const InputManager& input, const Camera& camera, float deltaTime);
-
 	// 매 프레임 호출되어 기즈모를 화면에 그립니다.
 	void Draw(URenderer& renderer);
+
+	void NextTranslation();
 
 	UPrimitiveComponent* GetTarget() { return targetObject; }
 	TArray<UGizmoComponent*>& GetRaycastableGizmos();
@@ -44,6 +43,8 @@ public:
 	//bool IsDragging() const { return m_bIsDragging; }
 
 private:
+	ETranslationType translationType = ETranslationType::Location;
+
 	// 드래그 상태 변수
 	bool isDragging = false;
 	EAxis selectedAxis = EAxis::None;
@@ -61,7 +62,10 @@ private:
 
 	// 역할에 따라 프리미티브를 분리해서 저장합니다.
 	UGizmoComponent* gridPrimitive = nullptr;              // 월드 그리드
-	TArray<UGizmoComponent*> transformGizmoPrimitives; // 이동/회전/크기 기즈모
+	//TArray<UGizmoComponent*> transformGizmoPrimitives; // 이동/회전/크기 기즈모
+	TArray<UGizmoComponent*> locationGizmos;
+	TArray<UGizmoComponent*> rotationGizmos;
+	TArray<UGizmoComponent*> scaleGizmos;
 
 	FVector FindCirclePlaneIntersection(const FRay& mouseRay, const FPlane& plane);
 };

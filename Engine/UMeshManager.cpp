@@ -20,8 +20,9 @@ UMeshManager::UMeshManager()
 	meshes["Sphere"] = CreateSphereMesh();
 	meshes["Plane"] = CreatePlaneMesh();
 	meshes["Cube"] = CreateCubeMesh();
-	meshes["GizmoArrow"] = CreateGizmoArrowMesh();
 	meshes["GizmoGrid"] = CreateGizmoGridMesh();
+	meshes["GizmoArrow"] = CreateGizmoArrowMesh();
+	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
 }
 
 // 소멸자 (메모리 해제)
