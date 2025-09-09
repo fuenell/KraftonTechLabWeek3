@@ -2,7 +2,9 @@
 #include "stdafx.h"
 #include "USceneComponent.h"
 #include "json.hpp"
+#include "UClass.h"
 
+IMPLEMENT_UCLASS(USceneComponent, UObject)
 FMatrix USceneComponent::GetWorldTransform()
 {
     return FMatrix::SRTRowEuler(RelativeLocation, RelativeRotation, RelativeScale3D);

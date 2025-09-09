@@ -3,6 +3,7 @@
 #include "UMeshManager.h"
 #include "URenderer.h"
 
+IMPLEMENT_UCLASS(UPrimitiveComponent, USceneComponent)
 bool UPrimitiveComponent::Init(UMeshManager* meshManager)
 {
 	if (meshManager)

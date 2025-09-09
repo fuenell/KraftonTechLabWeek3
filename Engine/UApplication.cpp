@@ -37,6 +37,8 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	if (bIsInitialized)
 		return false;
 
+	UClass::ResolveTypeBitsets();
+
 	windowTitle = title;
 	windowWidth = width;
 	windowHeight = height;

@@ -12,35 +12,38 @@ private:
 	static inline std::unordered_map<std::string, uint32> nameToId;
 	static inline uint32 registeredCount = 0;
 
+	uint32 typeId;
 	FDynamicBitset typeBitset;
-	std::string className;
-	const UClass* superClass;
+	std::string className, superClassTypeName;
+	UClass* superClass;
 	std::function<UObject*()> createFunction;
+	bool processed = false;
 public:
-	static UClass* RegisterToFactory(const std::string& typeName, const std::function<UObject*()>& createFunction, const UClass* const superClass = nullptr
-		//,std::function<json::JSON()>& serializeFunction, std::function<void(const json::JSON&)>& deserializeFunction
-	)
-	{
-		std::unique_ptr<UClass> classType = std::make_unique<UClass>();
+	static UClass* RegisterToFactory(const std::string& typeName, 
+		const std::function<UObject* ()>& createFunction, const std::string& superClassTypeName);
 
-		classType->typeId = registeredCount++;
-		classType->className = typeName;
-		classType->superClass = superClass;
-		classType->createFunction = createFunction;
+	static void ResolveTypeBitsets();
+	void ResolveTypeBitset(UClass* classPtr);
 
-		classType->typeBitset.Set(classType->typeId);
-
-		if(superClass)
-			classType->typeBitset |= superClass->typeBitset;
-
-		nameToId[typeName] = classType->typeId;
-
-		UClass* rawPtr = classType.get();
-		classList.push_back(std::move(classType));
-		return rawPtr;
+	static UClass* GetClass(uint32 typeId) {
+		return (typeId < classList.size()) ? classList[typeId].get() : nullptr;
 	}
 
-	uint32 GetTypeId() { return typeId; }
+	bool IsChildOf(UClass* baseClass) const {
+		return baseClass && typeBitset.Test(baseClass->typeId);
+	}
+
+	const std::string& GetClassName() const { return className; }
+
+	static UClass* FindClass(const std::string& name) {
+		auto it = nameToId.find(name);
+		return (it != nameToId.end()) ? GetClass(it->second) : nullptr;
+	}
+
+	UObject* CreateDefaultObject() const {
+		return createFunction ? createFunction() : nullptr;
+	}
 
 };
+
 

@@ -3,12 +3,14 @@
 #include "UMesh.h"
 #include "USceneComponent.h"
 #include "Vector.h"
+#include "UClass.h"
 
 class UMeshManager; // 전방 선언
 
 
 class UPrimitiveComponent : public USceneComponent
 {
+	DECLARE_UCLASS(UPrimitiveComponent, USceneComponent)
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr)
