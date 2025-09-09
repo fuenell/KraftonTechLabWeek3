@@ -2,12 +2,12 @@
 #include "UGizmoComponent.h"
 #include "UGizmoManager.h"
 
-class UGizmoScaleHandleComp : public UGizmoComponent
+class UGizmoRotationHandleComp : public UGizmoComponent
 {
 public:
 	using UGizmoComponent::UGizmoComponent;
 
 	EAxis Axis = EAxis::None;
 
-	FString GetType() const override { return "GizmoScaleHandle"; }
+	FString GetType() const override { return "GizmoRotationHandle"; }
 };

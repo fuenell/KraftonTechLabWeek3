@@ -4,9 +4,10 @@
 #include "UApplication.h"
 #include "UPrimitiveComponent.h"
 #include "UGizmoComponent.h"
-#include "UGizmoArrowComp.h"
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
+#include "UGizmoArrowComp.h"
+#include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
 
 UGizmoManager::UGizmoManager()
@@ -54,13 +55,34 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	arrowY->SetColor({ 0, 1, 0, 1 });
 	arrowZ->SetColor({ 0, 0, 1, 1 });
 
-	arrowX->SetRotation({ 0.0f, 0.0f, -90.0f });
-	arrowY->SetRotation({ 0.0f, 90.0f, 0.0f });
-	arrowZ->SetRotation({ 90.0f, 0.0f, 0.0f });
+	arrowX->SetOriginRotation({ 0.0f, 0.0f, 90.0f });
+	arrowY->SetOriginRotation({ 0.0f, 0.0f, 0.0f });
+	arrowZ->SetOriginRotation({ -90.0f, 0.0f, 0.0f });
 
 	locationGizmos.push_back(arrowX);
 	locationGizmos.push_back(arrowZ);
 	locationGizmos.push_back(arrowY);
+
+	// =================================================
+
+	UGizmoRotationHandleComp* rotationX = new UGizmoRotationHandleComp();
+	rotationX->Axis = EAxis::X;
+	UGizmoRotationHandleComp* rotationY = new UGizmoRotationHandleComp();
+	rotationY->Axis = EAxis::Y;
+	UGizmoRotationHandleComp* rotationZ = new UGizmoRotationHandleComp();
+	rotationZ->Axis = EAxis::Z;
+
+	rotationX->SetColor({ 1, 0, 0, 1 });
+	rotationY->SetColor({ 0, 1, 0, 1 });
+	rotationZ->SetColor({ 0, 0, 1, 1 });
+
+	rotationX->SetOriginRotation({ 0.0f, 0.0f, 90.0f });
+	rotationY->SetOriginRotation({ 0.0f, 0.0f, 0.0f });
+	rotationZ->SetOriginRotation({ -90.0f, 0.0f, 0.0f });
+
+	rotationGizmos.push_back(rotationX);
+	rotationGizmos.push_back(rotationZ);
+	rotationGizmos.push_back(rotationY);
 
 	// =================================================
 
@@ -75,15 +97,18 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	scaleY->SetColor({ 0, 1, 0, 1 });
 	scaleZ->SetColor({ 0, 0, 1, 1 });
 
-	scaleX->SetRotation({ 0.0f, 0.0f, -90.0f });
-	scaleY->SetRotation({ 0.0f, 90.0f, 0.0f });
-	scaleZ->SetRotation({ 90.0f, 0.0f, 0.0f });
+	scaleX->SetOriginRotation({ 0.0f, 0.0f, 90.0f });
+	scaleY->SetOriginRotation({ 0.0f, 0.0f, 0.0f });
+	scaleZ->SetOriginRotation({ -90.0f, 0.0f, 0.0f });
 
 	scaleGizmos.push_back(scaleX);
 	scaleGizmos.push_back(scaleZ);
 	scaleGizmos.push_back(scaleY);
 
+	// =================================================
+
 	if (!gridPrimitive->Init(meshManager) || !arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager)
+		|| !rotationX->Init(meshManager) || !rotationY->Init(meshManager) || !rotationZ->Init(meshManager)
 		|| !scaleX->Init(meshManager) || !scaleY->Init(meshManager) || !scaleZ->Init(meshManager))
 	{
 		delete gridPrimitive;
@@ -91,6 +116,10 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 		delete arrowX;
 		delete arrowY;
 		delete arrowZ;
+
+		delete rotationX;
+		delete rotationY;
+		delete rotationZ;
 
 		delete scaleX;
 		delete scaleY;
@@ -145,9 +174,6 @@ void UGizmoManager::Draw(URenderer& renderer)
 
 	if (targetObject == nullptr) return;
 
-	// 타겟의 위치를 가져옵니다.
-	FVector targetPosition = targetObject->GetPosition();
-
 	// 현재 모드에 따라 올바른 기즈모를 그립니다.
 	TArray<UGizmoComponent*>* currentGizmos = nullptr;
 
@@ -170,8 +196,9 @@ void UGizmoManager::Draw(URenderer& renderer)
 		{
 			if (gizmoPart)
 			{
-				gizmoPart->SetPosition(targetPosition);
-				gizmoPart->Draw(renderer);
+				gizmoPart->SetPosition(targetObject->GetPosition());
+				gizmoPart->SetQuaternion(targetObject->RelativeQuaternion);
+				gizmoPart->DrawOnTop(renderer);
 			}
 		}
 	}
@@ -265,7 +292,7 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 		targetObject->SetPosition(newPosition + dragOffset);
 		break;
 	case ETranslationType::Rotation:
-		targetObject->SetPosition(newPosition + dragOffset);
+		targetObject->SetRotation(dragStartRotation + ((newPosition - dragStartLocation + dragOffset) * 45));
 		break;
 	case ETranslationType::Scale:
 		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));

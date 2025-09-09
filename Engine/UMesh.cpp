@@ -2,7 +2,7 @@
 #include "UMesh.h"
 #include "FVertexPosColor.h"
 
-UMesh::UMesh(const std::vector<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
 	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
 {
 }

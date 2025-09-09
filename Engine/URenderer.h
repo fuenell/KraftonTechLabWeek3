@@ -69,7 +69,7 @@ public:
 	bool ReleaseIndexBuffer(ID3D11Buffer* buffer);
 
 	// Texture creation
-	ID3D11Texture2D* CreateTexture2D(int width, int height, DXGI_FORMAT format,
+	ID3D11Texture2D* CreateTexture2D(int32 width, int32 height, DXGI_FORMAT format,
 		const void* data = nullptr);
 	ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Texture2D* texture);
 	bool ReleaseTexture(ID3D11Texture2D* texture);
@@ -85,6 +85,7 @@ public:
 	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
 	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
 	void DrawMesh(UMesh* mesh);
+	void DrawMeshOnTop(UMesh* mesh);
 
 	// Resource binding
 	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);
@@ -96,7 +97,7 @@ public:
 	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
 
 	// Window resize handling
-	bool ResizeBuffers(int width, int height);
+	bool ResizeBuffers(int32 width, int32 height);
 
 	// Getters
 	ID3D11Device* GetDevice() const { return device; }
@@ -106,14 +107,14 @@ public:
 
 	// Utility functions
 	bool CheckDeviceState();
-	void GetBackBufferSize(int& width, int& height);
+	void GetBackBufferSize(int32& width, int32& height);
 
 private:
 	// Internal helper functions
 	bool CreateDeviceAndSwapChain(HWND windowHandle);
 	bool CreateRenderTargetView();
-	bool CreateDepthStencilView(int width, int height);
-	bool SetupViewport(int width, int height);
+	bool CreateDepthStencilView(int32 width, int32 height);
+	bool SetupViewport(int32 width, int32 height);
 
 	// Error handling
 	void LogError(const char* function, HRESULT hr);
@@ -122,8 +123,8 @@ private:
 	// 행렬 복사 핼퍼
 	static inline void CopyRowMajor(float dst[16], const FMatrix& src)
 	{
-		for (int r = 0; r < 4; ++r)
-			for (int c = 0; c < 4; ++c)
+		for (int32 r = 0; r < 4; ++r)
+			for (int32 c = 0; c < 4; ++c)
 				dst[r * 4 + c] = src.M[r][c];
 	}
 public:
@@ -131,9 +132,9 @@ public:
 	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
 	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
 	// targetAspect를 내부에서 사용 (카메라에 의존 X)
-	D3D11_VIEWPORT MakeAspectFitViewport(int winW, int winH) const;
+	D3D11_VIEWPORT MakeAspectFitViewport(int32 winW, int32 winH) const;
 	// 드래그 중 호출: currentViewport만 갈아끼움
-	void UseAspectFitViewport(int winW, int winH)
+	void UseAspectFitViewport(int32 winW, int32 winH)
 	{
 		currentViewport = MakeAspectFitViewport(winW, winH);
 	}

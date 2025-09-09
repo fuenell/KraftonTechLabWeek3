@@ -17,11 +17,12 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 // 생성자
 UMeshManager::UMeshManager()
 {
-	meshes["Sphere"] = CreateSphereMesh();
-	meshes["Plane"] = CreatePlaneMesh();
-	meshes["Cube"] = CreateCubeMesh();
-	meshes["GizmoGrid"] = CreateGizmoGridMesh();
-	meshes["GizmoArrow"] = CreateGizmoArrowMesh();
+	meshes["Sphere"] = CreateMeshInternal(sphere_vertices);
+	meshes["Plane"] = CreateMeshInternal(plane_vertices);
+	meshes["Cube"] = CreateMeshInternal(cube_vertices);
+	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 20), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);
+	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
 	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
 }
 
@@ -60,34 +61,9 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	return true;
 }
 
-UMesh* UMeshManager::RetrieveMesh(std::string meshName)
+UMesh* UMeshManager::RetrieveMesh(FString meshName)
 {
 	auto itr = meshes.find(meshName);
 	if (itr == meshes.end()) return nullptr;
 	return itr->second;
-}
-
-UMesh* UMeshManager::CreateSphereMesh()
-{
-	return CreateMeshInternal(sphere_vertices);
-}
-
-UMesh* UMeshManager::CreatePlaneMesh()
-{
-	return CreateMeshInternal(plane_vertices);
-}
-
-UMesh* UMeshManager::CreateCubeMesh()
-{
-	return CreateMeshInternal(cube_vertices);
-}
-
-UMesh* UMeshManager::CreateGizmoArrowMesh()
-{
-	return CreateMeshInternal(gizmo_arrow_vertices);
-}
-
-UMesh* UMeshManager::CreateGizmoGridMesh()
-{
-	return CreateMeshInternal(GridGenerator::CreateGridVertices(1, 20), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 }

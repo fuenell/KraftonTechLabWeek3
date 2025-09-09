@@ -7,14 +7,15 @@
 IMPLEMENT_UCLASS(USceneComponent, UObject)
 FMatrix USceneComponent::GetWorldTransform()
 {
-    return FMatrix::SRTRowEuler(RelativeLocation, RelativeRotation, RelativeScale3D);
+    return FMatrix::SRTRowQuaternion(RelativeLocation, RelativeQuaternion.ToMatrixRow(), RelativeScale3D);
 }
 
 json::JSON USceneComponent::Serialize() const
 {
+    FVector tmpRot = FQuaternion::EulerXYZFrom(RelativeQuaternion);
     json::JSON result;
     result["Location"] = json::Array(RelativeLocation.X, RelativeLocation.Y, RelativeLocation.Z);
-    result["Rotation"] = json::Array(RelativeRotation.X, RelativeRotation.Y, RelativeRotation.Z);
+    result["Rotation"] = json::Array( tmpRot.X, tmpRot.Y, tmpRot.Z);
     result["Scale"] = json::Array(RelativeScale3D.X, RelativeScale3D.Y, RelativeScale3D.Z);
     result["Type"] = GetType();
     return result;
@@ -34,7 +35,7 @@ bool USceneComponent::Deserialize(const json::JSON& data)
 
     auto rot = data.at("Rotation");
     if (rot.size() != 3) return false;
-    RelativeRotation = FVector(rot[0].ToFloat(), rot[1].ToFloat(), rot[2].ToFloat());
+    RelativeQuaternion = FQuaternion::FromEulerXYZ(rot[0].ToFloat(), rot[1].ToFloat(), rot[2].ToFloat());
 
     auto scale = data.at("Scale");
     if (scale.size() != 3) return false;

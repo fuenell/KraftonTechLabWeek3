@@ -13,9 +13,14 @@ bool UGizmoComponent::Init(UMeshManager* meshManager)
 	return false;
 }
 
+FMatrix UGizmoComponent::GetWorldTransform()
+{
+	return FMatrix::SRTRowQuaternion(RelativeLocation, (OriginQuaternion * RelativeQuaternion).ToMatrixRow(), RelativeScale3D);
+}
+
 void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
-	FMatrix M = FMatrix::SRTRowEuler(RelativeLocation, RelativeRotation, RelativeScale3D);
+	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, Color, bIsSelected);
 }
 
@@ -28,4 +33,15 @@ void UGizmoComponent::Draw(URenderer& renderer)
 
 	UpdateConstantBuffer(renderer);
 	renderer.DrawMesh(mesh);
+}
+
+void UGizmoComponent::DrawOnTop(URenderer& renderer)
+{
+	if (!mesh || !mesh->VertexBuffer)
+	{
+		return;
+	}
+
+	UpdateConstantBuffer(renderer);
+	renderer.DrawMeshOnTop(mesh);
 }

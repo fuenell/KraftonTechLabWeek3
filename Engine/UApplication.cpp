@@ -32,7 +32,7 @@ UApplication::~UApplication()
 	g_pApplication = nullptr;
 }
 
-bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, int width, int height)
+bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, int32 width, int32 height)
 {
 	if (bIsInitialized)
 		return false;
@@ -184,8 +184,8 @@ bool UApplication::CreateMainWindow(HINSTANCE hInstance)
 	RECT windowRect = { 0, 0, windowWidth, windowHeight };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	int adjustedWidth = windowRect.right - windowRect.left;
-	int adjustedHeight = windowRect.bottom - windowRect.top;
+	int32 adjustedWidth = windowRect.right - windowRect.left;
+	int32 adjustedHeight = windowRect.bottom - windowRect.top;
 
 	// Create window
 	hWnd = CreateWindowExW(
@@ -279,8 +279,8 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	case WM_SIZE:
 		if (g_pApplication && wParam != SIZE_MINIMIZED)
 		{
-			int width = LOWORD(lParam);
-			int height = HIWORD(lParam);
+			int32 width = LOWORD(lParam);
+			int32 height = HIWORD(lParam);
 
 			if (g_pApplication->isSizing)
 			{
@@ -302,8 +302,8 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
 		if (g_pApplication)
 		{
 			g_pApplication->isSizing = false;
-			int width = g_pApplication->windowWidth;
-			int height = g_pApplication->windowHeight;
+			int32 width = g_pApplication->windowWidth;
+			int32 height = g_pApplication->windowHeight;
 			if (width > 0 && height > 0)
 			{
 				g_pApplication->GetRenderer().ResizeBuffers(width, height);

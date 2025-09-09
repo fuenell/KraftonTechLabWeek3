@@ -311,6 +311,9 @@
     <ClInclude Include="FDynamicBitset.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="UGizmoRotationHandleComp.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

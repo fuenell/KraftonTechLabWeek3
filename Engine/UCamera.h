@@ -16,7 +16,7 @@ public:
         , mRot(FQuaternion::Identity())
         , mView(FMatrix::IdentityMatrix())
         , mProj(FMatrix::IdentityMatrix())
-        , mFovY(ToRad(60.0f)), mAspect(1.0f), mNearZ(0.1f), mFarZ(1000.0f)
+        , mFovY(ToRad(60.0f)), mAspect(1.0f), mNearZ(0.1f), mFarZ(1000.0f) 
         , mUseOrtho(false)
         , mOrthoWidth(10.0f)
         , mOrthoHeight(10.0f)

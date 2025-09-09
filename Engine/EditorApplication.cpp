@@ -8,6 +8,7 @@
 #include "UDefaultScene.h"
 #include "URaycastManager.h"
 #include "UGizmoArrowComp.h"
+#include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
 
 void EditorApplication::Update(float deltaTime)
@@ -88,6 +89,12 @@ void EditorApplication::Update(float deltaTime)
 					gizmoManager.BeginDrag(ray, arrow->Axis);
 					bIsGizmoDragging = true;
 				}
+				// UGizmoRotationHandleComp로 캐스팅 시도
+				else if (UGizmoRotationHandleComp* rotationHandle = dynamic_cast<UGizmoRotationHandleComp*>(hitGizmo))
+				{
+					gizmoManager.BeginDrag(ray, rotationHandle->Axis); // 스케일 드래그 시작 로직 추가
+					bIsGizmoDragging = true;
+				}
 				// UGizmoScaleHandleComp로 캐스팅 시도
 				else if (UGizmoScaleHandleComp* scaleHandle = dynamic_cast<UGizmoScaleHandleComp*>(hitGizmo))
 				{
@@ -116,8 +123,8 @@ void EditorApplication::Update(float deltaTime)
 
 void EditorApplication::Render()
 {
-	gizmoManager.Draw(GetRenderer());
 	UApplication::Render();
+	gizmoManager.Draw(GetRenderer());
 }
 
 void EditorApplication::RenderGUI()
@@ -153,7 +160,7 @@ bool EditorApplication::OnInitialize()
 }
 
 
-void EditorApplication::OnResize(int width, int height)
+void EditorApplication::OnResize(int32 width, int32 height)
 {
 	UScene* scene = GetSceneManager().GetScene();
 	if (scene == nullptr) return;

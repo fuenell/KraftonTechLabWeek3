@@ -7,7 +7,7 @@
 class UMeshManager : UEngineSubsystem
 {
 private:
-	std::unordered_map<std::string, UMesh*> meshes;
+	std::unordered_map<FString, UMesh*> meshes;
 
 	UMesh* CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -16,12 +16,5 @@ public:
 	~UMeshManager();
 
 	bool Initialize(URenderer* renderer);
-	UMesh* RetrieveMesh(std::string meshName);
-
-	// 기본 메쉬 생성 함수들
-	UMesh* CreateSphereMesh();
-	UMesh* CreatePlaneMesh();
-	UMesh* CreateCubeMesh();
-	UMesh* CreateGizmoArrowMesh();
-	UMesh* CreateGizmoGridMesh();
+	UMesh* RetrieveMesh(FString meshName);
 };

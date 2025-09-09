@@ -33,8 +33,8 @@ private:
 	std::wstring windowTitle;
 	// 화면 사이즈 조절
 	bool isSizing = false;
-	int windowWidth;
-	int windowHeight;
+	int32 windowWidth;
+	int32 windowHeight;
 
 
 
@@ -44,7 +44,7 @@ public:
 
 	// Application lifecycle
 	bool Initialize(HINSTANCE hInstance, const std::wstring& title = L"Engine Application",
-		int width = 1024, int height = 768);
+		int32 width = 1024, int32 height = 768);
 	void Run();
 	void Shutdown();
 
@@ -80,10 +80,10 @@ protected:
 	// Window procedure
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	// Override points for derived classes
+	// Override point32s for derived classes
 	virtual bool OnInitialize();
 	virtual void RenderGUI() {}
 	virtual void OnShutdown() {}
 	// Called on window resize
-	virtual void OnResize(int width, int height) {}
+	virtual void OnResize(int32 width, int32 height) {}
 };
