@@ -356,7 +356,7 @@ TArray<FVertexPosColor> GridGenerator::CreateGridVertices(float gridSize, int32 
 	// Negative side colors (lighter/desaturated)
 	FVector4 xNeg(0.5f, 0.3f, 0.3f, 1.0f); // light red
 	FVector4 yNeg(0.3f, 0.45f, 0.3f, 1.0f); // light green
-	FVector4 zNeg(0.3f, 0.3f, 0.6f, 1.0f); // light blue
+	FVector4 zNeg(0.3f, 0.3f, 0.5f, 1.0f); // light blue
 
 	// X axis
 	vertices.push_back({ 0.0f, 0.0f, 0.0f, xNeg.X, xNeg.Y, xNeg.Z, xNeg.W });
@@ -366,15 +366,15 @@ TArray<FVertexPosColor> GridGenerator::CreateGridVertices(float gridSize, int32 
 
 	// Y axis
 	vertices.push_back({ 0.0f, 0.0f, 0.0f, yNeg.X, yNeg.Y, yNeg.Z, yNeg.W });
-	vertices.push_back({ 0.0f, -axisLength, 0.0f, yNeg.X, yNeg.Y, yNeg.Z, yNeg.W });
+	vertices.push_back({ 0.0f, 0.0f, -axisLength, yNeg.X, yNeg.Y, yNeg.Z, yNeg.W });
 	vertices.push_back({ 0.0f, 0.0f, 0.0f, yPos.X, yPos.Y, yPos.Z, yPos.W });
-	vertices.push_back({ 0.0f,  axisLength, 0.0f, yPos.X, yPos.Y, yPos.Z, yPos.W });
+	vertices.push_back({ 0.0f,  0.0f, axisLength, yPos.X, yPos.Y, yPos.Z, yPos.W });
 
 	// Z axis
 	vertices.push_back({ 0.0f, 0.0f, 0.0f, zNeg.X, zNeg.Y, zNeg.Z, zNeg.W });
-	vertices.push_back({ 0.0f, 0.0f, -axisLength, zNeg.X, zNeg.Y, zNeg.Z, zNeg.W });
+	vertices.push_back({ 0.0f, -axisLength, 0.0f, zNeg.X, zNeg.Y, zNeg.Z, zNeg.W });
 	vertices.push_back({ 0.0f, 0.0f, 0.0f, zPos.X, zPos.Y, zPos.Z, zPos.W });
-	vertices.push_back({ 0.0f, 0.0f,  axisLength, zPos.X, zPos.Y, zPos.Z, zPos.W });
+	vertices.push_back({ 0.0f, axisLength, 0.0f, zPos.X, zPos.Y, zPos.Z, zPos.W });
 
 	FVertexPosColor::ChangeAxis(vertices.data(), (int32)vertices.size(), 1, 2);
 
