@@ -55,6 +55,8 @@ class UTimeManager;
 const float PI = 3.14159265358979323846f;
 const float PIDIV4 = PI / 4.0f;   // XM_PIDIV4 대체
 
+const float DegreeToRadian = PI / 180.0f;
+
 // Engine namespace (optional)
 namespace Engine
 {

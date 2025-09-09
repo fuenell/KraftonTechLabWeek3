@@ -306,6 +306,9 @@
     <ClInclude Include="UGizmoScaleHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
+    <ClInclude Include="UGizmoRotationHandleComp.h">
+      <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

@@ -249,6 +249,7 @@
     <ClInclude Include="UGizmoComponent.h" />
     <ClInclude Include="UGizmoGridComp.h" />
     <ClInclude Include="UGizmoManager.h" />
+    <ClInclude Include="UGizmoRotationHandleComp.h" />
     <ClInclude Include="UGizmoScaleHandleComp.h" />
     <ClInclude Include="USceneComponentPropertyWindow.h" />
     <ClInclude Include="USceneManager.h" />
