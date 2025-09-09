@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "GizmoVertices.h"
 
+#include "Vector4.h"
+
 const float cylRadius = 0.025;        // 원기둥 반지름
 const float cylHeight = 1;        // 원기둥 높이
 const float coneHeight = 0.25;       // 원뿔 높이
@@ -319,19 +321,60 @@ TArray<FVertexPosColor> GridGenerator::CreateGridVertices(float gridSize, int32 
 	// TArray 컨테이너 생성
 	TArray<FVertexPosColor> vertices;
 
+	FVector4 normalColor(0.5f, 0.5f, 0.5f, 1.0f);  // grey
+	FVector4 highlightColor(0.85f, 0.85f, 0.85f, 1.0f); // whiter
+
 	// Z축에 평행한 세로 선들을 생성하는 로직
 	for (int32 i = -gridCount; i <= gridCount; ++i)
 	{
-		vertices.push_back({ -gridSize * gridCount, 0.0f, i * gridSize, 1.0f, 1.0f, 1.0f, 1.0f });
-		vertices.push_back({ gridSize * gridCount, 0.0f, i * gridSize, 1.0f, 1.0f, 1.0f, 1.0f });
+		if (i == 0) continue; // skip the central X axis line
+		FVector4 color = (i % 5 == 0) ? highlightColor : normalColor;
+		vertices.push_back({ -gridSize * gridCount, 0.0f, i * gridSize, color.X, color.Y, color.Z, color.W });
+		vertices.push_back({  gridSize * gridCount, 0.0f, i * gridSize, color.X, color.Y, color.Z, color.W });
 	}
 
 	// X축에 평행한 가로 선들을 생성하는 로직
 	for (int32 i = -gridCount; i <= gridCount; ++i)
 	{
-		vertices.push_back({ i * gridSize, 0.0f, -gridSize * gridCount, 1.0f, 1.0f, 1.0f, 1.0f });
-		vertices.push_back({ i * gridSize, 0.0f, gridSize * gridCount, 1.0f, 1.0f, 1.0f, 1.0f });
+		if (i == 0) continue; // skip the central Z axis line
+		FVector4 color = (i % 5 == 0) ? highlightColor : normalColor;
+		vertices.push_back({ i * gridSize, 0.0f, -gridSize * gridCount, color.X, color.Y, color.Z, color.W });
+		vertices.push_back({ i * gridSize, 0.0f, gridSize * gridCount, color.X, color.Y, color.Z, color.W });
 	}
+
+	// --------------------------
+	// Main axis lines (X, Y, Z)
+	// --------------------------
+
+	float axisLength = gridSize * gridCount * 1.2f; // make them extend a bit beyond the grid
+	
+	// Positive side colors (strong RGB)
+	FVector4 xPos(1.0f, 0.0f, 0.0f, 1.0f); // red
+	FVector4 yPos(0.0f, 1.0f, 0.0f, 1.0f); // green
+	FVector4 zPos(0.0f, 0.0f, 1.0f, 1.0f); // blue
+
+	// Negative side colors (lighter/desaturated)
+	FVector4 xNeg(0.5f, 0.3f, 0.3f, 1.0f); // light red
+	FVector4 yNeg(0.3f, 0.45f, 0.3f, 1.0f); // light green
+	FVector4 zNeg(0.3f, 0.3f, 0.6f, 1.0f); // light blue
+
+	// X axis
+	vertices.push_back({ 0.0f, 0.0f, 0.0f, xNeg.X, xNeg.Y, xNeg.Z, xNeg.W });
+	vertices.push_back({ -axisLength, 0.0f, 0.0f, xNeg.X, xNeg.Y, xNeg.Z, xNeg.W });
+	vertices.push_back({ 0.0f, 0.0f, 0.0f, xPos.X, xPos.Y, xPos.Z, xPos.W });
+	vertices.push_back({  axisLength, 0.0f, 0.0f, xPos.X, xPos.Y, xPos.Z, xPos.W });
+
+	// Y axis
+	vertices.push_back({ 0.0f, 0.0f, 0.0f, yNeg.X, yNeg.Y, yNeg.Z, yNeg.W });
+	vertices.push_back({ 0.0f, -axisLength, 0.0f, yNeg.X, yNeg.Y, yNeg.Z, yNeg.W });
+	vertices.push_back({ 0.0f, 0.0f, 0.0f, yPos.X, yPos.Y, yPos.Z, yPos.W });
+	vertices.push_back({ 0.0f,  axisLength, 0.0f, yPos.X, yPos.Y, yPos.Z, yPos.W });
+
+	// Z axis
+	vertices.push_back({ 0.0f, 0.0f, 0.0f, zNeg.X, zNeg.Y, zNeg.Z, zNeg.W });
+	vertices.push_back({ 0.0f, 0.0f, -axisLength, zNeg.X, zNeg.Y, zNeg.Z, zNeg.W });
+	vertices.push_back({ 0.0f, 0.0f, 0.0f, zPos.X, zPos.Y, zPos.Z, zPos.W });
+	vertices.push_back({ 0.0f, 0.0f,  axisLength, zPos.X, zPos.Y, zPos.Z, zPos.W });
 
 	FVertexPosColor::ChangeAxis(vertices.data(), (int32)vertices.size(), 1, 2);
 

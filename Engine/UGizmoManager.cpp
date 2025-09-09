@@ -18,7 +18,6 @@ UGizmoManager::UGizmoManager()
 
 UGizmoManager::~UGizmoManager()
 {
-	delete gridPrimitive;
 	gridPrimitive = nullptr;
 
 	for (auto gizmo : locationGizmos)
@@ -138,6 +137,39 @@ void UGizmoManager::SetTarget(UPrimitiveComponent* target)
 	targetObject = target;
 }
 
+void UGizmoManager::ChangeGizmoSpace()
+{
+	if (isDragging)
+	{
+		UE_LOG("Now Dragging Can't Change Space");
+		return;
+	}
+
+	isWorldSpace = !isWorldSpace;
+}
+
+void UGizmoManager::NextTranslation()
+{
+	if (isDragging)
+	{
+		UE_LOG("Now Dragging Can't Change Translation");
+		return;
+	}
+
+	switch (translationType)
+	{
+	case ETranslationType::Location:
+		translationType = ETranslationType::Rotation;
+		break;
+	case ETranslationType::Rotation:
+		translationType = ETranslationType::Scale;
+		break;
+	case ETranslationType::Scale:
+		translationType = ETranslationType::Location;
+		break;
+	}
+}
+
 TArray<UGizmoComponent*>& UGizmoManager::GetRaycastableGizmos()
 {
 	if (targetObject == nullptr)
@@ -198,36 +230,19 @@ void UGizmoManager::Draw(URenderer& renderer)
 		{
 			if (gizmoPart)
 			{
+				// Todo: 이동을 update에서 처리해야 하나??
 				gizmoPart->SetPosition(targetObject->GetPosition());
-				gizmoPart->SetQuaternion(targetObject->RelativeQuaternion);
+				if (isWorldSpace)
+				{
+					gizmoPart->ResetQuaternion();
+				}
+				else
+				{
+					gizmoPart->SetQuaternion(targetObject->RelativeQuaternion);
+				}
 				gizmoPart->DrawOnTop(renderer);
 			}
 		}
-	}
-}
-
-void UGizmoManager::NextTranslation()
-{
-	if (isDragging)
-	{
-		UE_LOG("Now Dragging");
-		return;
-	}
-
-	switch (translationType)
-	{
-	case ETranslationType::Location:
-		translationType = ETranslationType::Rotation;
-		UE_LOG("Rotation");
-		break;
-	case ETranslationType::Rotation:
-		translationType = ETranslationType::Scale;
-		UE_LOG("Scale");
-		break;
-	case ETranslationType::Scale:
-		translationType = ETranslationType::Location;
-		UE_LOG("Location");
-		break;
 	}
 }
 
@@ -294,7 +309,7 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 		targetObject->SetPosition(newPosition + dragOffset);
 		break;
 	case ETranslationType::Rotation:
-		targetObject->SetRotation(dragStartRotation + ((newPosition - dragStartLocation + dragOffset) * 45));
+		targetObject->AddQuaternion(GetAxisVector(selectedAxis), (newPosition - dragStartLocation + dragOffset).Length() * 0.1f, isWorldSpace);
 		break;
 	case ETranslationType::Scale:
 		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));
