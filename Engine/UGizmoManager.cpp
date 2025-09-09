@@ -15,11 +15,12 @@ UGizmoManager::UGizmoManager()
 UGizmoManager::~UGizmoManager()
 {
 	delete gridPrimitive;
-	for (auto gizmo : transformGizmoPrimitives)
-	{
-		delete gizmo;
-	}
-	transformGizmoPrimitives.clear();
+    gridPrimitive = nullptr;
+
+    for (auto* gizmo : transformGizmoPrimitives) {
+        delete gizmo;
+    }
+    transformGizmoPrimitives.clear();
 }
 
 bool UGizmoManager::Initialize(UMeshManager* meshManager)

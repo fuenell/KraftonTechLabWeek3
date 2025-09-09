@@ -3,4 +3,4 @@
 
 TArray<UObject*> UObject::GUObjectArray;
 TArray<uint32> UObject::FreeIndices;
-uint32 UObject::NextFreshIndex;
+uint32 UObject::NextFreshIndex = 0;

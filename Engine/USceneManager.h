@@ -7,6 +7,7 @@ class UApplication;
 class USceneManager : UEngineSubsystem
 {
 private:
+    ~USceneManager();
     UApplication* application;
     UScene* currentScene = nullptr;
 public:

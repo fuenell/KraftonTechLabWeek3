@@ -18,12 +18,16 @@ private:
 
 	UControlPanel* controlPanel;
 	USceneComponentPropertyWindow* propertyWindow;
-
-
 	
 public:
 	EditorApplication() = default;
-	~EditorApplication() = default;
+	~EditorApplication()
+	{
+		delete controlPanel;
+		delete propertyWindow;
+		controlPanel = nullptr;
+		propertyWindow = nullptr;
+	}
 	UScene* CreateDefaultScene() override;
 
 protected:

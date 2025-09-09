@@ -22,6 +22,7 @@ UScene::~UScene()
 	{
 		delete object;
 	}
+	delete camera;
 }
 
 bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
