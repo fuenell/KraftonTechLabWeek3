@@ -22,6 +22,7 @@
 #include <optional>
 #include <filesystem>
 #include <climits>
+#include <bitset>
 
 // DirectX 관련
 #include <d3d11.h>

@@ -11,6 +11,8 @@ class UObject : ISerializable
 private:
     static TArray<uint32> FreeIndices;
     static uint32 NextFreshIndex;
+protected:
+    uint32 typeId;
 
 public:
     static TArray<UObject*> GUObjectArray;
