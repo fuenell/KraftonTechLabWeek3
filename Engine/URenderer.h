@@ -85,6 +85,7 @@ public:
 	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
 	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
 	void DrawMesh(UMesh* mesh);
+	void DrawMeshOnTop(UMesh* mesh);
 
 	// Resource binding
 	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);

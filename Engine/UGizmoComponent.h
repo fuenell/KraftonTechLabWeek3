@@ -29,6 +29,7 @@ public:
 	FMatrix GetWorldTransform() override;
 
 	virtual void Draw(URenderer& renderer);
+	virtual void DrawOnTop(URenderer& renderer);
 	virtual void UpdateConstantBuffer(URenderer& renderer);
 
 	UMesh* GetMesh() { return mesh; }

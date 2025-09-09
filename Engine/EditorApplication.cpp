@@ -123,8 +123,8 @@ void EditorApplication::Update(float deltaTime)
 
 void EditorApplication::Render()
 {
-	gizmoManager.Draw(GetRenderer());
 	UApplication::Render();
+	gizmoManager.Draw(GetRenderer());
 }
 
 void EditorApplication::RenderGUI()
