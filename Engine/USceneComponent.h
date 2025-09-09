@@ -2,16 +2,18 @@
 #include "Matrix.h"
 #include "UObject.h"
 #include "Vector.h"
+#include "Quaternion.h"
 
 class USceneComponent : public UObject
 {
 public:
 	FVector RelativeLocation;
-	FVector RelativeRotation;
+	// FVector RelativeRotation;
 	FVector RelativeScale3D;
-
+	FQuaternion RelativeQuaternion;
 	USceneComponent(FVector pos = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: RelativeLocation(pos), RelativeRotation(rot), RelativeScale3D(scl)
+		: RelativeLocation(pos), //RelativeRotation(rot), 
+		RelativeScale3D(scl), RelativeQuaternion(FQuaternion::FromEulerXYZDeg(rot))
 	{
 	}
 
@@ -27,11 +29,13 @@ public:
 	// 위치와 스케일 설정 함수들
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }
 	void SetScale(const FVector& scl) { RelativeScale3D = scl; }
-	void SetRotation(const FVector& rot) { RelativeRotation = rot; }
-
+	void SetRotation(const FVector& rot) { RelativeQuaternion = FQuaternion::FromEulerXYZDeg(rot); }
 	FVector GetPosition() const { return RelativeLocation; }
 	FVector GetScale() const { return RelativeScale3D; }
-	FVector GetRotation() const { return RelativeRotation; }
+	FVector GetRotation() const 
+	{ 
+		return FQuaternion::EulerXYZDegFrom(RelativeQuaternion); 
+	}
 
 	json::JSON Serialize() const override;
 	bool Deserialize(const json::JSON& data) override;

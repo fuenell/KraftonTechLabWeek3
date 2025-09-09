@@ -164,14 +164,14 @@ FVector UCamera::GetEulerXYZRad() const
 FVector UCamera::GetEulerXYZDeg() const
 {
 	FVector r = GetEulerXYZRad();
-	return FVector(r.X * (180.0f / PI), r.Y * (180.0f / PI), r.Z * (180.0f / PI));
+	return FVector(ToDeg(r.X), ToDeg(r.Y), ToDeg(r.Z));
 }
 
 void UCamera::SetEulerXYZRad(float rx, float ry, float rz)
 {
 	if (bLockRoll) rz = 0.0f;            // 롤 잠그고 싶으면 유지, 아니면 제거/토글
 	mRot = FQuaternion::FromEulerXYZ(rx, ry, rz).Normalized();
-	RecalcAxesFromQuat();
+	//RecalcAxesFromQuat();
 
 	// pitch 캐시(편의): forward.z = sin(pitch)
 	float fz = std::clamp(mForward.Z, -1.0f, 1.0f);

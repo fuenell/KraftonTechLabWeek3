@@ -197,8 +197,8 @@ void UGizmoManager::Draw(URenderer& renderer)
 			if (gizmoPart)
 			{
 				gizmoPart->SetPosition(targetObject->GetPosition());
-				gizmoPart->SetRotation(targetObject->GetRotation());
-				gizmoPart->DrawOnTop(renderer);
+				// gizmoPart->SetRotation(targetObject->GetRotation());
+				gizmoPart->Draw(renderer);
 			}
 		}
 	}
