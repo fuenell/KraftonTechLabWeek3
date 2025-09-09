@@ -4,6 +4,7 @@
 #include "UCamera.h"
 #include "USceneManager.h"
 #include "UScene.h"
+#include "UDefaultScene.h"
 
 UControlPanel::UControlPanel(USceneManager* sceneManager)
     : ImGuiWindowWrapper("Jungle Control Panel"), SceneManager(sceneManager)
@@ -76,6 +77,7 @@ void UControlPanel::SceneManagementSection()
     if (ImGui::Button("New scene"))
     {
         // TODO : Make New Scene
+        SceneManager->SetScene(new UDefaultScene());
     }
 
     if (ImGui::Button("Save scene") && strcmp(sceneName, "") != 0)

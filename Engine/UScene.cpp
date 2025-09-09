@@ -33,10 +33,6 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 	backBufferWidth = 0.0f;
 	backBufferHeight = 0.0f;
 
-	camera = new UCamera();
-	camera->SetPerspectiveDegrees(60.0f, (backBufferHeight > 0) ? (float)backBufferWidth / (float)backBufferHeight : 1.0f, 0.1f, 1000.0f);
-	camera->LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
-
 	// 모든 Primitive 컴포넌트 초기화
 	for (UObject* obj : objects)
 	{
@@ -46,7 +42,11 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 		}
 	}
 
-	return true;
+	camera = new UCamera();
+	camera->SetPerspectiveDegrees(60.0f, (backBufferHeight > 0) ? (float)backBufferWidth / (float)backBufferHeight : 1.0f, 0.1f, 1000.0f);
+	camera->LookAt({ 5,0,0 }, { 0,0,0 }, { 0,0,1 });
+
+	return OnInitialize();
 }
 
 UScene* UScene::Create(json::JSON data)
