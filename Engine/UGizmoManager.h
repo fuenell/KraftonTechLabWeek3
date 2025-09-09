@@ -47,11 +47,12 @@ public:
 private:
 	ETranslationType translationType = ETranslationType::Location;
 
-	bool isWorldSpace = false;
+	bool isWorldSpace = true;
 
 	// 드래그 상태 변수
 	bool isDragging = false;
 	EAxis selectedAxis = EAxis::None;
+	FVector dragRotationStartVector;
 	FVector dragOffset;
 
 	UMeshManager* meshManager;
@@ -59,12 +60,13 @@ private:
 
 	// 드래그 계산을 위해 저장해두는 정보
 	FVector dragStartLocation;    // 드래그 시작 시 Target의 월드 위치
-	FVector dragStartRotation;
+	FQuaternion dragStartQuaternion;
 	FVector dragStartScale;
 	FPlane movementPlane;         // 계산된 이동 평면
 
 	// 유틸리티 함수
 	FVector GetAxisVector(EAxis axis);
+	FVector GetRotationVector(EAxis axis);
 
 	// 역할에 따라 프리미티브를 분리해서 저장합니다.
 	UGizmoComponent* gridPrimitive = nullptr;              // 월드 그리드
