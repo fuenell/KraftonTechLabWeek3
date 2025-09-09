@@ -8,6 +8,7 @@
 #include "UDefaultScene.h"
 #include "URaycastManager.h"
 #include "UGizmoArrowComp.h"
+#include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
 
 void EditorApplication::Update(float deltaTime)
@@ -86,6 +87,12 @@ void EditorApplication::Update(float deltaTime)
 				if (UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo))
 				{
 					gizmoManager.BeginDrag(ray, arrow->Axis);
+					bIsGizmoDragging = true;
+				}
+				// UGizmoRotationHandleComp로 캐스팅 시도
+				else if (UGizmoRotationHandleComp* rotationHandle = dynamic_cast<UGizmoRotationHandleComp*>(hitGizmo))
+				{
+					gizmoManager.BeginDrag(ray, rotationHandle->Axis); // 스케일 드래그 시작 로직 추가
 					bIsGizmoDragging = true;
 				}
 				// UGizmoScaleHandleComp로 캐스팅 시도
