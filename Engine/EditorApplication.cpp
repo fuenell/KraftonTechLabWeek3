@@ -152,3 +152,8 @@ UScene* EditorApplication::CreateDefaultScene()
 {
     return new UDefaultScene();
 }
+
+void EditorApplication::OnSceneChange()
+{
+    propertyWindow->SetTarget(nullptr);
+}

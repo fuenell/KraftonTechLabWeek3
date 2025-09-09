@@ -78,6 +78,7 @@ void UControlPanel::SceneManagementSection()
     {
         // TODO : Make New Scene
         SceneManager->SetScene(new UDefaultScene());
+        
     }
 
     if (ImGui::Button("Save scene") && strcmp(sceneName, "") != 0)
