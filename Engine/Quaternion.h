@@ -10,7 +10,7 @@
 #define PI 3.14159265358979323846
 #endif
 inline float ToRad(float d) { return d * (float)(PI / 180.0); }
-
+inline float ToDeg(float r) { return r * (180.0f / (float)PI); }
 struct FQuaternion
 {
     // (x,y,z,w) with w = scalar
@@ -117,6 +117,9 @@ struct FQuaternion
         FQuaternion qz = FromAxisAngle(FVector(0, 0, 1), rz);
         // 먼저 X, 그 다음 Y, 그 다음 Z → row 규약 합성
         return qx * qy * qz;
+    }
+    static FQuaternion FromEulerXYZDeg(float degX, float degY, float degZ) {
+        return FromEulerXYZ(ToRad(degX), ToRad(degY), ToRad(degZ));
     }
     // TODO : 오브젝트에 쓰려면 조정이 필요함. 카메라 전용이었어서 잘 작동하지 않을 수 있음
     static FQuaternion LookRotation(const FVector& fwd, const FVector& up)
@@ -245,15 +248,12 @@ struct FQuaternion
         }
         return q.Normalized();
     }
-    // 이건 아직 틀릴수도 있습니다.
-    // 규약: row-vector, R = Rx * Ry * Rz (X→Y→Z 순서 적용)
+    // 규약: row-vector, columns are axes, R = Rx * Ry * Rz  (X→Y→Z 순서)
     FVector ToEulerXYZ() const
     {
         FMatrix R = ToMatrixRow();
-        // R = Rx * Ry * Rz 에서 유도된 요소 사용
-        // R[0][2] = sin(ry)
-        float sy = R.M[0][2];
-        // 수치 오차 방지용 클램프
+        // 유도 결과: R[0][2] = -sin(ry)
+        float sy = -R.M[0][2];
         if (sy > 1.0f) sy = 1.0f;
         if (sy < -1.0f) sy = -1.0f;
 
@@ -264,28 +264,77 @@ struct FQuaternion
         const float EPS = 1e-6f;
 
         if (fabsf(cy) > EPS) {
-            // 일반 케이스
-            // R[1][2] = -sin(rx)*cos(ry)  → rx = atan2(-R[1][2], R[2][2])
-            rx = atan2f(-R.M[1][2], R.M[2][2]);
+            // 일반 케이스:
+            // R[1][2] =  sin(rx)*cos(ry)
+            // R[2][2] =  cos(rx)*cos(ry)
+            rx = atan2f(R.M[1][2], R.M[2][2]);
 
-            // R[0][1] = -cos(ry)*sin(rz), R[0][0] = cos(ry)*cos(rz)
-            // → rz = atan2(-R[0][1], R[0][0])
-            rz = atan2f(-R.M[0][1], R.M[0][0]);
+            // R[0][1] =  sin(rz)*cos(ry)
+            // R[0][0] =  cos(rz)*cos(ry)
+            rz = atan2f(R.M[0][1], R.M[0][0]);
         }
         else {
-            // 짐벌락( |cos(ry)| ~ 0 ) : rz가 정의 불가 → rz=0 으로 두고 rx만 결정
+            // 짐벌락(cos(ry) ~ 0): rz 미정 → rz=0으로 두고 rx만 안정적으로 계산
             rz = 0.0f;
-            // 이때는 R[1][0], R[1][1]에서 rx를 복원
-            rx = atan2f(R.M[1][0], R.M[1][1]);
+
+            // 부호 주의: ry≈+π/2, -π/2 모두에서 동작하도록 sign(sy) 보정
+            // ry=+π/2: R[1][0]=sin(rx), R[1][1]=cos(rx)
+            // ry=-π/2: R[1][0]=-sin(rx), R[1][1]=cos(rx)
+            float sgn = (sy >= 0.0f) ? 1.0f : -1.0f;
+            rx = atan2f(sgn * R.M[1][0], R.M[1][1]);
         }
 
-        // X=rx, Y=ry, Z=rz (라디안)
-        return FVector(rx, ry, rz);
+        return FVector(rx, ry, rz); // (X, Y, Z) 라디안
     }
     FVector ToEulerXYZ_Deg() const {
         FVector r = ToEulerXYZ();
         const float R2D = 180.0f / (float)PI;
         return FVector(r.X * R2D, r.Y * R2D, r.Z * R2D);
+    }
+    // ============== Quaternion -> EulerXYZ (Rx * Ry * Rz) ==============
+// 반환: FVector(rx, ry, rz) 라디안
+    static FVector EulerXYZFrom(const FQuaternion& q)
+    {
+        FMatrix R = q.ToMatrixRow();
+
+        // 행벡터 + columns=axes + R = Rx*Ry*Rz 전개 결과:
+        // R[0][2] = -sin(ry)
+        float sy = -R.M[0][2];
+        if (sy > 1.0f) sy = 1.0f;
+        if (sy < -1.0f) sy = -1.0f;
+
+        float ry = asinf(sy);
+        float cy = cosf(ry);
+
+        float rx, rz;
+        const float EPS = 1e-6f;
+
+        if (fabsf(cy) > EPS) {
+            // R[1][2] =  sin(rx)*cos(ry),  R[2][2] = cos(rx)*cos(ry)
+            rx = atan2f(R.M[1][2], R.M[2][2]);
+
+            // R[0][1] =  sin(rz)*cos(ry),  R[0][0] = cos(rz)*cos(ry)
+            rz = atan2f(R.M[0][1], R.M[0][0]);
+        }
+        else {
+            // 짐벌락: rz 미정 → rz=0, rx만 안정적으로 뽑기
+            rz = 0.0f;
+
+            // ry ≈ ±π/2 에서 부호 일관성 확보용 보정
+            float sgn = (sy >= 0.0f) ? 1.0f : -1.0f;
+            // ry=+π/2: R[1][0]= sin(rx), R[1][1]=cos(rx)
+            // ry=-π/2: R[1][0]=-sin(rx), R[1][1]=cos(rx)
+            rx = atan2f(sgn * R.M[1][0], R.M[1][1]);
+        }
+
+        return FVector(rx, ry, rz);
+    }
+
+    // 반환: FVector(rx, ry, rz) 도(deg)
+    static FVector EulerXYZDegFrom(const FQuaternion& q)
+    {
+        FVector r = EulerXYZFrom(q);
+        return FVector(ToDeg(r.X), ToDeg(r.Y), ToDeg(r.Z));
     }
     FQuaternion RotatedWorldAxisAngle(const FVector& worldAxis, float radians) const
     {
