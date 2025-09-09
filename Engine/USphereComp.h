@@ -8,7 +8,7 @@
 class USphereComp : public UPrimitiveComponent
 {
 private:
-	static inline std::string type = "Sphere";
+	static inline FString type = "Sphere";
 
 	static USceneComponent* Create()
 	{
@@ -37,5 +37,5 @@ public:
 	{
 	}
 
-	std::string GetType() const override { return type; }
+	FString GetType() const override { return type; }
 };

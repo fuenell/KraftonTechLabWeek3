@@ -13,13 +13,13 @@ private:
 	bool isInitialized = false;
 public:
 	ID3D11Buffer* VertexBuffer = nullptr;
-	std::vector<FVertexPosColor4> Vertices;
+	TArray<FVertexPosColor4> Vertices;
 	int32 NumVertices = 0;
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
 	UINT Stride = 0;
 
 	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성
-	UMesh(const std::vector<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	~UMesh()
 	{

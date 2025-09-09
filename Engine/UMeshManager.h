@@ -7,7 +7,7 @@
 class UMeshManager : UEngineSubsystem
 {
 private:
-	std::unordered_map<std::string, UMesh*> meshes;
+	std::unordered_map<FString, UMesh*> meshes;
 
 	UMesh* CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -16,5 +16,5 @@ public:
 	~UMeshManager();
 
 	bool Initialize(URenderer* renderer);
-	UMesh* RetrieveMesh(std::string meshName);
+	UMesh* RetrieveMesh(FString meshName);
 };

@@ -13,7 +13,7 @@ class UGizmoGridComp : public UGizmoComponent
 public:
 	using UGizmoComponent::UGizmoComponent;
 
-	std::string GetType() const override { return "GizmoGrid"; }
+	FString GetType() const override { return "GizmoGrid"; }
 	
 	json::JSON Serialize() const override
 	{

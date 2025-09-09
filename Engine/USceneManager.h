@@ -17,7 +17,7 @@ public:
     void SetScene(UScene* scene);
 
     void RequestExit();
-    void LoadScene(const std::string& path = "");
-    void SaveScene(const std::string& path = "");
+    void LoadScene(const FString& path = "");
+    void SaveScene(const FString& path = "");
 };
 

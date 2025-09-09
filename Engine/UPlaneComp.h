@@ -7,7 +7,7 @@
 class UPlaneComp : public UPrimitiveComponent
 {
 private:
-	static inline std::string type = "Plane";
+	static inline FString type = "Plane";
 	FVector trianglePoints;
 
 	static USceneComponent* Create()
@@ -37,5 +37,5 @@ public:
 	{
 	}
 
-	std::string GetType() const override { return type; }
+	FString GetType() const override { return type; }
 };

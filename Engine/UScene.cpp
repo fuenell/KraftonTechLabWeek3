@@ -132,7 +132,7 @@ bool UScene::Deserialize(const json::JSON& data)
 	);
 	objects.push_back(gizmoGrid);
 
-	std::string uuidStr = data.at("NextUUID").ToString();
+	FString uuidStr = data.at("NextUUID").ToString();
 
 	UEngineStatics::SetNextUUID((uint32)stoi(uuidStr));
 
