@@ -1,12 +1,14 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "UEngineSubsystem.h"
+#include "UClass.h"
 
 // Forward declaration
 class UTimeManager;
 
 class UGUI : public UEngineSubsystem
 {
+    DECLARE_UCLASS(UGUI, UEngineSubsystem)
 private:
     bool bInitialized;
     bool bShowDemoWindow;

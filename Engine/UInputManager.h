@@ -4,6 +4,7 @@
 
 class UInputManager : UEngineSubsystem
 {
+    DECLARE_UCLASS(UInputManager, UEngineSubsystem)
 private:
     // Key states
     bool keyStates[256];

@@ -17,6 +17,7 @@ struct FRay
 
 class URaycastManager : UEngineSubsystem
 {
+	DECLARE_UCLASS(URaycastManager, UEngineSubsystem)
 public:
 	URaycastManager();
 	URaycastManager(URenderer* renderer, UCamera* camera, UInputManager* inputManager);

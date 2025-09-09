@@ -1,6 +1,14 @@
 ﻿#include "stdafx.h"
 #include "UMesh.h"
 #include "FVertexPosColor.h"
+#include "UObject.h"
+#include "UClass.h"
+
+IMPLEMENT_UCLASS(UMesh, UObject)
+
+UMesh::UMesh()
+{
+}
 
 UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
 	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))

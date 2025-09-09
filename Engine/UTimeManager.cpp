@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "UTimeManager.h"
-
+#include "UClass.h"
+IMPLEMENT_UCLASS(UTimeManager, UEngineSubsystem)
 UTimeManager::UTimeManager()
     : deltaTime(0.0)
     , totalTime(0.0)

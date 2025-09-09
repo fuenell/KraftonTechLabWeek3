@@ -2,12 +2,16 @@
 #include "UGizmoComponent.h"
 #include "UGizmoManager.h"
 
+
 class UGizmoScaleHandleComp : public UGizmoComponent
 {
+	DECLARE_UCLASS(UGizmoScaleHandleComp, UGizmoComponent)
 public:
 	using UGizmoComponent::UGizmoComponent;
 
 	EAxis Axis = EAxis::None;
 
 	FString GetType() const override { return "GizmoScaleHandle"; }
+
+	UGizmoScaleHandleComp();
 };

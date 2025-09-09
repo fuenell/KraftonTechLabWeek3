@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "UInputManager.h"
+#include "UClass.h"
 
+IMPLEMENT_UCLASS(UInputManager, UEngineSubsystem)
 UInputManager::UInputManager()
     : mouseX(0), mouseY(0)
     , prevMouseX(0), prevMouseY(0)

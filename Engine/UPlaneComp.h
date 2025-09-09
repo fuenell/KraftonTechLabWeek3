@@ -6,6 +6,7 @@
 
 class UPlaneComp : public UPrimitiveComponent
 {
+	DECLARE_UCLASS(UPlaneComp, UPrimitiveComponent)
 private:
 	static inline FString type = "Plane";
 	FVector trianglePoints;

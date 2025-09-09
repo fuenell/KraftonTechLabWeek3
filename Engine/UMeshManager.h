@@ -6,6 +6,7 @@
 
 class UMeshManager : UEngineSubsystem
 {
+	DECLARE_UCLASS(UMeshManager, UEngineSubsystem)
 private:
 	std::unordered_map<FString, UMesh*> meshes;
 

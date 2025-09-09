@@ -2,6 +2,7 @@
 #include "UClass.h"
 #include "UObject.h"
 
+IMPLEMENT_UCLASS(UClass, UObject)
 UClass* UClass::RegisterToFactory(const std::string& typeName, const std::function<UObject* ()>& createFunction, const std::string& superClassTypeName)
 {
 	std::unique_ptr<UClass> classType = std::make_unique<UClass>();

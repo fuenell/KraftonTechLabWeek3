@@ -9,6 +9,7 @@
 #include "URaycastManager.h"
 #include "UCamera.h"
 
+IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
 {
 	version = 1;

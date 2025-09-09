@@ -1,6 +1,9 @@
 ﻿#include "stdafx.h"
 #include "UGUI.h"
 #include "UTimeManager.h"
+#include "UClass.h"
+
+IMPLEMENT_UCLASS(UGUI, UEngineSubsystem)
 
 // Forward declaration for external time manager access
 extern UTimeManager* g_pTimeManager;

@@ -16,6 +16,7 @@ struct CBTransform
 
 class URenderer : UEngineSubsystem
 {
+	DECLARE_UCLASS(URenderer, UEngineSubsystem)
 private:
 	// Core D3D11 objects
 	ID3D11Device* device;

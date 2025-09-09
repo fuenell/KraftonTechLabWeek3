@@ -4,6 +4,7 @@
 
 class UTimeManager : UEngineSubsystem
 {
+	DECLARE_UCLASS(UTimeManager, UEngineSubsystem)
 private:
 	// High precision timing
 	LARGE_INTEGER frequency;

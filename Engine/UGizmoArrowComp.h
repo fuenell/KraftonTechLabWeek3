@@ -4,10 +4,13 @@
 
 class UGizmoArrowComp : public UGizmoComponent
 {
+	DECLARE_UCLASS(UGizmoArrowComp, UGizmoComponent)
 public:
 	using UGizmoComponent::UGizmoComponent;
 
 	EAxis Axis = EAxis::None;
 
 	FString GetType() const override { return "GizmoArrow"; }
+
+	UGizmoArrowComp();
 };

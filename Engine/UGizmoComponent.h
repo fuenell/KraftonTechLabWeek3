@@ -8,6 +8,7 @@ class UMeshManager; // 전방 선언
 
 class UGizmoComponent : public USceneComponent
 {
+	DECLARE_UCLASS(UGizmoComponent, USceneComponent)
 public:
 	FQuaternion OriginQuaternion;
 
@@ -17,10 +18,6 @@ public:
 	}
 
 	bool bIsSelected = false;
-
-	virtual ~UGizmoComponent()
-	{
-	}
 
 	bool Init(UMeshManager* meshManager);
 	FString GetType() const override { return "UGizmoComponent"; }

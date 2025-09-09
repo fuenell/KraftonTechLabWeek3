@@ -6,6 +6,8 @@
 #include "URenderer.h"
 #include "UScene.h"
 
+
+IMPLEMENT_UCLASS(URaycastManager, UEngineSubsystem)
 URaycastManager::URaycastManager()
 	: Renderer(nullptr),
 	InputManager(nullptr),

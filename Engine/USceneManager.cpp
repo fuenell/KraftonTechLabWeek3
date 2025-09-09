@@ -3,6 +3,8 @@
 #include "UScene.h"
 #include "UApplication.h"
 
+
+IMPLEMENT_UCLASS(USceneManager, UEngineSubsystem)
 USceneManager::~USceneManager()
 {
 	if (currentScene)

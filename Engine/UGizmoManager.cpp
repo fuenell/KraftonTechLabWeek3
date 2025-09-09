@@ -9,7 +9,9 @@
 #include "UGizmoArrowComp.h"
 #include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
+#include "UObject.h"
 
+IMPLEMENT_UCLASS(UGizmoManager, UEngineSubsystem)
 UGizmoManager::UGizmoManager()
 {
 }

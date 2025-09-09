@@ -7,6 +7,7 @@
 
 class UCubeComp : public UPrimitiveComponent
 {
+	DECLARE_UCLASS(UCubeComp, UPrimitiveComponent)
 private:
 	static inline FString type = "Cube";
 

@@ -19,6 +19,7 @@ struct FPlane
 
 class UGizmoManager : UEngineSubsystem
 {
+	DECLARE_UCLASS(UGizmoManager, UEngineSubsystem)
 public:
 	UGizmoManager();
 

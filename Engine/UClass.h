@@ -7,6 +7,7 @@
 
 class UClass : public UObject
 {
+	DECLARE_UCLASS(UClass, UObject)
 private:
 	static inline std::vector<std::unique_ptr<UClass>> classList;
 	static inline std::unordered_map<std::string, uint32> nameToId;

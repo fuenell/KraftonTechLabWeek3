@@ -199,8 +199,12 @@
     <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UDefaultScene.cpp" />
     <ClCompile Include="UEngineSubsystem.cpp" />
+    <ClCompile Include="UGizmoArrowComp.cpp" />
     <ClCompile Include="UGizmoComponent.cpp" />
+    <ClCompile Include="UGizmoGridComp.cpp" />
     <ClCompile Include="UGizmoManager.cpp" />
+    <ClCompile Include="UGizmoRotationHandleComp.cpp" />
+    <ClCompile Include="UGizmoScaleHandleComp.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="USceneComponentPropertyWindow.cpp" />
     <ClCompile Include="USceneManager.cpp" />
@@ -213,6 +217,7 @@
     <ClCompile Include="UObject.cpp" />
     <ClCompile Include="UScene.cpp" />
     <ClCompile Include="USceneComponent.cpp" />
+    <ClCompile Include="USphereComp.cpp" />
     <ClCompile Include="UTimeManager.cpp" />
     <ClCompile Include="UGUI.cpp" />
     <ClCompile Include="UInputManager.cpp" />

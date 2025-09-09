@@ -7,6 +7,7 @@
 
 class USphereComp : public UPrimitiveComponent
 {
+	DECLARE_UCLASS(USphereComp, UPrimitiveComponent)
 private:
 	static inline FString type = "Sphere";
 

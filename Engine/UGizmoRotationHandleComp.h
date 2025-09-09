@@ -4,10 +4,13 @@
 
 class UGizmoRotationHandleComp : public UGizmoComponent
 {
+	DECLARE_UCLASS(UGizmoRotationHandleComp, UGizmoComponent)
 public:
 	using UGizmoComponent::UGizmoComponent;
 
 	EAxis Axis = EAxis::None;
 
 	FString GetType() const override { return "GizmoRotationHandle"; }
+
+	UGizmoRotationHandleComp();
 };

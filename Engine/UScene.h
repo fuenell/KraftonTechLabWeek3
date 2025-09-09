@@ -11,6 +11,7 @@ class URaycastManager;
 
 class UScene : public UObject
 {
+    DECLARE_UCLASS(UScene, UObject)
 protected:
     int32 backBufferWidth, backBufferHeight;
     int32 version;
