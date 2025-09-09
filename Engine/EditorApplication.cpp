@@ -26,18 +26,22 @@ void EditorApplication::Update(float deltaTime)
 		gizmoManager.NextTranslation();
 	}
 
+	if (GetInputManager().IsKeyPressed('X'))
+	{
+		gizmoManager.ChangeGizmoSpace();
+	}
+
 	UGizmoComponent* hitGizmo = nullptr;
 	UPrimitiveComponent* hitPrimitive = nullptr;
 
 	if (GetInputManager().IsMouseButtonReleased(0))
 	{
 		gizmoManager.EndDrag();
-		bIsGizmoDragging = false;
 		return;
 	}
 
 	// 드래그 하고 있을때
-	if (bIsGizmoDragging)
+	if (gizmoManager.IsDragging())
 	{
 		FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
 		gizmoManager.UpdateDrag(ray);
@@ -87,19 +91,16 @@ void EditorApplication::Update(float deltaTime)
 				if (UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo))
 				{
 					gizmoManager.BeginDrag(ray, arrow->Axis);
-					bIsGizmoDragging = true;
 				}
 				// UGizmoRotationHandleComp로 캐스팅 시도
 				else if (UGizmoRotationHandleComp* rotationHandle = dynamic_cast<UGizmoRotationHandleComp*>(hitGizmo))
 				{
 					gizmoManager.BeginDrag(ray, rotationHandle->Axis); // 스케일 드래그 시작 로직 추가
-					bIsGizmoDragging = true;
 				}
 				// UGizmoScaleHandleComp로 캐스팅 시도
 				else if (UGizmoScaleHandleComp* scaleHandle = dynamic_cast<UGizmoScaleHandleComp*>(hitGizmo))
 				{
 					gizmoManager.BeginDrag(ray, scaleHandle->Axis); // 스케일 드래그 시작 로직 추가
-					bIsGizmoDragging = true;
 				}
 
 				if (target->IsManageable())

@@ -40,10 +40,13 @@ public:
 	void UpdateDrag(const FRay& mouseRay);
 	void EndDrag();
 
-	//bool IsDragging() const { return m_bIsDragging; }
+	void ChangeGizmoSpace();
+	bool IsDragging() const { return isDragging; }
 
 private:
 	ETranslationType translationType = ETranslationType::Location;
+
+	bool isWorldSpace = false;
 
 	// 드래그 상태 변수
 	bool isDragging = false;

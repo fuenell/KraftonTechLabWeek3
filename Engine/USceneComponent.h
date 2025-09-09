@@ -32,11 +32,18 @@ public:
 	void SetScale(const FVector& scl) { RelativeScale3D = scl; }
 	void SetRotation(const FVector& rot) { RelativeQuaternion = FQuaternion::FromEulerXYZDeg(rot); }
 	void SetQuaternion(const FQuaternion quat) { RelativeQuaternion = quat; }
+	void ResetQuaternion()
+	{
+		RelativeQuaternion.X = 0;
+		RelativeQuaternion.Y = 0;
+		RelativeQuaternion.Z = 0;
+		RelativeQuaternion.W = 1;
+	}
 	FVector GetPosition() const { return RelativeLocation; }
 	FVector GetScale() const { return RelativeScale3D; }
-	FVector GetRotation() const 
-	{ 
-		return FQuaternion::EulerXYZDegFrom(RelativeQuaternion); 
+	FVector GetRotation() const
+	{
+		return FQuaternion::EulerXYZDegFrom(RelativeQuaternion);
 	}
 
 	json::JSON Serialize() const override;

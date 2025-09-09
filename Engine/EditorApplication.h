@@ -13,12 +13,11 @@ private:
 	UGizmoManager gizmoManager;
 	TArray<USceneComponent*> sceneComponents;
 
-	bool bIsGizmoDragging = false;
 	USceneComponent* selectedSceneComponent;
 
 	UControlPanel* controlPanel;
 	USceneComponentPropertyWindow* propertyWindow;
-	
+
 public:
 	EditorApplication() = default;
 	~EditorApplication()
