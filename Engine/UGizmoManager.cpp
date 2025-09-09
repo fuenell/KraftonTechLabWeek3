@@ -16,6 +16,8 @@ UGizmoManager::UGizmoManager()
 UGizmoManager::~UGizmoManager()
 {
 	delete gridPrimitive;
+	gridPrimitive = nullptr;
+
 	for (auto gizmo : locationGizmos)
 	{
 		delete gizmo;

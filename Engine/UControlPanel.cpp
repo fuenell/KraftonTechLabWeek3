@@ -6,6 +6,7 @@
 #include "UScene.h"
 #include "UDefaultScene.h"
 
+
 UControlPanel::UControlPanel(USceneManager* sceneManager)
     : ImGuiWindowWrapper("Jungle Control Panel"), SceneManager(sceneManager)
 {
@@ -96,6 +97,16 @@ void UControlPanel::SceneManagementSection()
 void UControlPanel::CameraManagementSection()
 {
     UCamera* camera = SceneManager->GetScene()->GetCamera();
+    // 카메라 정보
+    FVector pos = camera->GetLocation();
+	float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
+    FVector eulDeg = camera->GetEulerXYZDeg();
+    float eulerXYZ[3] = { eulDeg.X, eulDeg.Y, eulDeg.Z };
+
+    // --- 테이블 UI ---
+    bool locCommitted = false;
+    bool rotCommitted = false;
+
     bool isOrthogonal = camera->IsOrtho();
     ImGui::Checkbox("Orthogonal", &isOrthogonal);
     if (isOrthogonal)
@@ -122,19 +133,8 @@ void UControlPanel::CameraManagementSection()
     ImGui::SameLine();
     ImGui::Text("FOV");
 
-    // === 위치 ===
-    FVector pos = camera->GetLocation();
-    float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
 
-    // === 회전(Yaw, Pitch, Roll=0 표기) ===
-    float yawZ = 0.f, pitch = 0.f;
-    camera->GetYawPitch(yawZ, pitch);
-    float cameraRotation[3] = {
-        yawZ * 180.0f / 3.14159265f, // deg
-        pitch * 180.0f / 3.14159265f, // deg
-        0.0f // roll 고정
-    };
-
+    // --- Euler(XYZ) 편집 ---
     // 나머지는 테이블로
     if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None))
     {
@@ -146,6 +146,8 @@ void UControlPanel::CameraManagementSection()
             ImGui::SetNextItemWidth(-1);
             ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
                 &cameraLocation[i], 0.0f, 0.0f, "%.3f");
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                locCommitted = true;
         }
         ImGui::TableSetColumnIndex(3);
         ImGui::Text("Camera Location");
@@ -157,7 +159,9 @@ void UControlPanel::CameraManagementSection()
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
             ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
-                &cameraRotation[i], 0.0f, 0.0f, "%.3f");
+                &eulerXYZ[i], 0.0f, 0.0f, "%.3f");
+            if (ImGui::IsItemDeactivatedAfterEdit())
+                rotCommitted = true;
         }
         ImGui::TableSetColumnIndex(3);
         ImGui::Text("Camera Rotation");
@@ -167,10 +171,12 @@ void UControlPanel::CameraManagementSection()
 
     // === 변경사항을 카메라에 반영 ===
     // 위치
-    camera->SetLocation(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+    // === 변경사항을 카메라에 '커밋 시'만 반영 ===
+    if (locCommitted) {
+        camera->SetLocation(FVector(cameraLocation[0], cameraLocation[1], cameraLocation[2]));
+    }
 
-    // 회전 (roll은 무시)
-    float newYawRad = cameraRotation[0] * 3.14159265f / 180.0f;
-    float newPitchRad = cameraRotation[1] * 3.14159265f / 180.0f;
-    //camera->SetYawPitch(newYawRad, newPitchRad);
+    if (rotCommitted) {
+        camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
+    }
 }

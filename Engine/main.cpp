@@ -1,10 +1,18 @@
-﻿#include "stdafx.h"
+﻿#define _CRTDBG_MAP_ALLOC
+// #define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#include <crtdbg.h>
+#include "stdafx.h"
 #include "UApplication.h"
 #include "EditorApplication.h"
 
 // Engine entry point
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	// _CrtSetBreakAlloc(951);
+#endif
+
 	// Create application instance
 	EditorApplication app;
 
@@ -18,6 +26,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Run main loop
 	app.Run();
 
+	app.Shutdown();
+	_CrtDumpMemoryLeaks();
 	// Cleanup handled automatically by destructor
 	return 0;
 }

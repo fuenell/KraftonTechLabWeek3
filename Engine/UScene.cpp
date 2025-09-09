@@ -22,6 +22,7 @@ UScene::~UScene()
 	{
 		delete object;
 	}
+	delete camera;
 }
 
 bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
@@ -207,35 +208,10 @@ void UScene::Update(float deltaTime)
 	float len = sqrtf(dx * dx + dy * dy + dz * dz);
 	if (len > 0.f) { dx /= len; dy /= len; dz /= len; }
 	camera->MoveLocal(dx, dy, dz, deltaTime, boost);
-
-	// Basic rendering - nothing for now
-	// 3D objects would be rendered here
-		// 구 그리기
-	//GetRenderer().SetViewProj(Camera.GetView(), Camera.GetProj());  // 카메라 행렬 세팅
-	//sphere->SetPosition({ 0, 0.0f, 0.1f * t });
-	//sphere->SetPosition({ 0, 0.0f, 0.1f * t });
-	//RaycastManager->Update(GetInputManager(), *sphere);
 }
 
 bool UScene::OnInitialize()
 {
-	/*
-	  // Manager에서 공유 Mesh 가져오기
-	  UMeshManager& meshManager = GetMeshManager();
-	  UMesh* sharedSphereMesh = meshManager.RetrieveMesh("Sphere");
-	  UMesh* gridMesh = meshManager.RetrieveMesh("GizmoGrid");
-
-	  // 메시가 제대로 로드되었는지 확인
-	  if (!sharedSphereMesh || !gridMesh) {
-		  return false; // 초기화 실패
-	  }
-
-	  RaycastManager = new URaycastManager(GetRenderer(), camera);
-
-	  // Sphere 인스턴스 생성
-	  sphere = new USphereComp(sharedSphereMesh, { 0.0f, 0.0f, 0.5f }, { 0.0f, 0.0f, 0.0f }, { 0.5f, 0.5f, 0.5f });
-	  sphere2 = new USphereComp(gridMesh);
-	  */
 
 	return true;
 }

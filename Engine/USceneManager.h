@@ -10,6 +10,7 @@ private:
     UApplication* application;
     UScene* currentScene = nullptr;
 public:
+    ~USceneManager() override;
     bool Initialize(UApplication* _application);
 
     UScene* GetScene();

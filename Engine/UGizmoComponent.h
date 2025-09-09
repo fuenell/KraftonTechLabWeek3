@@ -16,7 +16,9 @@ public:
 
 	bool bIsSelected = false;
 
-	virtual ~UGizmoComponent() {}
+	virtual ~UGizmoComponent()
+	{
+	}
 
 	bool Init(UMeshManager* meshManager);
 	std::string GetType() const override { return "UGizmoComponent"; }

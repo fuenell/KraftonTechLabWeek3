@@ -3,6 +3,12 @@
 #include "UScene.h"
 #include "UApplication.h"
 
+USceneManager::~USceneManager()
+{
+	if (currentScene)
+		delete currentScene;
+}
+
 bool USceneManager::Initialize(UApplication* _application)
 {
 	application = _application;
