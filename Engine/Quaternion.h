@@ -118,8 +118,11 @@ struct FQuaternion
         // 먼저 X, 그 다음 Y, 그 다음 Z → row 규약 합성
         return qx * qy * qz;
     }
+    static FQuaternion FromEulerXYZDeg(FVector v) {
+        return FromEulerXYZDeg(v.X, v.Y, v.Z);
+    }
     static FQuaternion FromEulerXYZDeg(float degX, float degY, float degZ) {
-        return FromEulerXYZ(ToRad(degX), ToRad(degY), ToRad(degZ));
+        return FromEulerXYZ(ToRad(degX), ToRad(degY), ToRad(degZ)).Normalized();
     }
     // TODO : 오브젝트에 쓰려면 조정이 필요함. 카메라 전용이었어서 잘 작동하지 않을 수 있음
     static FQuaternion LookRotation(const FVector& fwd, const FVector& up)
@@ -299,34 +302,23 @@ struct FQuaternion
 
         // 행벡터 + columns=axes + R = Rx*Ry*Rz 전개 결과:
         // R[0][2] = -sin(ry)
-        float sy = -R.M[0][2];
-        if (sy > 1.0f) sy = 1.0f;
-        if (sy < -1.0f) sy = -1.0f;
-
-        float ry = asinf(sy);
-        float cy = cosf(ry);
-
+            // R = Rx * Ry * Rz (row-vector)
+        const float sy = std::clamp(R.M[0][2], -1.0f, 1.0f); // +Y가 col1, 그래서 R[0][2]가 +sinY
+        const float ry = asinf(sy);
+        const float cy = cosf(ry);
         float rx, rz;
-        const float EPS = 1e-6f;
-
-        if (fabsf(cy) > EPS) {
-            // R[1][2] =  sin(rx)*cos(ry),  R[2][2] = cos(rx)*cos(ry)
-            rx = atan2f(R.M[1][2], R.M[2][2]);
-
-            // R[0][1] =  sin(rz)*cos(ry),  R[0][0] = cos(rz)*cos(ry)
-            rz = atan2f(R.M[0][1], R.M[0][0]);
+        if (fabsf(cy) > 1e-6f)
+        {
+            rx = atan2f(-R.M[1][2], R.M[2][2]); // X
+            rz = atan2f(-R.M[0][1], R.M[0][0]); // Z
         }
-        else {
-            // 짐벌락: rz 미정 → rz=0, rx만 안정적으로 뽑기
+        else
+        {
+            // gimbal lock
             rz = 0.0f;
-
-            // ry ≈ ±π/2 에서 부호 일관성 확보용 보정
-            float sgn = (sy >= 0.0f) ? 1.0f : -1.0f;
-            // ry=+π/2: R[1][0]= sin(rx), R[1][1]=cos(rx)
-            // ry=-π/2: R[1][0]=-sin(rx), R[1][1]=cos(rx)
-            rx = atan2f(sgn * R.M[1][0], R.M[1][1]);
+            rx = (sy > 0.0f) ? atan2f(R.M[2][0], R.M[1][0])
+                : atan2f(-R.M[2][0], -R.M[1][0]);
         }
-
         return FVector(rx, ry, rz);
     }
 
