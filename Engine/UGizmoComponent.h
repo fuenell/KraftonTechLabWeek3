@@ -18,8 +18,6 @@ public:
 
 	virtual ~UGizmoComponent()
 	{
-		delete mesh;
-		mesh = nullptr;
 	}
 
 	bool Init(UMeshManager* meshManager);
