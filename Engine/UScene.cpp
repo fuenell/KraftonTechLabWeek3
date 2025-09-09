@@ -85,7 +85,7 @@ json::JSON UScene::Serialize() const
 	// UScene 특성에 맞는 JSON 구성
 	result["Version"] = version;
 	result["NextUUID"] = std::to_string(UEngineStatics::GetNextUUID());
-	int validCount = 0;
+	int32 validCount = 0;
 	for (UObject* object : objects)
 	{
 		if (object == nullptr) continue;

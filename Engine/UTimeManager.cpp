@@ -18,7 +18,7 @@ UTimeManager::~UTimeManager()
     // Nothing specific to clean up
 }
 
-bool UTimeManager::Initialize(int fps)
+bool UTimeManager::Initialize(int32 fps)
 {
     // Get the high-resolution performance counter frequency
     if (!QueryPerformanceFrequency(&frequency))
@@ -89,7 +89,7 @@ void UTimeManager::WaitForTargetFrameTime()
     } while (elapsedTime < targetFrameTime);
 }
 
-void UTimeManager::SetTargetFPS(int fps)
+void UTimeManager::SetTargetFPS(int32 fps)
 {
     if (fps <= 0)
     {

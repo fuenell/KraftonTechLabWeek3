@@ -12,9 +12,9 @@ class URaycastManager;
 class UScene : public UObject
 {
 protected:
-    int backBufferWidth, backBufferHeight;
-    int version;
-    int primitiveCount;
+    int32 backBufferWidth, backBufferHeight;
+    int32 version;
+    int32 primitiveCount;
     bool isInitialized;
     TArray<USceneComponent*> objects;
 
@@ -41,12 +41,12 @@ public:
 
     bool IsInitialized() { return isInitialized; }
 
-    int GetObjectCount() { return primitiveCount; }
+    int32 GetObjectCount() { return primitiveCount; }
 
     static UScene* Create(json::JSON data);
 
     void AddObject(USceneComponent* obj);
-    void SetVersion(int v) { version = v; }
+    void SetVersion(int32 v) { version = v; }
 
     json::JSON Serialize() const override;
 

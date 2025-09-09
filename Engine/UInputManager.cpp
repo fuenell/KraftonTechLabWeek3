@@ -95,7 +95,7 @@ bool UInputManager::ProcessMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
     return false; // 보통 0 반환(핸들드)해도 되지만, 기본 처리가 필요 없으면 true/0 선택
 }
 
-bool UInputManager::IsKeyDown(int keyCode) const
+bool UInputManager::IsKeyDown(int32 keyCode) const
 {
     if (keyCode < 0 || keyCode >= 256)
         return false;
@@ -103,7 +103,7 @@ bool UInputManager::IsKeyDown(int keyCode) const
     return keyStates[keyCode];
 }
 
-bool UInputManager::IsKeyPressed(int keyCode) const
+bool UInputManager::IsKeyPressed(int32 keyCode) const
 {
     if (keyCode < 0 || keyCode >= 256)
         return false;
@@ -112,7 +112,7 @@ bool UInputManager::IsKeyPressed(int keyCode) const
     return keyStates[keyCode] && !prevKeyStates[keyCode];
 }
 
-bool UInputManager::IsKeyReleased(int keyCode) const
+bool UInputManager::IsKeyReleased(int32 keyCode) const
 {
     if (keyCode < 0 || keyCode >= 256)
         return false;
@@ -121,7 +121,7 @@ bool UInputManager::IsKeyReleased(int keyCode) const
     return !keyStates[keyCode] && prevKeyStates[keyCode];
 }
 
-bool UInputManager::IsMouseButtonDown(int button) const
+bool UInputManager::IsMouseButtonDown(int32 button) const
 {
     if (button < 0 || button >= 3)
         return false;
@@ -129,7 +129,7 @@ bool UInputManager::IsMouseButtonDown(int button) const
     return mouseButtons[button];
 }
 
-bool UInputManager::IsMouseButtonPressed(int button) const
+bool UInputManager::IsMouseButtonPressed(int32 button) const
 {
     if (button < 0 || button >= 3)
         return false;
@@ -138,7 +138,7 @@ bool UInputManager::IsMouseButtonPressed(int button) const
     return mouseButtons[button] && !prevMouseButtons[button];
 }
 
-bool UInputManager::IsMouseButtonReleased(int button) const
+bool UInputManager::IsMouseButtonReleased(int32 button) const
 {
     if (button < 0 || button >= 3)
         return false;
@@ -178,11 +178,11 @@ void UInputManager::HandleKeyUp(WPARAM wParam)
 
 void UInputManager::HandleMouseMove(LPARAM lParam)
 {
-    //int newMouseX = LOWORD(lParam);
-    //int newMouseY = HIWORD(lParam);
+    //int32 newMouseX = LOWORD(lParam);
+    //int32 newMouseY = HIWORD(lParam);
     // 부호를 살리기 위해서 short로 캐스팅 한다고 함
-    int x = static_cast<short>(LOWORD(lParam));
-    int y = static_cast<short>(HIWORD(lParam));
+    int32 x = static_cast<short>(LOWORD(lParam));
+    int32 y = static_cast<short>(HIWORD(lParam));
 
     if (!initializedMouse) {
         prevMouseX = mouseX = x;
@@ -191,8 +191,8 @@ void UInputManager::HandleMouseMove(LPARAM lParam)
         return;
     }
 
-    int dx = x - mouseX;
-    int dy = y - mouseY;
+    int32 dx = x - mouseX;
+    int32 dy = y - mouseY;
 
     mouseX = x; mouseY = y;
 

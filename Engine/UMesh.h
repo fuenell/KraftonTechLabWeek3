@@ -14,7 +14,7 @@ private:
 public:
 	ID3D11Buffer* VertexBuffer = nullptr;
 	std::vector<FVertexPosColor4> Vertices;
-	int NumVertices = 0;
+	int32 NumVertices = 0;
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
 	UINT Stride = 0;
 

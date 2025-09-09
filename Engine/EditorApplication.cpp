@@ -160,7 +160,7 @@ bool EditorApplication::OnInitialize()
 }
 
 
-void EditorApplication::OnResize(int width, int height)
+void EditorApplication::OnResize(int32 width, int32 height)
 {
 	UScene* scene = GetSceneManager().GetScene();
 	if (scene == nullptr) return;

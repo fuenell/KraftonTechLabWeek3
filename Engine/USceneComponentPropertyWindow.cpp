@@ -17,7 +17,7 @@ void USceneComponentPropertyWindow::RenderContent()
     if (ImGui::BeginTable("EditablePropertyTable", 4, ImGuiTableFlags_None))
     {
         ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++)
+        for (int32 i = 0; i < 3; i++)
         {
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
@@ -28,7 +28,7 @@ void USceneComponentPropertyWindow::RenderContent()
         ImGui::Text("Translation");
 
         ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++)
+        for (int32 i = 0; i < 3; i++)
         {
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
@@ -39,7 +39,7 @@ void USceneComponentPropertyWindow::RenderContent()
         ImGui::Text("Rotation");
 
         ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++)
+        for (int32 i = 0; i < 3; i++)
         {
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);

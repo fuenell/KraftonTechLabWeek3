@@ -12,12 +12,12 @@ private:
     // Mouse states
     bool mouseButtons[3]; // Left, Right, Middle
     bool prevMouseButtons[3];
-    int mouseX = 0, mouseY = 0;
-    int prevMouseX, prevMouseY;
-    int mouseDeltaX, mouseDeltaY;
+    int32 mouseX = 0, mouseY = 0;
+    int32 prevMouseX, prevMouseY;
+    int32 mouseDeltaX, mouseDeltaY;
 
     // Per-frame wheel delta (accumulate within a frame)
-    int wheelDelta;
+    int32 wheelDelta;
 
     bool initializedMouse = false;
     bool mouseLook = false;
@@ -31,23 +31,23 @@ public:
     bool ProcessMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     // Keyboard input
-    bool IsKeyDown(int keyCode) const;
-    bool IsKeyPressed(int keyCode) const;  // True only on the frame key was pressed
-    bool IsKeyReleased(int keyCode) const; // True only on the frame key was released
+    bool IsKeyDown(int32 keyCode) const;
+    bool IsKeyPressed(int32 keyCode) const;  // True only on the frame key was pressed
+    bool IsKeyReleased(int32 keyCode) const; // True only on the frame key was released
 
     // Mouse input
-    bool IsMouseButtonDown(int button) const; // 0=Left, 1=Right, 2=Middle
-    bool IsMouseButtonPressed(int button) const;
-    bool IsMouseButtonReleased(int button) const;
+    bool IsMouseButtonDown(int32 button) const; // 0=Left, 1=Right, 2=Middle
+    bool IsMouseButtonPressed(int32 button) const;
+    bool IsMouseButtonReleased(int32 button) const;
 
     // Mouse position and movement
-    int GetMouseX() const { return mouseX; }
-    int GetMouseY() const { return mouseY; }
+    int32 GetMouseX() const { return mouseX; }
+    int32 GetMouseY() const { return mouseY; }
     // Utility
     void ResetStates();
 
 
-    void OnMouseMove(int x, int y) {
+    void OnMouseMove(int32 x, int32 y) {
         if (!initializedMouse) { prevMouseX = mouseX = x; prevMouseY = mouseY = y; initializedMouse = true; }
         prevMouseX = mouseX; prevMouseY = mouseY;
         mouseX = x; mouseY = y;

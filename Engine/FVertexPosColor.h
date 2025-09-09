@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <math.h>
 #include "Vector.h"
 #include "TArray.h"
+#include "UEngineStatics.h"
 
 struct FVertexPosColor
 {
@@ -9,7 +9,7 @@ struct FVertexPosColor
 	float r, g, b, a;    // Color (4개)
 
 	// 정적 함수 ChangeAxis 구현
-	static void ChangeAxis(FVertexPosColor vertices[], int count, int axis1, int axis2)
+	static void ChangeAxis(FVertexPosColor vertices[], int32 count, int32 axis1, int32 axis2)
 	{
 		// 유효성 검사
 		if (axis1 < 0 || 2 < axis1 || axis2 < 0 || 2 < axis2 || axis1 == axis2)
@@ -19,7 +19,7 @@ struct FVertexPosColor
 		}
 
 		// 모든 버텍스를 순회하며 축 교환
-		for (int i = 0; i < count; ++i)
+		for (int32 i = 0; i < count; ++i)
 		{
 			//std::swap(vertices[i].y, vertices[i].z);
 			float* pCoords = &vertices[i].x; // 첫 번째 좌표의 포인터
@@ -36,12 +36,12 @@ struct FVertexPosColor4
 	float r, g, b, a;       // Color (float4)
 
 	// 변환 함수
-	static TArray<FVertexPosColor4> ConvertVertexData(const FVertexPosColor* oldVertices, int count)
+	static TArray<FVertexPosColor4> ConvertVertexData(const FVertexPosColor* oldVertices, int32 count)
 	{
 		TArray<FVertexPosColor4> newVertices;
 		newVertices.reserve(count);
 
-		for (int i = 0; i < count; i++)
+		for (int32 i = 0; i < count; i++)
 		{
 			FVertexPosColor4 newVertex;
 

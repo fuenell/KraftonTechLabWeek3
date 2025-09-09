@@ -3,9 +3,6 @@
 #include "TArray.h"
 #include "ISerializable.h"
 
-typedef int int32;
-typedef unsigned int uint32;
-
 class UObject : ISerializable
 {
 private:

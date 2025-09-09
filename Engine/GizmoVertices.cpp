@@ -198,8 +198,8 @@ const TArray<FVertexPosColor> gizmo_rotation_handle_vertices =
 
 TArray<FVertexPosColor> GridGenerator::CreateRotationHandleVertices()
 {
-	const int segU = 30; // 도넛 둘레 분할
-	const int segV = 3;  // 단면 분할
+	const int32 segU = 30; // 도넛 둘레 분할
+	const int32 segV = 3;  // 단면 분할
 	const float R = polyRadius; // 큰 반지름
 	const float r = 0.1f;       // 작은 반지름
 
@@ -210,12 +210,12 @@ TArray<FVertexPosColor> GridGenerator::CreateRotationHandleVertices()
 		};
 
 	// 토러스 정점 생성
-	for (int i = 0; i < segU; i++)
+	for (int32 i = 0; i < segU; i++)
 	{
 		float u0 = i * 2.0f * PI / segU;
 		float u1 = (i + 1) * 2.0f * PI / segU;
 
-		for (int j = 0; j < segV; j++)
+		for (int32 j = 0; j < segV; j++)
 		{
 			float v0 = j * 2.0f * PI / segV;
 			float v1 = (j + 1) * 2.0f * PI / segV;
@@ -314,26 +314,26 @@ const TArray<FVertexPosColor> gizmo_scale_handle_vertices =
 	{ -cubeSize / 2.0f, cubeOffset - cubeSize / 2.0f, -cubeSize / 2.0f, 1, 1, 1, 1 }, { -cubeSize / 2.0f, cubeOffset + cubeSize / 2.0f, cubeSize / 2.0f, 1, 1, 1, 1 }, { -cubeSize / 2.0f, cubeOffset - cubeSize / 2.0f, cubeSize / 2.0f, 1, 1, 1, 1 },
 	{ -cubeSize / 2.0f, cubeOffset - cubeSize / 2.0f, -cubeSize / 2.0f, 1, 1, 1, 1 }, { -cubeSize / 2.0f, cubeOffset + cubeSize / 2.0f, -cubeSize / 2.0f, 1, 1, 1, 1 }, { -cubeSize / 2.0f, cubeOffset + cubeSize / 2.0f, cubeSize / 2.0f, 1, 1, 1, 1 }
 };
-TArray<FVertexPosColor> GridGenerator::CreateGridVertices(float gridSize, int gridCount)
+TArray<FVertexPosColor> GridGenerator::CreateGridVertices(float gridSize, int32 gridCount)
 {
 	// TArray 컨테이너 생성
 	TArray<FVertexPosColor> vertices;
 
 	// Z축에 평행한 세로 선들을 생성하는 로직
-	for (int i = -gridCount; i <= gridCount; ++i)
+	for (int32 i = -gridCount; i <= gridCount; ++i)
 	{
 		vertices.push_back({ -gridSize * gridCount, 0.0f, i * gridSize, 1.0f, 1.0f, 1.0f, 1.0f });
 		vertices.push_back({ gridSize * gridCount, 0.0f, i * gridSize, 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 
 	// X축에 평행한 가로 선들을 생성하는 로직
-	for (int i = -gridCount; i <= gridCount; ++i)
+	for (int32 i = -gridCount; i <= gridCount; ++i)
 	{
 		vertices.push_back({ i * gridSize, 0.0f, -gridSize * gridCount, 1.0f, 1.0f, 1.0f, 1.0f });
 		vertices.push_back({ i * gridSize, 0.0f, gridSize * gridCount, 1.0f, 1.0f, 1.0f, 1.0f });
 	}
 
-	FVertexPosColor::ChangeAxis(vertices.data(), (int)vertices.size(), 1, 2);
+	FVertexPosColor::ChangeAxis(vertices.data(), (int32)vertices.size(), 1, 2);
 
 	return vertices;
 }

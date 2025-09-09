@@ -38,9 +38,9 @@ void UControlPanel::PrimaryInformationSection()
 
 void UControlPanel::SpawnPrimitiveSection()
 {
-    ImGui::Combo("Primitive", &primitiveChoiceIndex, choices.data(), static_cast<int>(choices.size()));
+    ImGui::Combo("Primitive", &primitiveChoiceIndex, choices.data(), static_cast<int32>(choices.size()));
 
-    int objectCount = SceneManager->GetScene()->GetObjectCount();
+    int32 objectCount = SceneManager->GetScene()->GetObjectCount();
     if (ImGui::Button("Spawn"))
     {
         USceneComponent* sceneComponent = USceneComponentFactory::Create(choices[primitiveChoiceIndex]);
@@ -140,7 +140,7 @@ void UControlPanel::CameraManagementSection()
     {
         // Camera Location 행
         ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++)
+        for (int32 i = 0; i < 3; i++)
         {
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
@@ -154,7 +154,7 @@ void UControlPanel::CameraManagementSection()
 
         // Camera Rotation 행
         ImGui::TableNextRow();
-        for (int i = 0; i < 3; i++)
+        for (int32 i = 0; i < 3; i++)
         {
             ImGui::TableSetColumnIndex(i);
             ImGui::SetNextItemWidth(-1);
