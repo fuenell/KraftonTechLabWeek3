@@ -37,7 +37,7 @@ public:
 
 	UPrimitiveComponent* GetTarget() { return targetObject; }
 	TArray<UGizmoComponent*>& GetRaycastableGizmos();
-	void BeginDrag(UCamera* camera, EAxis selectedAxis);
+	void BeginDrag(const FRay& mouseRay, EAxis selectedAxis);
 	void UpdateDrag(const FRay& mouseRay);
 	void EndDrag();
 
@@ -45,15 +45,16 @@ public:
 
 private:
 	// 드래그 상태 변수
-	bool m_bIsDragging = false;
-	EAxis m_SelectedAxis = EAxis::None;
+	bool isDragging = false;
+	EAxis selectedAxis = EAxis::None;
+	FVector dragOffset;
 
-	UMeshManager* MeshManager;
+	UMeshManager* meshManager;
 	UPrimitiveComponent* targetObject = nullptr; // 현재 선택된 객체
 
 	// 드래그 계산을 위해 저장해두는 정보
-	FVector m_DragStartLocation;    // 드래그 시작 시 Target의 월드 위치
-	FPlane m_MovementPlane;         // 계산된 이동 평면
+	FVector dragStartLocation;    // 드래그 시작 시 Target의 월드 위치
+	FPlane movementPlane;         // 계산된 이동 평면
 
 	// 유틸리티 함수
 	FVector GetAxisVector(EAxis axis);
@@ -61,4 +62,6 @@ private:
 	// 역할에 따라 프리미티브를 분리해서 저장합니다.
 	UGizmoComponent* gridPrimitive = nullptr;              // 월드 그리드
 	TArray<UGizmoComponent*> transformGizmoPrimitives; // 이동/회전/크기 기즈모
+
+	FVector FindCirclePlaneIntersection(const FRay& mouseRay, const FPlane& plane);
 };
