@@ -30,6 +30,7 @@ public:
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }
 	void SetScale(const FVector& scl) { RelativeScale3D = scl; }
 	void SetRotation(const FVector& rot) { RelativeQuaternion = FQuaternion::FromEulerXYZDeg(rot); }
+	void SetQuaternion(const FQuaternion quat) { RelativeQuaternion = quat; }
 	FVector GetPosition() const { return RelativeLocation; }
 	FVector GetScale() const { return RelativeScale3D; }
 	FVector GetRotation() const 

@@ -9,7 +9,7 @@ class UMeshManager; // 전방 선언
 class UGizmoComponent : public USceneComponent
 {
 public:
-	FVector OriginRotation{ 0,0,0 };
+	FQuaternion OriginQuaternion;
 
 	UGizmoComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr)
@@ -36,7 +36,7 @@ public:
 
 	void SetOriginRotation(FVector originRotation)
 	{
-		OriginRotation = originRotation;
+		OriginQuaternion = FQuaternion::FromEulerXYZDeg(originRotation);
 	}
 
 	void SetColor(const FVector4& newColor) { Color = newColor; }

@@ -505,13 +505,6 @@ struct FMatrix
 		FMatrix T = TranslationRow(t.X, t.Y, t.Z);
 		return S * R * T;                        // row 규약 핵심
 	}
-	// 쿼터니언 용
-	//static FMatrix TRSRow(const FVector& t, const FQuaternion& q, const FVector& s) {
-	//    FMatrix S = FMatrix::Scale(s.X, s.Y, s.Z);
-	//    FMatrix R = q.ToMatrix();  // RH 회전행렬 블록 
-	//    FMatrix T = FMatrix::TranslationRow(t.X, t.Y, t.Z);
-	//    return S * R * T;
-	//}
 
 	static FMatrix SRTRowEuler(const FVector& t, const FVector& eulerXYZ, const FVector& s)
 	{
@@ -520,6 +513,13 @@ struct FMatrix
 		FMatrix Ry = RotationYRow(eulerXYZ.Y * DegreeToRadian);
 		FMatrix Rz = RotationZRow(eulerXYZ.Z * DegreeToRadian);
 		FMatrix R = Rx * Ry * Rz;               // 필요에 따라 오일러 순서 변경 가능
+		FMatrix T = TranslationRow(t.X, t.Y, t.Z);
+		return S * R * T;                        // row 규약 핵심
+	}
+
+	static FMatrix SRTRowQuaternion(const FVector& t, const FMatrix& R, const FVector& s)
+	{
+		FMatrix S = Scale(s.X, s.Y, s.Z);
 		FMatrix T = TranslationRow(t.X, t.Y, t.Z);
 		return S * R * T;                        // row 규약 핵심
 	}

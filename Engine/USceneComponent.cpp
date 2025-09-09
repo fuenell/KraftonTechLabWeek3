@@ -5,7 +5,7 @@
 
 FMatrix USceneComponent::GetWorldTransform()
 {
-    return FMatrix::SRTRowEuler(RelativeLocation, GetRotation(), RelativeScale3D);
+    return FMatrix::SRTRowQuaternion(RelativeLocation, RelativeQuaternion.ToMatrixRow(), RelativeScale3D);
 }
 
 json::JSON USceneComponent::Serialize() const

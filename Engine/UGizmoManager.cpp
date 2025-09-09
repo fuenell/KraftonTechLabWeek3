@@ -55,9 +55,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	arrowY->SetColor({ 0, 1, 0, 1 });
 	arrowZ->SetColor({ 0, 0, 1, 1 });
 
-	arrowX->SetOriginRotation({ 0.0f, 0.0f, -90.0f });
-	arrowY->SetOriginRotation({ 0.0f, 90.0f, 0.0f });
-	arrowZ->SetOriginRotation({ 90.0f, 0.0f, 0.0f });
+	arrowX->SetOriginRotation({ 0.0f, 0.0f, 90.0f });
+	arrowY->SetOriginRotation({ 0.0f, 0.0f, 0.0f });
+	arrowZ->SetOriginRotation({ -90.0f, 0.0f, 0.0f });
 
 	locationGizmos.push_back(arrowX);
 	locationGizmos.push_back(arrowZ);
@@ -76,9 +76,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	rotationY->SetColor({ 0, 1, 0, 1 });
 	rotationZ->SetColor({ 0, 0, 1, 1 });
 
-	rotationX->SetOriginRotation({ 0.0f, 0.0f, -90.0f });
-	rotationY->SetOriginRotation({ 0.0f, 90.0f, 0.0f });
-	rotationZ->SetOriginRotation({ 90.0f, 0.0f, 0.0f });
+	rotationX->SetOriginRotation({ 0.0f, 0.0f, 90.0f });
+	rotationY->SetOriginRotation({ 0.0f, 0.0f, 0.0f });
+	rotationZ->SetOriginRotation({ -90.0f, 0.0f, 0.0f });
 
 	rotationGizmos.push_back(rotationX);
 	rotationGizmos.push_back(rotationZ);
@@ -97,9 +97,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	scaleY->SetColor({ 0, 1, 0, 1 });
 	scaleZ->SetColor({ 0, 0, 1, 1 });
 
-	scaleX->SetOriginRotation({ 0.0f, 0.0f, -90.0f });
-	scaleY->SetOriginRotation({ 0.0f, 90.0f, 0.0f });
-	scaleZ->SetOriginRotation({ 90.0f, 0.0f, 0.0f });
+	scaleX->SetOriginRotation({ 0.0f, 0.0f, 90.0f });
+	scaleY->SetOriginRotation({ 0.0f, 0.0f, 0.0f });
+	scaleZ->SetOriginRotation({ -90.0f, 0.0f, 0.0f });
 
 	scaleGizmos.push_back(scaleX);
 	scaleGizmos.push_back(scaleZ);
@@ -197,7 +197,7 @@ void UGizmoManager::Draw(URenderer& renderer)
 			if (gizmoPart)
 			{
 				gizmoPart->SetPosition(targetObject->GetPosition());
-				// gizmoPart->SetRotation(targetObject->GetRotation());
+				gizmoPart->SetQuaternion(targetObject->RelativeQuaternion);
 				gizmoPart->Draw(renderer);
 			}
 		}
