@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "UObject.h"
+#include "UClass.h"
 
-TArray<UObject*> UObject::GUObjectArray;
-TArray<uint32> UObject::FreeIndices;
-uint32 UObject::NextFreshIndex = 0;
+IMPLEMENT_ROOT_UCLASS(UObject)

@@ -156,6 +156,7 @@
     <ClCompile Include="UCamera.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="UClass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -305,6 +306,10 @@
     <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UGizmoScaleHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="UClass.h" />
+    <ClInclude Include="FDynamicBitset.h">
+      <Filter>Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="UGizmoRotationHandleComp.h">
       <Filter>Engine\Core\Component</Filter>

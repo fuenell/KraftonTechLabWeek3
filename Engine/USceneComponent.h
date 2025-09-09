@@ -6,6 +6,7 @@
 
 class USceneComponent : public UObject
 {
+	DECLARE_UCLASS(USceneComponent, UObject)
 public:
 	FVector RelativeLocation;
 	// FVector RelativeRotation;

@@ -2,16 +2,54 @@
 #include "UEngineStatics.h"
 #include "TArray.h"
 #include "ISerializable.h"
+#include <type_traits>
 
-class UObject : ISerializable
+// Forward declaration으로 순환 종속성 해결
+class UClass;
+
+typedef int int32;
+typedef unsigned int uint32;
+
+#define DECLARE_ROOT_UCLASS(ClassName) \
+public: \
+    virtual UClass* GetClass() const; \
+    static UClass* StaticClass(); \
+private: \
+    static UClass* s_StaticClass; \
+    static UObject* CreateInstance();
+
+#define IMPLEMENT_ROOT_UCLASS(ClassName) \
+UObject* ClassName::CreateInstance() { return new ClassName(); } \
+UClass* ClassName::s_StaticClass = UClass::RegisterToFactory( \
+    #ClassName, &ClassName::CreateInstance, ""); \
+UClass* ClassName::StaticClass() { return s_StaticClass; } \
+UClass* ClassName::GetClass() const { return StaticClass(); }
+
+#define DECLARE_UCLASS(ClassName, ParentClass) \
+public: \
+    using Super = ParentClass; \
+    UClass* GetClass() const override; \
+    static UClass* StaticClass(); \
+private: \
+    static UClass* s_StaticClass; \
+    static UObject* CreateInstance();
+
+#define IMPLEMENT_UCLASS(ClassName, ParentClass) \
+UObject* ClassName::CreateInstance() { return new ClassName(); } \
+UClass* ClassName::s_StaticClass = UClass::RegisterToFactory( \
+    #ClassName, &ClassName::CreateInstance, #ParentClass); \
+UClass* ClassName::StaticClass() { return s_StaticClass; } \
+UClass* ClassName::GetClass() const { return StaticClass(); }
+
+
+class UObject : public ISerializable
 {
+    DECLARE_ROOT_UCLASS(UObject)
 private:
-    static TArray<uint32> FreeIndices;
-    static uint32 NextFreshIndex;
-
+    static inline TArray<uint32> FreeIndices;
+    static inline uint32 NextFreshIndex = 0;
 public:
-    static TArray<UObject*> GUObjectArray;
-
+    static inline TArray<UObject*> GUObjectArray;
     uint32 UUID;
     uint32 InternalIndex;
 
@@ -49,6 +87,20 @@ public:
         return false;
     }
 
+    template<typename T>
+    bool IsA() const {
+        return GetClass()->IsChildOf(T::StaticClass());
+    }
+
+    template<typename T>
+    T* Cast() {
+        return IsA<T>() ? static_cast<T*>(this) : nullptr;
+    }
+
+    template<typename T>
+    const T* Cast() const {
+        return IsA<T>() ? static_cast<const T*>(this) : nullptr;
+    }
     // Override new/delete for tracking
     void* operator new(size_t size)
     {

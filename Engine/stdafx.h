@@ -22,6 +22,8 @@
 #include <optional>
 #include <filesystem>
 #include <climits>
+#include <bitset>
+#include <stack>
 
 // DirectX 관련
 #include <d3d11.h>

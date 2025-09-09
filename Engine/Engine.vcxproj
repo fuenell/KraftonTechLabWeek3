@@ -194,6 +194,7 @@
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="UCamera.cpp" />
+    <ClCompile Include="UClass.cpp" />
     <ClCompile Include="UControlPanel.cpp" />
     <ClCompile Include="UCubeComp.cpp" />
     <ClCompile Include="UDefaultScene.cpp" />
@@ -221,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CubeVertices.h" />
+    <ClInclude Include="FDynamicBitset.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="PlaneVertices.h" />
     <ClInclude Include="UCamera.h" />
@@ -241,6 +243,7 @@
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="UClass.h" />
     <ClInclude Include="UControlPanel.h" />
     <ClInclude Include="UCubeComp.h" />
     <ClInclude Include="UDefaultScene.h" />
