@@ -111,7 +111,6 @@ struct FQuaternion
     }
 
     // 행벡터 규약: X→Y→Z 순서라면 실제 행렬은 S*Rx*Ry*Rz 같은 식으로 오른쪽에 쌓임.
-    // 여기서는 "오일러 X, Y, Z를 그 순서로 적용"하도록 구성(카메라 pitch-yaw 등 용도에 맞게 바꿔 써).
     static FQuaternion FromEulerXYZ(float rx, float ry, float rz) {
         FQuaternion qx = FromAxisAngle(FVector(1, 0, 0), rx);
         FQuaternion qy = FromAxisAngle(FVector(0, 1, 0), ry);
@@ -119,9 +118,7 @@ struct FQuaternion
         // 먼저 X, 그 다음 Y, 그 다음 Z → row 규약 합성
         return qx * qy * qz;
     }
-
-    // fwd: 카메라가 바라볼 "월드 방향" (우리 규약에서 Forward = q·(-Y))
-// up : 월드 기준 위벡터 (보통 (0,0,1))
+    // TODO : 오브젝트에 쓰려면 조정이 필요함. 카메라 전용이었어서 잘 작동하지 않을 수 있음
     static FQuaternion LookRotation(const FVector& fwd, const FVector& up)
     {
         // 1) 우리 카메라 규약 맞추기
@@ -173,7 +170,6 @@ struct FQuaternion
         FQuaternion inv = Inverse();
         // tmp = q ⊗ v
         FQuaternion tmp = Hamilton(qv, *this);   // Hamilton(p,q)=q⊗p 이므로 (qv, q)
-
         // r = (q ⊗ v) ⊗ q^{-1}
         FQuaternion r = Hamilton(inv, tmp);      // (tmp, inv) => tmp ⊗ inv
 
@@ -184,30 +180,25 @@ struct FQuaternion
     // col0 = q·(+X) = Right
     FMatrix ToMatrixRow() const {
         FQuaternion q = Normalized();
-        float x = q.X, y = q.Y, z = q.Z, w = q.W;
 
+        float x = q.X, y = q.Y, z = q.Z, w = q.W;
         float xx = x * x, yy = y * y, zz = z * z;
         float xy = x * y, xz = x * z, yz = y * z;
         float wx = w * x, wy = w * y, wz = w * z;
 
         FMatrix R = FMatrix::IdentityMatrix();
-
-        // === COLUMNS are axes (row-vector) ===
-        // col0 = q·(+X) = Right
+        // === columns are axes (col0=+X, col1=+Y, col2=+Z) ===
         R.M[0][0] = 1.0f - 2.0f * (yy + zz);
-        R.M[0][1] = 2.0f * (xy + wz);
-        R.M[0][2] = 2.0f * (xz - wy);
+        R.M[0][1] = 2.0f * (xy - wz);
+        R.M[0][2] = 2.0f * (xz + wy);
 
-        // col1 = q·(+Y)
-        R.M[1][0] = 2.0f * (xy - wz);
+        R.M[1][0] = 2.0f * (xy + wz);
         R.M[1][1] = 1.0f - 2.0f * (xx + zz);
-        R.M[1][2] = 2.0f * (yz + wx);
+        R.M[1][2] = 2.0f * (yz - wx);
 
-        // col2 = q·(+Z) = Up
-        R.M[2][0] = 2.0f * (xz + wy);
-        R.M[2][1] = 2.0f * (yz - wx);
+        R.M[2][0] = 2.0f * (xz - wy);
+        R.M[2][1] = 2.0f * (yz + wx);
         R.M[2][2] = 1.0f - 2.0f * (xx + yy);
-
         return R;
     }
 
@@ -249,7 +240,49 @@ struct FQuaternion
         }
         return q.Normalized();
     }
+    // 이건 아직 틀릴수도 있습니다.
+    // 규약: row-vector, R = Rx * Ry * Rz (X→Y→Z 순서 적용)
+    FVector ToEulerXYZ() const
+    {
+        FMatrix R = ToMatrixRow();
+        // R = Rx * Ry * Rz 에서 유도된 요소 사용
+        // R[0][2] = sin(ry)
+        float sy = R.M[0][2];
+        // 수치 오차 방지용 클램프
+        if (sy > 1.0f) sy = 1.0f;
+        if (sy < -1.0f) sy = -1.0f;
 
+        float ry = asinf(sy);
+        float cy = cosf(ry);
+
+        float rx, rz;
+        const float EPS = 1e-6f;
+
+        if (fabsf(cy) > EPS) {
+            // 일반 케이스
+            // R[1][2] = -sin(rx)*cos(ry)  → rx = atan2(-R[1][2], R[2][2])
+            rx = atan2f(-R.M[1][2], R.M[2][2]);
+
+            // R[0][1] = -cos(ry)*sin(rz), R[0][0] = cos(ry)*cos(rz)
+            // → rz = atan2(-R[0][1], R[0][0])
+            rz = atan2f(-R.M[0][1], R.M[0][0]);
+        }
+        else {
+            // 짐벌락( |cos(ry)| ~ 0 ) : rz가 정의 불가 → rz=0 으로 두고 rx만 결정
+            rz = 0.0f;
+            // 이때는 R[1][0], R[1][1]에서 rx를 복원
+            rx = atan2f(R.M[1][0], R.M[1][1]);
+        }
+
+        // X=rx, Y=ry, Z=rz (라디안)
+        return FVector(rx, ry, rz);
+    }
+
+    FVector ToEulerXYZ_Deg() const {
+        FVector r = ToEulerXYZ();
+        const float R2D = 180.0f / (float)PI;
+        return FVector(r.X * R2D, r.Y * R2D, r.Z * R2D);
+    }
 };
 
 // 모델행렬 (row-vector): M = S * R * T

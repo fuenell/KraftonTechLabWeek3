@@ -161,6 +161,10 @@
     </ClCompile>
     <ClCompile Include="ImguiConsole.cpp" />
     <ClCompile Include="UPlaneComp.cpp" />
+    <ClCompile Include="UCubeComp.cpp" />
+    <ClCompile Include="UCamera.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -305,6 +309,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="UPlaneComp.h" />
+    <ClInclude Include="CubeVertices.h" />
+    <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="UCubeComp.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
