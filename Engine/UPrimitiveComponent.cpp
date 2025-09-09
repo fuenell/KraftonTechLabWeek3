@@ -15,7 +15,7 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager)
 
 void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
 {
-	FMatrix M = FMatrix::SRTRowEuler(RelativeLocation, RelativeRotation, RelativeScale3D);
+	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, Color, bIsSelected);
 }
 

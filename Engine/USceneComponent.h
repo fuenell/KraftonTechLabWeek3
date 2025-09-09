@@ -14,12 +14,13 @@ public:
 		: RelativeLocation(pos), RelativeRotation(rot), RelativeScale3D(scl)
 	{
 	}
-    FMatrix GetWorldTransform();
 
-    virtual std::string GetType() const
-    {
-        return "USceneComponent";
-    }
+	virtual FMatrix GetWorldTransform();
+
+	virtual std::string GetType() const
+	{
+		return "USceneComponent";
+	}
 
 	virtual bool IsManageable() { return false; }
 

@@ -13,9 +13,14 @@ bool UGizmoComponent::Init(UMeshManager* meshManager)
 	return false;
 }
 
+FMatrix UGizmoComponent::GetWorldTransform()
+{
+	return FMatrix::SRTRowEuler(RelativeLocation, OriginRotation + RelativeRotation, RelativeScale3D);
+}
+
 void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
-	FMatrix M = FMatrix::SRTRowEuler(RelativeLocation, RelativeRotation, RelativeScale3D);
+	FMatrix M = GetWorldTransform();
 	renderer.SetModel(M, Color, bIsSelected);
 }
 

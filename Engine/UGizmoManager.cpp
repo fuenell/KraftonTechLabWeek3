@@ -55,9 +55,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	arrowY->SetColor({ 0, 1, 0, 1 });
 	arrowZ->SetColor({ 0, 0, 1, 1 });
 
-	arrowX->SetRotation({ 0.0f, 0.0f, -90.0f });
-	arrowY->SetRotation({ 0.0f, 90.0f, 0.0f });
-	arrowZ->SetRotation({ 90.0f, 0.0f, 0.0f });
+	arrowX->SetOriginRotation({ 0.0f, 0.0f, -90.0f });
+	arrowY->SetOriginRotation({ 0.0f, 90.0f, 0.0f });
+	arrowZ->SetOriginRotation({ 90.0f, 0.0f, 0.0f });
 
 	locationGizmos.push_back(arrowX);
 	locationGizmos.push_back(arrowZ);
@@ -76,9 +76,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	rotationY->SetColor({ 0, 1, 0, 1 });
 	rotationZ->SetColor({ 0, 0, 1, 1 });
 
-	rotationX->SetRotation({ 0.0f, 0.0f, -90.0f });
-	rotationY->SetRotation({ 0.0f, 90.0f, 0.0f });
-	rotationZ->SetRotation({ 90.0f, 0.0f, 0.0f });
+	rotationX->SetOriginRotation({ 0.0f, 0.0f, -90.0f });
+	rotationY->SetOriginRotation({ 0.0f, 90.0f, 0.0f });
+	rotationZ->SetOriginRotation({ 90.0f, 0.0f, 0.0f });
 
 	rotationGizmos.push_back(rotationX);
 	rotationGizmos.push_back(rotationZ);
@@ -97,9 +97,9 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	scaleY->SetColor({ 0, 1, 0, 1 });
 	scaleZ->SetColor({ 0, 0, 1, 1 });
 
-	scaleX->SetRotation({ 0.0f, 0.0f, -90.0f });
-	scaleY->SetRotation({ 0.0f, 90.0f, 0.0f });
-	scaleZ->SetRotation({ 90.0f, 0.0f, 0.0f });
+	scaleX->SetOriginRotation({ 0.0f, 0.0f, -90.0f });
+	scaleY->SetOriginRotation({ 0.0f, 90.0f, 0.0f });
+	scaleZ->SetOriginRotation({ 90.0f, 0.0f, 0.0f });
 
 	scaleGizmos.push_back(scaleX);
 	scaleGizmos.push_back(scaleZ);
@@ -174,9 +174,6 @@ void UGizmoManager::Draw(URenderer& renderer)
 
 	if (targetObject == nullptr) return;
 
-	// 타겟의 위치를 가져옵니다.
-	FVector targetPosition = targetObject->GetPosition();
-
 	// 현재 모드에 따라 올바른 기즈모를 그립니다.
 	TArray<UGizmoComponent*>* currentGizmos = nullptr;
 
@@ -199,7 +196,8 @@ void UGizmoManager::Draw(URenderer& renderer)
 		{
 			if (gizmoPart)
 			{
-				gizmoPart->SetPosition(targetPosition);
+				gizmoPart->SetPosition(targetObject->GetPosition());
+				gizmoPart->SetRotation(targetObject->GetRotation());
 				gizmoPart->Draw(renderer);
 			}
 		}
