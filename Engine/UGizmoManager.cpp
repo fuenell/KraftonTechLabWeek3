@@ -4,9 +4,10 @@
 #include "UApplication.h"
 #include "UPrimitiveComponent.h"
 #include "UGizmoComponent.h"
-#include "UGizmoArrowComp.h"
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
+#include "UGizmoArrowComp.h"
+#include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
 
 UGizmoManager::UGizmoManager()
@@ -64,6 +65,27 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 
 	// =================================================
 
+	UGizmoRotationHandleComp* rotationX = new UGizmoRotationHandleComp();
+	rotationX->Axis = EAxis::X;
+	UGizmoRotationHandleComp* rotationY = new UGizmoRotationHandleComp();
+	rotationY->Axis = EAxis::Y;
+	UGizmoRotationHandleComp* rotationZ = new UGizmoRotationHandleComp();
+	rotationZ->Axis = EAxis::Z;
+
+	rotationX->SetColor({ 1, 0, 0, 1 });
+	rotationY->SetColor({ 0, 1, 0, 1 });
+	rotationZ->SetColor({ 0, 0, 1, 1 });
+
+	rotationX->SetRotation({ 0.0f, 0.0f, -90.0f });
+	rotationY->SetRotation({ 0.0f, 90.0f, 0.0f });
+	rotationZ->SetRotation({ 90.0f, 0.0f, 0.0f });
+
+	rotationGizmos.push_back(rotationX);
+	rotationGizmos.push_back(rotationZ);
+	rotationGizmos.push_back(rotationY);
+
+	// =================================================
+
 	UGizmoScaleHandleComp* scaleX = new UGizmoScaleHandleComp();
 	scaleX->Axis = EAxis::X;
 	UGizmoScaleHandleComp* scaleY = new UGizmoScaleHandleComp();
@@ -83,7 +105,10 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 	scaleGizmos.push_back(scaleZ);
 	scaleGizmos.push_back(scaleY);
 
+	// =================================================
+
 	if (!gridPrimitive->Init(meshManager) || !arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager)
+		|| !rotationX->Init(meshManager) || !rotationY->Init(meshManager) || !rotationZ->Init(meshManager)
 		|| !scaleX->Init(meshManager) || !scaleY->Init(meshManager) || !scaleZ->Init(meshManager))
 	{
 		delete gridPrimitive;
@@ -91,6 +116,10 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 		delete arrowX;
 		delete arrowY;
 		delete arrowZ;
+
+		delete rotationX;
+		delete rotationY;
+		delete rotationZ;
 
 		delete scaleX;
 		delete scaleY;
@@ -265,7 +294,7 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 		targetObject->SetPosition(newPosition + dragOffset);
 		break;
 	case ETranslationType::Rotation:
-		targetObject->SetPosition(newPosition + dragOffset);
+		targetObject->SetRotation(dragStartRotation + ((newPosition - dragStartLocation + dragOffset) * 45));
 		break;
 	case ETranslationType::Scale:
 		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));
