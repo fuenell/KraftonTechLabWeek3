@@ -517,6 +517,46 @@ void URenderer::DrawMesh(UMesh* mesh)
 	deviceContext->Draw(mesh->NumVertices, 0);
 }
 
+void URenderer::DrawMeshOnTop(UMesh* mesh)
+{
+	if (!mesh || !mesh->IsInitialized())
+		return;
+	
+	// Create a depth-stencil state with depth testing disabled
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = FALSE;  // disable depth testing
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	dsDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+
+	ID3D11DepthStencilState* pDSState = nullptr;
+	HRESULT hr = device->CreateDepthStencilState(&dsDesc, &pDSState);
+	if (FAILED(hr))
+	{
+		LogError("CreateDepthStencilState (DrawMeshOnTop)", hr);
+		return;
+	}
+
+	// Backup current depth-stencil state
+	ID3D11DepthStencilState* pOldState = nullptr;
+	UINT stencilRef = 0;
+	deviceContext->OMGetDepthStencilState(&pOldState, &stencilRef);
+
+	// Set new state (no depth test)
+	deviceContext->OMSetDepthStencilState(pDSState, 0);
+
+	// Draw mesh
+	UINT offset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
+	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
+	deviceContext->Draw(mesh->NumVertices, 0);
+
+	// Restore previous depth state
+	deviceContext->OMSetDepthStencilState(pOldState, stencilRef);
+
+	// Release local COM objects
+	SAFE_RELEASE(pOldState);
+	SAFE_RELEASE(pDSState);
+}
 
 void URenderer::SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset)
 {

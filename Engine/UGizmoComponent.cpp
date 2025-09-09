@@ -34,3 +34,14 @@ void UGizmoComponent::Draw(URenderer& renderer)
 	UpdateConstantBuffer(renderer);
 	renderer.DrawMesh(mesh);
 }
+
+void UGizmoComponent::DrawOnTop(URenderer& renderer)
+{
+	if (!mesh || !mesh->VertexBuffer)
+	{
+		return;
+	}
+
+	UpdateConstantBuffer(renderer);
+	renderer.DrawMeshOnTop(mesh);
+}
