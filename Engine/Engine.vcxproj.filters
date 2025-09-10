@@ -172,6 +172,9 @@
     <ClCompile Include="USphereComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>PCH</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
