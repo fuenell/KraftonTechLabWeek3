@@ -10,6 +10,7 @@
 #include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
 #include "UObject.h"
+#include "UScene.h"
 
 IMPLEMENT_UCLASS(UGizmoManager, UEngineSubsystem)
 UGizmoManager::UGizmoManager()
@@ -255,6 +256,53 @@ void UGizmoManager::Draw(URenderer& renderer)
 		}
 	}
 }
+// FVector2, FVector4, FMatrix4x4는 사용하시는 엔진의 자료형으로 대체하세요.
+
+
+FVector ConvertWorldVectorToCamera2D(const FVector& worldVector, const UCamera* camera)
+{
+	// 1. 카메라의 로컬 축 벡터를 가져옵니다.
+	FVector cameraRight = camera->GetRight();
+	FVector cameraUp = camera->GetUp();
+
+	// 2. 월드 벡터를 카메라의 Right축과 Up축에 각각 내적합니다.
+	float newX = worldVector.Dot(cameraRight);
+	float newY = worldVector.Dot(cameraUp);
+
+	// 3. 계산된 값으로 2D 벡터를 반환합니다.
+	return FVector(newX, newY, 0);
+}
+
+FVector WorldVectorToScreenVector(
+	const FVector& worldVector,
+	const FMatrix& viewMatrix,
+	const FMatrix& projectionMatrix,
+	float screenWidth,
+	float screenHeight)
+{
+	// 1. 월드 벡터를 4차원 벡터로 변환 (동차 좌표계, w=1은 위치, w=0은 방향)
+	// 방향 벡터를 변환할 때는 w=0을 사용해야 이동(Translation)이 적용되지 않습니다.
+	FVector4 worldPos_4D(worldVector.X, worldVector.Y, worldVector.Z, 0.0f);
+
+	// 2. 뷰 변환과 투영 변환을 순차적으로 적용
+	// DirectX 기준 순서입니다. OpenGL은 순서가 반대일 수 있습니다.
+	FMatrix viewProjectionMatrix = viewMatrix * projectionMatrix;
+	FVector4 clipPos = FMatrix::MultiplyVectorRow(worldPos_4D, viewProjectionMatrix);
+
+	// 3. 원근 나누기 (w로 나누어 정규화된 장치 좌표(NDC)로 변환)
+	// w가 0에 가까우면 (카메라와 매우 가깝거나 뒤에 있으면) 연산을 피합니다.
+	if (abs(clipPos.W) < 0.0001f)
+	{
+		return FVector(-1.0f, -1.0f, 0); // 화면 밖이라는 의미의 값
+	}
+	FVector ndcPos(clipPos.X / clipPos.W, clipPos.Y / clipPos.W, clipPos.Z / clipPos.W);
+
+	// 4. 뷰포트 변환 (NDC -> Screen Coordinates)
+	float screenX = (ndcPos.X + 1.0f) / 2.0f * screenWidth;
+	float screenY = (1.0f - ndcPos.Y) / 2.0f * screenHeight;
+
+	return FVector(screenX, screenY, 0);
+}
 
 //레이와 이동 평면의 3D 교차점 찾기
 FVector UGizmoManager::FindCirclePlaneIntersection(const FRay& ray, const FPlane& plane)
@@ -270,7 +318,7 @@ FVector UGizmoManager::FindCirclePlaneIntersection(const FRay& ray, const FPlane
 	return intersectionPoint;
 }
 
-void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis, FVector impactPoint)
+void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis, FVector impactPoint, UScene* curScene)
 {
 	isDragging = true;
 	selectedAxis = axis;
@@ -290,17 +338,14 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis, FVector impactPo
 
 	if (translationType == ETranslationType::Rotation)
 	{
-		// 1. 회전이 일어날 평면을 정의 (법선: 회전축, 기준점: 객체 중심)
-		movementPlane.Normal = axisDir;
-		movementPlane.PointOnPlane = dragStartLocation;
-
-		// 2. 평면과 마우스 레이의 교차점을 드래그 시작점으로 저장
-		dragRotationStartPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
-
-		// 3. 드래그 방향(회전 접선 방향)을 계산하고 정규화
-		FVector centerToStartVec = dragRotationStartPoint - dragStartLocation;
-		dragRotationStartVector = axisDir.Cross(centerToStartVec).Normalized();
-
+		// 로컬 스페이스 모드일 경우, 축 벡터를 오브젝트의 회전만큼 회전시킵니다.
+		if (!isWorldSpace)
+		{
+			axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
+		}
+		dragRotationStartPoint = mouseRay.MousePos;
+		FVector rotDir = axisDir.Cross(impactPoint - dragStartLocation);
+		dragRotationStartVector = ConvertWorldVectorToCamera2D(rotDir, curScene->GetCamera()).Normalized();
 		return;
 	}
 	else if (translationType == ETranslationType::Location)
@@ -334,7 +379,6 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis, FVector impactPo
 
 	projectedLengthOffset = projectedLength;
 
-	UE_LOG("%f", projectedLengthOffset);
 }
 
 void UGizmoManager::UpdateDrag(const FRay& mouseRay)
@@ -376,21 +420,16 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 	}
 	else // ETranslationType::Rotation
 	{
-		// [수정된 부분]
-		// 1. 현재 마우스 위치를 회전 평면상에서 계산
-		FVector currentPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+		FVector mouseOffset = mouseRay.MousePos - dragRotationStartPoint;
 
-		// 2. 드래그 시작점에서 현재점까지의 이동 벡터를 계산
-		FVector mouseMoveVec = currentPoint - dragRotationStartPoint;
+		mouseOffset.X *= -1;
 
-		// 3. 마우스 이동 벡터를 처음에 설정한 '기준 방향'으로 투영하여 실제 이동 거리를 계산
-		float draggedDistance = mouseMoveVec.Dot(dragRotationStartVector);
+		float newAmout = mouseOffset.Dot(dragRotationStartVector);
 
-		// 4. 거리를 각도로 변환 (rotationSensitivity 값으로 회전 속도 조절)
-		const float rotationSensitivity = 0.5f;
-		float angle = -draggedDistance * rotationSensitivity;
+		const float rotationSensitivity = 0.005f;
+		float angle = newAmout * rotationSensitivity;
 
-		// 5. 계산된 각도를 적용하여 최종 회전값 계산
+		// 계산된 각도를 적용하여 최종 회전값 계산
 		FQuaternion finalQuaternion;
 		FVector rotationAxis = GetAxisVector(selectedAxis);
 

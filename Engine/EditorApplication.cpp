@@ -103,17 +103,17 @@ void EditorApplication::Update(float deltaTime)
 				// UGizmoArrowComp로 캐스팅 시도
 				if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
 				{
-					gizmoManager.BeginDrag(ray, arrow->Axis, outImpactPoint);
+					gizmoManager.BeginDrag(ray, arrow->Axis, outImpactPoint, GetSceneManager().GetScene());
 				}
 				// UGizmoRotationHandleComp로 캐스팅 시도
 				else if (UGizmoRotationHandleComp* rotationHandle = hitGizmo->Cast<UGizmoRotationHandleComp>())
 				{
-					gizmoManager.BeginDrag(ray, rotationHandle->Axis, outImpactPoint); // 스케일 드래그 시작 로직 추가
+					gizmoManager.BeginDrag(ray, rotationHandle->Axis, outImpactPoint, GetSceneManager().GetScene()); // 스케일 드래그 시작 로직 추가
 				}
 				// UGizmoScaleHandleComp로 캐스팅 시도
 				else if (UGizmoScaleHandleComp* scaleHandle = hitGizmo->Cast<UGizmoScaleHandleComp>())
 				{
-					gizmoManager.BeginDrag(ray, scaleHandle->Axis, outImpactPoint); // 스케일 드래그 시작 로직 추가
+					gizmoManager.BeginDrag(ray, scaleHandle->Axis, outImpactPoint, GetSceneManager().GetScene()); // 스케일 드래그 시작 로직 추가
 				}
 
 				if (target->IsManageable())

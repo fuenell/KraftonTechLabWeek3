@@ -6,6 +6,7 @@
 
 class UMeshManager; // 전방 선언
 class URenderer;
+class UScene;
 
 enum class EAxis { None, X, Y, Z };
 
@@ -39,7 +40,7 @@ public:
 
 	UPrimitiveComponent* GetTarget() { return targetObject; }
 	TArray<UGizmoComponent*>& GetRaycastableGizmos();
-	void BeginDrag(const FRay& mouseRay, EAxis selectedAxis, FVector impactPoint);
+	void BeginDrag(const FRay& mouseRay, EAxis selectedAxis, FVector impactPoint, UScene* curScene);
 	void UpdateDrag(const FRay& mouseRay);
 	void EndDrag();
 
