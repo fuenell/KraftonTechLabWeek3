@@ -281,16 +281,29 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
 		// 로컬 스페이스 모드일 경우, 축 벡터를 오브젝트의 회전만큼 회전시킵니다.
 		if (!isWorldSpace)
 		{
-			axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+			axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
 		}
 	}
 	else if (translationType == ETranslationType::Scale)
 	{
-		// --- [스케일] 이동 평면 생성 ---
+		// --- 이동 평면 생성 ---
 		movementPlane.PointOnPlane = dragStartLocation;
 
-		// 스케일은 항상 로컬 축을 기준으로 하므로, isWorldSpace 플래그와 상관없이 축을 회전시킵니다.
-		axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+		FVector axisDir = GetAxisVector(selectedAxis);
+		FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).Normalized();
+
+		// 이동 축과 시선 벡터에 동시에 수직인 벡터를 찾고,
+		// 다시 외적하여 평면의 법선 벡터를 계산
+		FVector tempVec = axisDir.Cross(camToObjectDir);
+		movementPlane.Normal = axisDir.Cross(tempVec).Normalized();
+
+		// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
+		FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+		FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
+		float projectedLength = startToIntersectionVec.Dot(axisDir);
+		FVector newPosition = dragStartLocation + axisDir * projectedLength;
+
+		dragOffset = dragStartLocation - newPosition;
 	}
 	else // ETranslationType::Rotation
 	{
@@ -348,7 +361,7 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 		// 로컬 스페이스 모드일 경우, 축 벡터를 오브젝트의 회전만큼 회전시킵니다.
 		if (!isWorldSpace)
 		{
-			axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+			axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
 		}
 
 		float projectedLength = startToIntersectionVec.Dot(axisDir);
@@ -358,41 +371,18 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 	}
 	else if (translationType == ETranslationType::Scale)
 	{
-		// --- [스케일] 업데이트 로직 ---
-		// 스케일은 항상 로컬 축을 기준으로 하므로, 축을 회전시킵니다.
-		axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+		// --- 1. 마우스 레이와 이동 평면의 3D 교차점 찾기 ---
+		FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
 
-		// 드래그한 거리를 계산합니다.
+		// --- 2. 3D 교차점을 이동 축으로 투영하기 ---
+		FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
+		FVector axisDir = GetAxisVector(selectedAxis);
+
 		float projectedLength = startToIntersectionVec.Dot(axisDir);
+		FVector newPosition = dragStartLocation + axisDir * projectedLength;
 
-		// 드래그 시작 시의 오프셋을 반영한 순수 이동량을 계산합니다.
-		float offsetLength = dragOffset.Dot(axisDir);
-		float finalDragAmount = projectedLength + offsetLength;
-
-		// 너무 급격하게 변하지 않도록 민감도를 조절할 수 있습니다.
-		float scaleSensitivity = 0.1f;
-		finalDragAmount *= scaleSensitivity;
-
-		FVector newScale = dragStartScale;
-		switch (selectedAxis)
-		{
-		case EAxis::X:
-			newScale.X += finalDragAmount;
-			break;
-		case EAxis::Y:
-			newScale.Y += finalDragAmount;
-			break;
-		case EAxis::Z:
-			newScale.Z += finalDragAmount;
-			break;
-		}
-
-		// 스케일 값이 0 이하로 내려가지 않도록 방지합니다.
-		newScale.X = max(0.01f, newScale.X);
-		newScale.Y = max(0.01f, newScale.Y);
-		newScale.Z = max(0.01f, newScale.Z);
-
-		targetObject->SetScale(newScale);
+		// --- 3. Target 액터 위치 업데이트 ---
+		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));
 	}
 	else // ETranslationType::Rotation
 	{
