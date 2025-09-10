@@ -43,8 +43,15 @@ public:
 	void UpdateDrag(const FRay& mouseRay);
 	void EndDrag();
 
+	ETranslationType GetTranslationType() { return translationType; }
+	void SetTranslationType(ETranslationType type);
+	void SetGizmoSpace(bool isWorld);
 	void ChangeGizmoSpace();
+	bool GetIsWorldSpace() { return isWorldSpace; }
+
 	bool IsDragging() const { return isDragging; }
+
+	EAxis GetSelectedAxis() { return selectedAxis; }
 
 private:
 	ETranslationType translationType = ETranslationType::Location;

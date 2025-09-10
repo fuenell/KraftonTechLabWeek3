@@ -149,8 +149,8 @@ void EditorApplication::RenderGUI()
 	ImGui::SetNextWindowPos(ImVec2(0, 460));         // Fixed position (x=20, y=20)
 	ImGui::SetNextWindowSize(ImVec2(275, 75));      // Fixed size (width=300, height=100)
 	ImGui::Begin("Memory Stats", nullptr,
-		ImGuiWindowFlags_NoResize | 
-		ImGuiWindowFlags_NoMove | 
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoCollapse);                // Prevent resizing, moving, collapsing
 
 	ImGui::Text("Allocated Object Count : %d", UEngineStatics::GetTotalAllocationCount());
@@ -168,7 +168,7 @@ bool EditorApplication::OnInitialize()
 	UApplication::OnInitialize();
 	// 리사이즈/초기화
 
-	controlPanel = new UControlPanel(&GetSceneManager());
+	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager);
 	propertyWindow = new USceneComponentPropertyWindow();
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))

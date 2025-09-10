@@ -417,6 +417,26 @@ void UGizmoManager::EndDrag()
 	}
 }
 
+void UGizmoManager::SetTranslationType(ETranslationType type)
+{
+	if (isDragging)
+	{
+		return;
+	}
+
+	translationType = type;
+}
+
+void UGizmoManager::SetGizmoSpace(bool isWorld)
+{
+	if (isDragging)
+	{
+		return;
+	}
+
+	isWorldSpace = isWorld;
+}
+
 FVector UGizmoManager::GetAxisVector(EAxis axis)
 {
 	switch (axis)

@@ -2,11 +2,13 @@
 #include "ImGuiWindowWrapper.h"
 #include "USceneManager.h"
 #include "USceneComponent.h"
+#include "UGizmoManager.h"
 
 class UControlPanel : public ImGuiWindowWrapper
 {
 	USceneManager* SceneManager;
-	
+	UGizmoManager* GizmoManager;
+
 	// Spawn Primitive Section
 	TArray<UClass*> registeredTypes;
 	TArray<std::string> choiceStrList;
@@ -20,7 +22,7 @@ class UControlPanel : public ImGuiWindowWrapper
 
 
 public:
-	UControlPanel(USceneManager* sceneManager);
+	UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager);
 	void RenderContent() override;
 	void PrimaryInformationSection();
 	void SpawnPrimitiveSection();
