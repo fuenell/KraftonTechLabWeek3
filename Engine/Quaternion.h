@@ -5,10 +5,7 @@
 #include "Matrix.h"
 #include <math.h>
 
-// ===================== 유틸 =====================
-#ifndef PI
-#define PI 3.14159265358979323846
-#endif
+
 inline float ToRad(float d) { return d * (float)(PI / 180.0); }
 inline float ToDeg(float r) { return r * (180.0f / (float)PI); }
 inline FVector ToRad(FVector v) { return { ToRad(v.X), ToRad(v.Y), ToRad(v.Z) }; }
@@ -49,11 +46,12 @@ struct FQuaternion
 		return FQuaternion(-X * inv, -Y * inv, -Z * inv, W * inv);
 	}
 
-	// ====== 행벡터 친화 합성 ======
-	// 표준 해밀턴 곱(H): "먼저 a, 그 다음 b"를 column 규약으로 표현하면 b ⊗ a.
-	// 우리는 row 규약이므로 "행렬 곱 순서와 동일"하도록 정의:
-	//   ToMatrixRow(a * b) == ToMatrixRow(a) * ToMatrixRow(b)
-	//   → operator*는 H(b,a)로 구현한다.
+	/*
+		표준 해밀턴 곱(H): "먼저 a, 그 다음 b"를 column 규약으로 표현하면 b ⊗ a.
+		우리는 row 규약이므로 "행렬 곱 순서와 동일"하도록 정의:
+		ToMatrixRow(a * b) == ToMatrixRow(a) * ToMatrixRow(b)
+		→ operator*는 H(b,a)로 구현한다.
+	*/
 	static FQuaternion Hamilton(const FQuaternion& p, const FQuaternion& q)
 	{
 		// 표준 해밀턴 곱: q ⊗ p (column 규약: 먼저 p, 그 다음 q)
@@ -73,10 +71,12 @@ struct FQuaternion
 		// *this ⊗ quat
 		return Hamilton(quat, *this);
 	}
-	// 스칼라 보간/SLERP
-	// 계산 빠름 (성분끼리 그냥 선형 보간)
-	// 근사적인 회전 → 두 회전 사이가 "대략적"으로 부드럽게 이어짐
-	// 짧은 각도 차이에서는 SLERP와 거의 차이가 없음
+	/*
+		스칼라 보간/SLERP
+		계산 빠름 (성분끼리 그냥 선형 보간)
+		근사적인 회전 → 두 회전 사이가 "대략적"으로 부드럽게 이어짐
+		짧은 각도 차이에서는 SLERP와 거의 차이가 없음
+	*/
 	static FQuaternion Lerp(const FQuaternion& a, const FQuaternion& b, float t)
 	{
 		FQuaternion r(
@@ -87,13 +87,15 @@ struct FQuaternion
 		);
 		return r.Normalized();
 	}
-	// 두 쿼터니온이 만드는 4차원 단위구면(S³) 위의 "최단 호"를 따라 회전
-	// 회전 속도가 일정해 보임(등속 회전)
-	// 정확하지만 계산이 조금 더 무거움(삼각함수 사용)
-	// 쿼터니온은 단위 4차원 벡터 (S³ 구면 위의 점)
-	// 두 쿼터니온 a, b는 같은 구면 위의 점
-	// 따라서 "구 위의 최단 경로(호)"를 따라가며 보간하는 게 SLERP
-	// 즉, a에서 b로 가는 대원(geodesic) 을 따라t만큼 이동하는 원리
+	/*
+		두 쿼터니온이 만드는 4차원 단위구면(S³) 위의 "최단 호"를 따라 회전
+		회전 속도가 일정해 보임(등속 회전)
+		정확하지만 계산이 조금 더 무거움(삼각함수 사용)
+		쿼터니온은 단위 4차원 벡터 (S³ 구면 위의 점)
+		두 쿼터니온 a, b는 같은 구면 위의 점
+		따라서 "구 위의 최단 경로(호)"를 따라가며 보간하는 게 SLERP
+		즉, a에서 b로 가는 대원(geodesic) 을 따라t만큼 이동하는 원리
+	*/
 	static FQuaternion Slerp(FQuaternion a, FQuaternion b, float t)
 	{
 		float cosv = a.Dot(b);
@@ -179,9 +181,11 @@ struct FQuaternion
 		return FQuaternion(axis.X * invs, axis.Y * invs, axis.Z * invs, s * 0.5f).Normalized();
 	}
 
-	// 벡터 회전 (쿼터니언 샌드위치)
-	// 단위 쿼터니언이 아니여도 된다.
-	// 해밀턴 곱은 연산량이 많아서 느립니다. 공부하실 때 참고해요
+	/*
+	   벡터 회전 (쿼터니언 샌드위치)
+	   단위 쿼터니언이 아니여도 된다.
+	   해밀턴 곱은 연산량이 많아서 느립니다. 공부하실 때 참고해요
+	*/
 	/*
 	FVector Rotate(const FVector& v) const
 	{
@@ -191,7 +195,7 @@ struct FQuaternion
 		FQuaternion r = (*this) * qv * inv;      // (tmp, inv) => tmp ⊗ inv
 		return FVector(r.X, r.Y, r.Z);
 	}
-	FVector InverseRotate(const FVector& v) const
+	FVector RotateInverse(const FVector& v) const
 	{
 		FQuaternion qv(v.X, v.Y, v.Z, 0.0f);
 		FQuaternion inv = Inverse();
@@ -200,6 +204,7 @@ struct FQuaternion
 		return FVector(r.X, r.Y, r.Z);
 	}
 	*/
+	// 벡터 회전
 	FVector Rotate(const FVector& v) const {
 		float n2 = X * X + Y * Y + Z * Z + W * W;
 		if (n2 <= 0.0f) return v;  // 안전가드
@@ -232,13 +237,21 @@ struct FQuaternion
 		const FVector term3 = (u.Cross(v)) * (2.0f * w);
 		return (term1 + term2 - term3) * (1.0f / n2);  // ← 여기만 '-' 로 바뀜
 	}
-
-	//FVector InverseRotateUnit(const FVector& v) const
-	//{
-	//	const FVector u(X, Y, Z);
-	//	const FVector t = 2.0f * u.Cross(v);
-	//	return v - W * t + u.Cross(t);  // 정방향 v + W*t + u×t 와 w 항 부호만 반대
-	//}
+	// 단위 쿼터니언이 확실하다면 이걸 쓰는게 더 빠릅니다
+	FVector RotateUnit(const FVector& v) const
+	{
+		// q = (X,Y,Z,W), RH cross 기준
+		FVector qv(X, Y, Z);
+		FVector t = 2.0f * qv.Cross(v);
+		return v + W * t + qv.Cross(t);
+	}
+	// 단위 쿼터니언이 확실하다면 이걸 쓰는게 더 빠릅니다
+	FVector RotateUnitInverse(const FVector& v) const
+	{
+		const FVector u(X, Y, Z);
+		const FVector t = 2.0f * u.Cross(v);
+		return v - W * t + u.Cross(t);  // 정방향 v + W*t + u×t 와 w 항 부호만 반대
+	}
 
 	// === COLUMNS are axes (row-vector) ===
 	// col0 = q·(+X) = Right
@@ -365,17 +378,15 @@ struct FQuaternion
 		return (qL * *this).Normalized();
 	}
 	// In-place 버전
-	void RotateWorldAxisAngleInPlace(const FVector& worldAxis, float radians)
+	void RotateWorldAxisAngle(const FVector& worldAxis, float radians)
 	{
 		*this = RotatedWorldAxisAngle(worldAxis, radians);
 	}
-
 	// In-place 버전
-	void RotateLocalAxisAngleInPlace(const FVector& worldAxis, float radians)
+	void RotateLocalAxisAngle(const FVector& worldAxis, float radians)
 	{
-		*this = RotatedLocalAxisAngle(worldAxis, radians);
+		*this = RotatedLocalAxisAngle(worldAxis, radians); 
 	}
-
 	// 월드 오일러(X→Y→Z)로 누적: q' = (Rx * Ry * Rz) * q
 	FQuaternion RotatedWorldEulerXYZ(float rx, float ry, float rz) const
 	{
@@ -385,11 +396,23 @@ struct FQuaternion
 		FQuaternion qW = qx * qy * qz;
 		return (qW * *this).Normalized();
 	}
+	// 월드 오일러(X→Y→Z)로 누적: q' = (Rx * Ry * Rz) * q
+	FQuaternion RotatedWorldEulerXYZ(const FVector& v) const
+	{
+		FQuaternion qx = FromAxisAngle(FVector(1, 0, 0), v.X);
+		FQuaternion qy = FromAxisAngle(FVector(0, 1, 0), v.Y);
+		FQuaternion qz = FromAxisAngle(FVector(0, 0, 1), v.Z);
+		FQuaternion qW = qx * qy * qz;
+		return (qW * *this).Normalized();
+	}
 	void RotateWorldEulerXYZInPlace(float rx, float ry, float rz)
 	{
 		*this = RotatedWorldEulerXYZ(rx, ry, rz);
 	}
-
+	void RotateWorldEulerXYZInPlace(const FVector& v)
+	{
+		*this = RotatedWorldEulerXYZ(v.X, v.Y, v.Z);
+	}
 	// 월드 Yaw/Pitch/Roll 누적 (Z=Yaw, X=Pitch, Y=Roll; Z-up, Forward=+Y 규약)
 	// 합성: Rz(yaw) * Rx(pitch) * Ry(roll)
 	FQuaternion RotatedWorldYawPitchRoll(float yawZ, float pitchX, float rollY) const
@@ -453,6 +476,8 @@ struct FQuaternion
 	void RotateWorldZDegInPlace(float deg) { *this = RotatedWorldZDeg(deg); }
 };
 
+// 참고용
+/*
 // 모델행렬 (row-vector): M = S * R * T
 inline FMatrix MakeModelRow(const FVector& pos, const FQuaternion& rot, const FVector& scl)
 {
@@ -461,4 +486,5 @@ inline FMatrix MakeModelRow(const FVector& pos, const FQuaternion& rot, const FV
 	FMatrix T = FMatrix::TranslationRow(pos.X, pos.Y, pos.Z);
 	return S * R * T;
 }
+*/
 
