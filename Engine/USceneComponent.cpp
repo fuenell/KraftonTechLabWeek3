@@ -17,7 +17,7 @@ json::JSON USceneComponent::Serialize() const
     result["Location"] = json::Array(RelativeLocation.X, RelativeLocation.Y, RelativeLocation.Z);
     result["Rotation"] = json::Array( tmpRot.X, tmpRot.Y, tmpRot.Z);
     result["Scale"] = json::Array(RelativeScale3D.X, RelativeScale3D.Y, RelativeScale3D.Z);
-    result["Type"] = GetType();
+    result["Type"] = GetClass()->GetDisplayName();
     return result;
 }
 

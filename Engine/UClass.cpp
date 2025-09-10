@@ -41,8 +41,6 @@ void UClass::ResolveTypeBitset(UClass* classPtr)
     std::stack<UClass*> stack;
     stack.push(classPtr);
 
-    
-
     while (!stack.empty())
     {
         UClass* cur = stack.top();

@@ -67,7 +67,7 @@ void EditorApplication::Update(float deltaTime)
 
 		for (UObject* obj : GetSceneManager().GetScene()->GetObjects())
 		{
-			if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+			if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 			{
 				if (primitive->GetMesh()) primitives.push_back(primitive);
 				primitive->bIsSelected = false;
@@ -83,22 +83,22 @@ void EditorApplication::Update(float deltaTime)
 			{
 				target->bIsSelected = true;
 				hitGizmo->bIsSelected = true;
-				UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo);
+				UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>();
 
 				FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
 
 				// UGizmoArrowComp로 캐스팅 시도
-				if (UGizmoArrowComp* arrow = dynamic_cast<UGizmoArrowComp*>(hitGizmo))
+				if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
 				{
 					gizmoManager.BeginDrag(ray, arrow->Axis);
 				}
 				// UGizmoRotationHandleComp로 캐스팅 시도
-				else if (UGizmoRotationHandleComp* rotationHandle = dynamic_cast<UGizmoRotationHandleComp*>(hitGizmo))
+				else if (UGizmoRotationHandleComp* rotationHandle = hitGizmo->Cast<UGizmoRotationHandleComp>())
 				{
 					gizmoManager.BeginDrag(ray, rotationHandle->Axis); // 스케일 드래그 시작 로직 추가
 				}
 				// UGizmoScaleHandleComp로 캐스팅 시도
-				else if (UGizmoScaleHandleComp* scaleHandle = dynamic_cast<UGizmoScaleHandleComp*>(hitGizmo))
+				else if (UGizmoScaleHandleComp* scaleHandle = hitGizmo->Cast<UGizmoScaleHandleComp>())
 				{
 					gizmoManager.BeginDrag(ray, scaleHandle->Axis); // 스케일 드래그 시작 로직 추가
 				}

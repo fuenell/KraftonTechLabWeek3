@@ -41,6 +41,10 @@ UClass* ClassName::s_StaticClass = UClass::RegisterToFactory( \
 UClass* ClassName::StaticClass() { return s_StaticClass; } \
 UClass* ClassName::GetClass() const { return StaticClass(); }
 
+#define UCLASS_META(ClassName, Key, Value) \
+struct _MetaRegister_##ClassName##_##Key { \
+    _MetaRegister_##ClassName##_##Key() { ClassName::StaticClass()->SetMeta(#Key, Value); } \
+} _MetaRegisterInstance_##ClassName##_##Key;
 
 class UObject : public ISerializable
 {
@@ -89,7 +93,7 @@ public:
 
     template<typename T>
     bool IsA() const {
-        return GetClass()->IsChildOf(T::StaticClass());
+        return GetClass()->IsChildOrSelfOf(T::StaticClass());
     }
 
     template<typename T>

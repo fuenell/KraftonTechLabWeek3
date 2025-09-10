@@ -8,7 +8,7 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager)
 {
 	if (meshManager)
 	{
-		mesh = meshManager->RetrieveMesh(GetType());
+		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
 		return mesh != nullptr;
 	}
 	return false;

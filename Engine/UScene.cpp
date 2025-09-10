@@ -38,7 +38,7 @@ bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 	// 모든 Primitive 컴포넌트 초기화
 	for (UObject* obj : objects)
 	{
-		if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
 			primitive->Init(meshManager);
 		}
@@ -72,7 +72,7 @@ void UScene::AddObject(USceneComponent* obj)
 	objects.push_back(obj);
 
 	// 일단 표준 RTTI 사용
-	if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
 		primitive->Init(meshManager);
 		if (obj->CountOnInspector())
@@ -115,11 +115,13 @@ bool UScene::Deserialize(const json::JSON& data)
 		uint32 uuid = stoi(primitiveJson.first);
 		json::JSON _data = primitiveJson.second;
 
-		USceneComponent* component = USceneComponentFactory::Create(_data.at("Type").ToString());
+		UClass* _class = UClass::FindClassWithDisplayName(_data.at("Type").ToString());
+		USceneComponent* component = nullptr;
+			if(_class != nullptr) component = _class->CreateDefaultObject()->Cast<USceneComponent>();
+
 		component->Deserialize(_data);
 		component->SetUUID(uuid);
 
-		//AddObject(component);
 		objects.push_back(component);
 		if (component->CountOnInspector())
 			++primitiveCount;
@@ -149,8 +151,7 @@ void UScene::Render()
 
 	for (UObject* obj : objects)
 	{
-		// 일단 표준 RTTI 사용
-		if (UPrimitiveComponent* primitive = dynamic_cast<UPrimitiveComponent*>(obj))
+		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
 			primitive->Draw(*renderer);
 		}
