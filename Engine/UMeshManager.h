@@ -8,7 +8,7 @@ class UMeshManager : UEngineSubsystem
 {
 	DECLARE_UCLASS(UMeshManager, UEngineSubsystem)
 private:
-	std::unordered_map<FString, UMesh*> meshes;
+	TMap<FString, UMesh*> meshes;
 
 	UMesh* CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
 		D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

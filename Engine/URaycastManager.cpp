@@ -136,7 +136,7 @@ template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TA
 template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&, FVector&);
 
 
-std::optional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertices[3])
+TOptional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertices[3])
 {
 	constexpr float epsilon = std::numeric_limits<float>::epsilon();
 

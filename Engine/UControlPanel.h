@@ -11,7 +11,7 @@ class UControlPanel : public ImGuiWindowWrapper
 
 	// Spawn Primitive Section
 	TArray<UClass*> registeredTypes;
-	TArray<std::string> choiceStrList;
+	TArray<FString> choiceStrList;
 	TArray<const char*> choices;
 	int32 primitiveChoiceIndex = 0;
 

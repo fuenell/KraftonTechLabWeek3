@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include <algorithm>
-#include <vector>
+#include "TArray.h"
 #include "UEngineStatics.h"
 
 struct FDynamicBitset
 {
-	std::vector<uint64> Data;
+	TArray<uint64> Data;
 
 	void Set(size_t idx)
 	{

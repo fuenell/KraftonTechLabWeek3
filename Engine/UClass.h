@@ -9,21 +9,21 @@ class UClass : public UObject
 {
 	DECLARE_UCLASS(UClass, UObject)
 private:
-	static inline std::vector<std::unique_ptr<UClass>> classList;
-	static inline std::unordered_map<std::string, uint32> nameToId;
-	static inline std::unordered_map<std::string, uint32> displayNameToId;
+	static inline TArray<TUniquePtr<UClass>> classList;
+	static inline TMap<FString, uint32> nameToId;
+	static inline TMap<FString, uint32> displayNameToId;
 	static inline uint32 registeredCount = 0;
 
-	std::unordered_map<std::string, std::string> metadata;
+	TMap<FString, FString> metadata;
 	uint32 typeId;
 	FDynamicBitset typeBitset;
-	std::string className, superClassTypeName;
+	FString className, superClassTypeName;
 	UClass* superClass;
-	std::function<UObject*()> createFunction;
+	TFunction<UObject*()> createFunction;
 	bool processed = false;
 public:
-	static UClass* RegisterToFactory(const std::string& typeName, 
-		const std::function<UObject* ()>& createFunction, const std::string& superClassTypeName);
+	static UClass* RegisterToFactory(const FString& typeName, 
+		const TFunction<UObject* ()>& createFunction, const FString& superClassTypeName);
 
 	static void ResolveTypeBitsets();
 	void ResolveTypeBitset(UClass* classPtr);
@@ -32,12 +32,12 @@ public:
 		return (typeId < classList.size()) ? classList[typeId].get() : nullptr;
 	}
 
-	static UClass* FindClass(const std::string& name) {
+	static UClass* FindClass(const FString& name) {
 		auto it = nameToId.find(name);
 		return (it != nameToId.end()) ? GetClass(it->second) : nullptr;
 	}
 
-	static UClass* FindClassWithDisplayName(const std::string& name)
+	static UClass* FindClassWithDisplayName(const FString& name)
 	{
 		// 1) DisplayName lookup
 		auto it = displayNameToId.find(name);
@@ -50,7 +50,7 @@ public:
 	}
 
 
-	static const TArray<std::unique_ptr<UClass>>& GetClassList()
+	static const TArray<TUniquePtr<UClass>>& GetClassList()
 	{
 		return classList;
 	}
@@ -59,9 +59,9 @@ public:
 		return baseClass && typeBitset.Test(baseClass->typeId);
 	}
 
-	const std::string& GetUClassName() const { return className; }
+	const FString& GetUClassName() const { return className; }
 
-	const std::string& GetDisplayName() const
+	const FString& GetDisplayName() const
 	{
 		auto itr = metadata.find("DisplayName");
 		if (itr != metadata.end())
@@ -72,7 +72,7 @@ public:
 		return GetUClassName();
 	}
 
-	void SetMeta(const std::string& key, const std::string& value)
+	void SetMeta(const FString& key, const FString& value)
 	{
 		metadata[key] = value;
 
@@ -83,8 +83,8 @@ public:
 	}
 
 
-	const std::string& GetMeta(const std::string& key) const {
-		static std::string empty;
+	const FString& GetMeta(const FString& key) const {
+		static FString empty;
 		auto it = metadata.find(key);
 		return (it != metadata.end()) ? it->second : empty;
 	}

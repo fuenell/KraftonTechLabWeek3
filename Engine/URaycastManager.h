@@ -7,7 +7,7 @@
 #include "FVertexPosColor.h"
 #include "UEngineSubsystem.h"
 
-class FVector;
+struct FVector;
 
 struct FRay
 {
@@ -37,7 +37,7 @@ public:
 	template <typename T>
 	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint);
 
-	std::optional<FVector> RayIntersectsTriangle(FVector triangleVertices[3]);
+	TOptional<FVector> RayIntersectsTriangle(FVector triangleVertices[3]);
 
 	FRay CreateRayFromScreenPosition(UCamera* camera);
 

@@ -30,7 +30,7 @@ UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoMa
 		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
 			continue;
 
-		std::string displayName = registeredType->GetMeta("DisplayName");
+		FString displayName = registeredType->GetMeta("DisplayName");
 		if (displayName.empty())
 			continue;
 
@@ -38,7 +38,7 @@ UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoMa
 		choiceStrList.push_back(registeredType->GetMeta("DisplayName"));
 	}
 
-	for (const std::string& str : choiceStrList)
+	for (const FString& str : choiceStrList)
 	{
 		choices.push_back(str.c_str());
 	}
