@@ -60,4 +60,9 @@ struct FVector
         return n * (Dot(n) / d);
     }
     FVector RejectFrom(const FVector& n) const { return *this - ProjectOn(n); }
+
+    friend inline FVector operator*(float s, const FVector& v) {
+        // return v * s; 로 멤버 연산자 재사용해도 됨
+        return FVector(s * v.X, s * v.Y, s * v.Z);
+    }
 };

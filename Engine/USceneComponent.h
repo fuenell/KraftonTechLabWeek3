@@ -29,11 +29,11 @@ public:
 	{
 		if (isWorldAxis)
 		{
-			RelativeQuaternion.RotateWorldAxisAngleInPlace(axis, deg);
+			RelativeQuaternion.RotateWorldAxisAngle(axis, deg);
 		}
 		else
 		{
-			RelativeQuaternion.RotateLocalAxisAngleInPlace(axis, deg);
+			RelativeQuaternion.RotateLocalAxisAngle(axis, deg);
 		}
 	}
 	void SetQuaternion(const FQuaternion quat) { RelativeQuaternion = quat; }
