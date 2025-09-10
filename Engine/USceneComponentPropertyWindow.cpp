@@ -2,13 +2,6 @@
 #include "USceneComponentPropertyWindow.h"
 
 
-// 임시 ;;
-enum class EGizmoMode { Translate, Rotate, Scale };
-enum class EGizmoSpace { World, Local };
-
-static EGizmoMode  g_GizmoMode = EGizmoMode::Translate;
-static EGizmoSpace g_GizmoSpace = EGizmoSpace::World;
-
 // 활성화(선택) 상태면 버튼색을 Active 계열로 바꿔서 '눌린 버튼'처럼 보이게 하는 헬퍼
 static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVec2(0, 0))
 {
@@ -58,7 +51,7 @@ void USceneComponentPropertyWindow::RenderContent()
 			ImGui::SetNextItemWidth(-1);
 			ImGui::InputFloat(("##rot" + std::to_string(i)).c_str(),
 				&rotationInput[i], 0.0f, 0.0f, "%.3f");
-			if(ImGui::IsItemDeactivatedAfterEdit())
+			if (ImGui::IsItemDeactivatedAfterEdit())
 			{
 				rotCommited = true;
 			}
@@ -78,19 +71,6 @@ void USceneComponentPropertyWindow::RenderContent()
 		ImGui::Text("Scale");
 
 		ImGui::EndTable();
-
-		/* 모드/좌표계 토글 렌더링 */
-		if (ModeButton("Translation", g_GizmoMode == EGizmoMode::Translate)) g_GizmoMode = EGizmoMode::Translate;
-		ImGui::SameLine();
-		if (ModeButton("Rotation", g_GizmoMode == EGizmoMode::Rotate))    g_GizmoMode = EGizmoMode::Rotate;
-		ImGui::SameLine();
-		if (ModeButton("Scale", g_GizmoMode == EGizmoMode::Scale))     g_GizmoMode = EGizmoMode::Scale;
-
-		// World / Local 선택 (체크박스 대신, 버튼처럼 보이는 상호배타 토글)
-
-		if (ModeButton("World", g_GizmoSpace == EGizmoSpace::World)) g_GizmoSpace = EGizmoSpace::World;
-		ImGui::SameLine();
-		if (ModeButton("Local", g_GizmoSpace == EGizmoSpace::Local)) g_GizmoSpace = EGizmoSpace::Local;
 	}
 
 	if (rotCommited)
