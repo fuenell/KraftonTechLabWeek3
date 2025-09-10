@@ -280,7 +280,22 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis, FVector impactPo
 	// 카메라 위치에서 객체를 향하는 벡터 (시선 벡터)
 	FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).Normalized();
 
-	if (translationType == ETranslationType::Location)
+	if (translationType == ETranslationType::Rotation)
+	{
+		// 1. 회전이 일어날 평면을 정의 (법선: 회전축, 기준점: 객체 중심)
+		movementPlane.Normal = axisDir;
+		movementPlane.PointOnPlane = dragStartLocation;
+
+		// 2. 평면과 마우스 레이의 교차점을 드래그 시작점으로 저장
+		dragRotationStartPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+
+		// 3. 드래그 방향(회전 접선 방향)을 계산하고 정규화
+		FVector centerToStartVec = dragRotationStartPoint - dragStartLocation;
+		dragRotationStartVector = axisDir.Cross(centerToStartVec).Normalized();
+
+		return;
+	}
+	else if (translationType == ETranslationType::Location)
 	{
 		// 로컬 스페이스 모드일 경우, 축 벡터를 오브젝트의 회전만큼 회전시킵니다.
 		if (!isWorldSpace)
@@ -303,37 +318,6 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis, FVector impactPo
 		FVector tempVec = axisDir.Cross(camToObjectDir);
 		movementPlane.Normal = axisDir.Cross(tempVec).Normalized();
 	}
-	else // ETranslationType::Rotation
-	{
-		if (!isWorldSpace)
-		{
-			axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
-		}
-		//float planeDir = axisDir.Dot(camToObjectDir);
-		//float sign = copysign(1.0f, planeDir) * -1.0f;
-		//movementPlane.Normal = axisDir * sign;
-
-		movementPlane.Normal = -camToObjectDir;
-
-		//FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
-
-		dragRotationStartPoint = impactPoint;
-		dragRotationStartVector = axisDir.Cross(impactPoint);
-
-
-		UE_LOG("movementPlane %f %f %f", movementPlane.Normal.X, movementPlane.Normal.Y, movementPlane.Normal.Z);
-		UE_LOG("dragRotationStartPoint %f %f %f", dragRotationStartPoint.X, dragRotationStartPoint.Y, dragRotationStartPoint.Z);
-		UE_LOG("dragRotationStartVector %f %f %f", dragRotationStartVector.X, dragRotationStartVector.Y, dragRotationStartVector.Z);
-
-		// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
-		float projectedLength = dragRotationStartVector.Dot(axisDir);
-
-		projectedLengthOffset = projectedLength;
-
-		UE_LOG("%f", projectedLengthOffset);
-		return;
-	}
-
 
 	// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
 	FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
@@ -384,66 +368,34 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 	}
 	else // ETranslationType::Rotation
 	{
-		// 새로운 터치 포인트
-		FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+		// [수정된 부분]
+		// 1. 현재 마우스 위치를 회전 평면상에서 계산
+		FVector currentPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
 
-		FVector dragAmountVector = intersectionPoint - dragRotationStartPoint;
+		// 2. 드래그 시작점에서 현재점까지의 이동 벡터를 계산
+		FVector mouseMoveVec = currentPoint - dragRotationStartPoint;
 
-		UE_LOG("dragAmountVector %f %f %f", dragAmountVector.X, dragAmountVector.Y, dragAmountVector.Z);
+		// 3. 마우스 이동 벡터를 처음에 설정한 '기준 방향'으로 투영하여 실제 이동 거리를 계산
+		float draggedDistance = mouseMoveVec.Dot(dragRotationStartVector);
 
-		// 기존 터치 포인트와 차이
-		float dragAmount = dragRotationStartVector.Dot(dragAmountVector);
+		// 4. 거리를 각도로 변환 (rotationSensitivity 값으로 회전 속도 조절)
+		const float rotationSensitivity = 0.5f;
+		float angle = -draggedDistance * rotationSensitivity;
 
-		UE_LOG("%f", dragAmount);
-
-		//dragRotationStartVector = movementPlane.Normal.Cross(intersectionPoint);
-
-		//float projectedLength = dragRotationStartVector.Dot(axisDir);
-
-
-		//if (!isWorldSpace)
-		//{
-		//	axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
-		//}
-
-		//FVector intersectionPoint2 = FindCirclePlaneIntersection(mouseRay, movementPlane);
-
-		//dragRotationStartVector = movementPlane.Normal.Cross(intersectionPoint2);
-
-		//// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
-		//float projectedLength = dragRotationStartVector.Dot(axisDir);
-
-		//projectedLengthOffset = projectedLength;
-
-		//UE_LOG("%f", projectedLengthOffset);
-
-
-
-
-
-		//// --- 1. 마우스 레이와 이동 평면의 3D 교차점 찾기 ---
-		//FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
-
-		//// --- 2. 3D 교차점을 이동 축으로 투영하기 ---
-		//FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
-		//FVector axisDir = dragRotationStartVector;
-		//float projectedLength = startToIntersectionVec.Dot(axisDir);
-		//float angle = projectedLength;
-
-		// 4. 회전 축과 각도로 새로운 회전 쿼터니언을 생성합니다.
-		FQuaternion deltaRotation;
+		// 5. 계산된 각도를 적용하여 최종 회전값 계산
+		FQuaternion finalQuaternion;
+		FVector rotationAxis = GetAxisVector(selectedAxis);
 
 		if (isWorldSpace)
 		{
-			deltaRotation = dragStartQuaternion.RotatedWorldAxisAngle(GetAxisVector(selectedAxis), -dragAmount);
+			finalQuaternion = dragStartQuaternion.RotatedWorldAxisAngle(rotationAxis, angle);
 		}
 		else
 		{
-			deltaRotation = dragStartQuaternion.RotatedLocalAxisAngle(GetAxisVector(selectedAxis), -dragAmount);
+			finalQuaternion = dragStartQuaternion.RotatedLocalAxisAngle(rotationAxis, angle);
 		}
 
-		// 5. 드래그 시작 시의 회전값에 새로운 회전을 곱하여 최종 회전을 계산합니다.
-		targetObject->SetQuaternion(deltaRotation);
+		targetObject->SetQuaternion(finalQuaternion);
 	}
 }
 

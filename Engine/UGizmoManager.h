@@ -63,6 +63,8 @@ private:
 	FVector dragStartLocation;    // 드래그 시작 시 Target의 월드 위치
 	FQuaternion dragStartQuaternion;
 	FVector dragStartScale;
+
+	FVector dragStartVec;
 	FPlane movementPlane;         // 계산된 이동 평면
 
 	// 유틸리티 함수
