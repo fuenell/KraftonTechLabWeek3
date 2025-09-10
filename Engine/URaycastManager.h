@@ -35,7 +35,7 @@ public:
 	void SetInputManager(UInputManager* inputManager) { InputManager = inputManager; }
 
 	template <typename T>
-	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent);
+	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint);
 
 	std::optional<FVector> RayIntersectsTriangle(FVector triangleVertices[3]);
 

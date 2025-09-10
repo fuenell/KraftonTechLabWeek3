@@ -31,6 +31,7 @@ void EditorApplication::Update(float deltaTime)
 		gizmoManager.ChangeGizmoSpace();
 	}
 
+	FVector outImpactPoint;
 	UGizmoComponent* hitGizmo = nullptr;
 	UPrimitiveComponent* hitPrimitive = nullptr;
 
@@ -76,7 +77,7 @@ void EditorApplication::Update(float deltaTime)
 
 		// std::cout << "gizmos.size() : " << gizmos.size();
 		// std::cout << " primitives.size() : " << primitives.size() << std::endl;
-		if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo))
+		if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, outImpactPoint))
 		{
 			// std::cout << "hitGizmo : " << hitGizmo << std::endl;
 			if (auto target = gizmoManager.GetTarget())
@@ -90,24 +91,24 @@ void EditorApplication::Update(float deltaTime)
 				// UGizmoArrowComp로 캐스팅 시도
 				if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
 				{
-					gizmoManager.BeginDrag(ray, arrow->Axis);
+					gizmoManager.BeginDrag(ray, arrow->Axis, outImpactPoint);
 				}
 				// UGizmoRotationHandleComp로 캐스팅 시도
 				else if (UGizmoRotationHandleComp* rotationHandle = hitGizmo->Cast<UGizmoRotationHandleComp>())
 				{
-					gizmoManager.BeginDrag(ray, rotationHandle->Axis); // 스케일 드래그 시작 로직 추가
+					gizmoManager.BeginDrag(ray, rotationHandle->Axis, outImpactPoint); // 스케일 드래그 시작 로직 추가
 				}
 				// UGizmoScaleHandleComp로 캐스팅 시도
 				else if (UGizmoScaleHandleComp* scaleHandle = hitGizmo->Cast<UGizmoScaleHandleComp>())
 				{
-					gizmoManager.BeginDrag(ray, scaleHandle->Axis); // 스케일 드래그 시작 로직 추가
+					gizmoManager.BeginDrag(ray, scaleHandle->Axis, outImpactPoint); // 스케일 드래그 시작 로직 추가
 				}
 
 				if (target->IsManageable())
 					propertyWindow->SetTarget(target);
 			}
 		}
-		else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive))
+		else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, outImpactPoint))
 		{
 			gizmoManager.SetTarget(hitPrimitive);
 			hitPrimitive->bIsSelected = true;

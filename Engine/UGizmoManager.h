@@ -37,7 +37,7 @@ public:
 
 	UPrimitiveComponent* GetTarget() { return targetObject; }
 	TArray<UGizmoComponent*>& GetRaycastableGizmos();
-	void BeginDrag(const FRay& mouseRay, EAxis selectedAxis);
+	void BeginDrag(const FRay& mouseRay, EAxis selectedAxis, FVector impactPoint);
 	void UpdateDrag(const FRay& mouseRay);
 	void EndDrag();
 
@@ -52,6 +52,7 @@ private:
 	// 드래그 상태 변수
 	bool isDragging = false;
 	EAxis selectedAxis = EAxis::None;
+	FVector dragRotationStartPoint;
 	FVector dragRotationStartVector;
 	float projectedLengthOffset;
 
