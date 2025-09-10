@@ -10,10 +10,22 @@
 UControlPanel::UControlPanel(USceneManager* sceneManager)
     : ImGuiWindowWrapper("Jungle Control Panel"), SceneManager(sceneManager)
 {
-    registeredTypes = USceneComponentFactory::GetRegisteredTypes();
-    for (const auto& registeredType : registeredTypes)
+    for (const auto& registeredType : UClass::GetClassList())
     {
-        choices.push_back(registeredType.c_str());
+        if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
+            continue;
+
+        std::string displayName = registeredType->GetMeta("DisplayName");
+        if (displayName.empty())
+            continue;
+
+        registeredTypes.push_back(registeredType.get());
+        choiceStrList.push_back(registeredType->GetMeta("DisplayName"));
+    }
+
+    for (const std::string& str : choiceStrList)
+    {
+        choices.push_back(str.c_str());
     }
 }
 
@@ -36,6 +48,12 @@ void UControlPanel::PrimaryInformationSection()
     ImGui::Text("FPS %.0f (%.0f ms)", frameRate, 1000.0f / frameRate);
 }
 
+USceneComponent* UControlPanel::CreateSceneComponentFromChoice(int index) {
+    auto obj = registeredTypes[primitiveChoiceIndex]->CreateDefaultObject();
+    if (!obj) return nullptr;
+    return obj->Cast<USceneComponent>();
+}
+
 void UControlPanel::SpawnPrimitiveSection()
 {
     ImGui::Combo("Primitive", &primitiveChoiceIndex, choices.data(), static_cast<int32>(choices.size()));
@@ -43,7 +61,7 @@ void UControlPanel::SpawnPrimitiveSection()
     int32 objectCount = SceneManager->GetScene()->GetObjectCount();
     if (ImGui::Button("Spawn"))
     {
-        USceneComponent* sceneComponent = USceneComponentFactory::Create(choices[primitiveChoiceIndex]);
+        USceneComponent* sceneComponent = CreateSceneComponentFromChoice(primitiveChoiceIndex);
         if (sceneComponent != nullptr)
         {
         sceneComponent->SetPosition(FVector(

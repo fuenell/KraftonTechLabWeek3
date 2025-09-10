@@ -13,8 +13,6 @@ class UGizmoGridComp : public UGizmoComponent
 	DECLARE_UCLASS(UGizmoGridComp, UGizmoComponent)
 public:
 	using UGizmoComponent::UGizmoComponent;
-
-	FString GetType() const override { return "GizmoGrid"; }
 	
 	json::JSON Serialize() const override
 	{

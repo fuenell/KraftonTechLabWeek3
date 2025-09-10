@@ -1,13 +1,15 @@
 ﻿#pragma once
 #include "ImGuiWindowWrapper.h"
 #include "USceneManager.h"
+#include "USceneComponent.h"
 
 class UControlPanel : public ImGuiWindowWrapper
 {
 	USceneManager* SceneManager;
 	
 	// Spawn Primitive Section
-	TArray<FString> registeredTypes;
+	TArray<UClass*> registeredTypes;
+	TArray<std::string> choiceStrList;
 	TArray<const char*> choices;
 	int32 primitiveChoiceIndex = 0;
 
@@ -24,5 +26,6 @@ public:
 	void SpawnPrimitiveSection();
 	void SceneManagementSection();
 	void CameraManagementSection();
+	USceneComponent* CreateSceneComponentFromChoice(int index);
 };
 

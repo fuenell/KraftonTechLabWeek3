@@ -18,18 +18,6 @@ private:
 		return newInstance;
 	}
 
-	static bool RegisterToFactory()
-	{
-		static bool isRegistered = false;
-		if (isRegistered) return true;
-
-		USceneComponentFactory::Register(type, Create);
-		isRegistered = true;
-		return true;
-	}
-
-	static inline bool registered = RegisterToFactory();
-
 	bool IsManageable() override { return true; }
 
 public:
@@ -37,6 +25,4 @@ public:
 		:UPrimitiveComponent(pos, rot, scl)
 	{
 	}
-
-	FString GetType() const override { return type; }
 };

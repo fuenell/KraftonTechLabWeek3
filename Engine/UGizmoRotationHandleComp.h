@@ -10,7 +10,5 @@ public:
 
 	EAxis Axis = EAxis::None;
 
-	FString GetType() const override { return "GizmoRotationHandle"; }
-
 	UGizmoRotationHandleComp();
 };

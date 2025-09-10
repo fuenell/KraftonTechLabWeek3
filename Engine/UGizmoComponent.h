@@ -20,7 +20,6 @@ public:
 	bool bIsSelected = false;
 
 	bool Init(UMeshManager* meshManager);
-	FString GetType() const override { return "UGizmoComponent"; }
 	bool CountOnInspector() override { return true; }
 
 	FMatrix GetWorldTransform() override;
