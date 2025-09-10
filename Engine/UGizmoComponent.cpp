@@ -24,7 +24,11 @@ FMatrix UGizmoComponent::GetWorldTransform()
 void UGizmoComponent::UpdateConstantBuffer(URenderer& renderer)
 {
 	FMatrix M = GetWorldTransform();
-	renderer.SetModel(M, Color, bIsSelected);
+	renderer.SetModel(M, GetColor(), bIsSelected);
+}
+
+void UGizmoComponent::Update(float deltaTime)
+{
 }
 
 void UGizmoComponent::Draw(URenderer& renderer)

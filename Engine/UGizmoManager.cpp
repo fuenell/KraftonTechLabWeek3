@@ -196,6 +196,14 @@ TArray<UGizmoComponent*>& UGizmoManager::GetRaycastableGizmos()
 	return *currentGizmos;
 }
 
+void UGizmoManager::Update(float deltaTime)
+{
+	if (gridPrimitive)
+	{
+		gridPrimitive->Update(deltaTime);
+	}
+}
+
 void UGizmoManager::Draw(URenderer& renderer)
 {
 	// --- 파트 1: 타겟 유무와 상관없이 항상 그리는 요소 ---
@@ -403,6 +411,10 @@ void UGizmoManager::EndDrag()
 {
 	isDragging = false;
 	selectedAxis = EAxis::None;
+	if (gridPrimitive)
+	{
+		gridPrimitive->bIsSelected = false;
+	}
 }
 
 FVector UGizmoManager::GetAxisVector(EAxis axis)
