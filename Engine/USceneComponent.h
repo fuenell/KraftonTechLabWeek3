@@ -9,7 +9,6 @@ class USceneComponent : public UObject
 	DECLARE_UCLASS(USceneComponent, UObject)
 public:
 	FVector RelativeLocation;
-	// FVector RelativeRotation;
 	FVector RelativeScale3D;
 	FQuaternion RelativeQuaternion;
 	USceneComponent(FVector pos = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
@@ -45,11 +44,21 @@ public:
 		RelativeQuaternion.Z = 0;
 		RelativeQuaternion.W = 1;
 	}
-	FVector GetPosition() const { return RelativeLocation; }
-	FVector GetScale() const { return RelativeScale3D; }
+	FVector GetPosition() const
+	{
+		return RelativeLocation;
+	}
+	FVector GetScale() const
+	{
+		return RelativeScale3D;
+	}
 	FVector GetRotation() const
 	{
-		return FQuaternion::EulerXYZDegFrom(RelativeQuaternion);
+		return RelativeQuaternion.GetEulerXYZDeg();
+	}
+	FQuaternion GetQuaternion() const
+	{
+		return RelativeQuaternion;
 	}
 
 	json::JSON Serialize() const override;

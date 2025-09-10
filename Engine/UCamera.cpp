@@ -41,22 +41,12 @@ void UCamera::GetBasis(FVector& outRight, FVector& outForward, FVector& outUp) c
 
 // target을 바라보도록 (RH, Z-up)
 // RH 크로스 사용: Right = forward x Up, Up = right x forward(기존 크로스와 다른 순서)
-// 첨언 : AI 한테 물어보면 틀렸다고 뭐라뭐라 합니다;; (근데 이거 맞음)
 void UCamera::LookAt(const FVector& eye, const FVector& target, const FVector& up)
 {
 	mEye = eye;
-	FVector F = (target - eye).GetNormalized();
-	FVector Uref = up.GetNormalized();
-	FVector R = F.Cross(Uref).GetNormalized();
-	FVector U = R.Cross(F).GetNormalized();
-	FMatrix M = FMatrix::IdentityMatrix();
-	// R=Right, U=Up, F=Forward (여기서는 로컬 +Y가 Forward라는 네 규약)
-	M.M[0][0] = R.X; M.M[0][1] = F.X; M.M[0][2] = U.X;  // col0 = Right
-	M.M[1][0] = R.Y; M.M[1][1] = F.Y; M.M[1][2] = U.Y;  // col1 = Forward (= +Y)
-	M.M[2][0] = R.Z; M.M[2][1] = F.Z; M.M[2][2] = U.Z;  // col2 = Up
-	// 쿼터니언으로 저장 (행벡터 규약용 FromMatrixRow는 이 3×3을 그대로 기대)
-	mRot = FQuaternion::FromMatrixRow(M).Normalized();
-	// (옵션) pitch 추정
+	FVector F = (target - eye).Normalized();
+	mRot = FQuaternion::LookRotation(F, up);
+	// pitch 추정
 	float fz = (F.Z < -1.f ? -1.f : (F.Z > 1.f ? 1.f : F.Z));
 	mPitch = asinf(fz);
 	// 뷰 갱신
@@ -82,7 +72,7 @@ void UCamera::AddYawPitch(float yawZ, float pitch)
 	FQuaternion qYaw = FQuaternion::FromAxisAngle(FVector(0, 0, 1), yawZ);
 
 	// 2) pitch(야우 적용 후의 Right 축)
-	FVector rightAfterYaw = qYaw.Rotate(mRight).GetNormalized();
+	FVector rightAfterYaw = qYaw.Rotate(mRight).Normalized();
 	FQuaternion qPitch = FQuaternion::FromAxisAngle(rightAfterYaw, pitch);
 
 	// 3) 합성 (row-vector 규약: 먼저 yaw, 다음 pitch, 그 다음 기존 회전)
@@ -192,9 +182,9 @@ void UCamera::SetEulerXYZDeg(float rxDeg, float ryDeg, float rzDeg)
 void UCamera::RecalcAxesFromQuat()
 {
 	// 로컬 단위축을 회전
-	mRight = mRot.Rotate(FVector(1, 0, 0)).GetNormalized(); // +X
-	mForward = mRot.Rotate(FVector(0, 1, 0)).GetNormalized(); // +Y
-	mUp = mRot.Rotate(FVector(0, 0, 1)).GetNormalized(); // +Z
+	mRight = mRot.Rotate(FVector(1, 0, 0)).Normalized(); // +X
+	mForward = mRot.Rotate(FVector(0, 1, 0)).Normalized(); // +Y
+	mUp = mRot.Rotate(FVector(0, 0, 1)).Normalized(); // +Z
 }
 
 // 투영 행렬 갱신
@@ -220,7 +210,7 @@ void UCamera::UpdateView()
 	// 여기서 f(Back)는 카메라가 보는 -Z 방향과 대응시키기 위해 사용
 	FVector s = mRight;                 // Right
 	FVector u = mUp;                    // Up
-	FVector f = (-mForward).GetNormalized(); // Back = -Forward
+	FVector f = (-mForward).Normalized(); // Back = -Forward
 	FMatrix V = FMatrix::IdentityMatrix();
 	// 회전 성분: 열에 [s u f] 배치 (row-vector 규약)
 	V.M[0][0] = s.X; V.M[0][1] = u.X; V.M[0][2] = f.X;

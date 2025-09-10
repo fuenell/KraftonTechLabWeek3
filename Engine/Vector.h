@@ -44,7 +44,7 @@ struct FVector
         else { X = Y = Z = 0.0f; }
     }
 
-    FVector GetNormalized() const {
+    FVector Normalized() const {
         float ls = LengthSquared();
         if (ls > 0.0f) {
             float inv = 1.0f / sqrtf(ls);

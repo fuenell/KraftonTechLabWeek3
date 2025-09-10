@@ -232,7 +232,9 @@ void UGizmoManager::Draw(URenderer& renderer)
 			{
 				// Todo: 이동을 update에서 처리해야 하나??
 				gizmoPart->SetPosition(targetObject->GetPosition());
-				if (isWorldSpace)
+
+				// Scale 은 항상 local
+				if (translationType != ETranslationType::Scale && isWorldSpace)
 				{
 					gizmoPart->ResetQuaternion();
 				}
@@ -265,19 +267,62 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
 	isDragging = true;
 	selectedAxis = axis;
 	dragStartLocation = targetObject->GetPosition();
-	dragStartRotation = targetObject->GetRotation();
+	dragStartQuaternion = targetObject->GetQuaternion();
 	dragStartScale = targetObject->GetScale();
 
-	// --- 이동 평면 생성 ---
-	movementPlane.PointOnPlane = dragStartLocation;
-
+	// 사용자가 선택한 이동 축 벡터 (예: X축이면 (1,0,0))
 	FVector axisDir = GetAxisVector(selectedAxis);
-	FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).GetNormalized();
+
+	if (translationType == ETranslationType::Location)
+	{
+		// --- [위치] 이동 평면 생성 ---
+		movementPlane.PointOnPlane = dragStartLocation;
+
+		// 로컬 스페이스 모드일 경우, 축 벡터를 오브젝트의 회전만큼 회전시킵니다.
+		if (!isWorldSpace)
+		{
+			axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+		}
+	}
+	else if (translationType == ETranslationType::Scale)
+	{
+		// --- [스케일] 이동 평면 생성 ---
+		movementPlane.PointOnPlane = dragStartLocation;
+
+		// 스케일은 항상 로컬 축을 기준으로 하므로, isWorldSpace 플래그와 상관없이 축을 회전시킵니다.
+		axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+	}
+	else // ETranslationType::Rotation
+	{
+		// 1. 회전이 일어날 평면을 정의합니다. 법선 벡터가 곧 회전 축입니다.
+		movementPlane.PointOnPlane = dragStartLocation;
+		movementPlane.Normal = GetAxisVector(selectedAxis);
+
+		FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+		FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
+		float projectedLength = startToIntersectionVec.Dot(GetRotationVector(selectedAxis));
+		FVector newPosition = dragStartLocation + GetRotationVector(selectedAxis) * projectedLength;
+
+		dragOffset = dragStartLocation - newPosition;
+
+		dragRotationStartVector = movementPlane.Normal.Cross(intersectionPoint - dragStartLocation);
+
+		if (!isWorldSpace) // 로컬 스페이스 회전일 경우, 축도 함께 회전시켜 줍니다.
+		{
+			movementPlane.Normal = targetObject->GetQuaternion().Rotate(movementPlane.Normal);
+		}
+
+		return; // 회전 로직은 여기서 종료
+	}
+
+	// --- 위치 및 스케일 공통 로직 ---
+	// 카메라 위치에서 객체를 향하는 벡터 (시선 벡터)
+	FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).Normalized();
 
 	// 이동 축과 시선 벡터에 동시에 수직인 벡터를 찾고,
 	// 다시 외적하여 평면의 법선 벡터를 계산
 	FVector tempVec = axisDir.Cross(camToObjectDir);
-	movementPlane.Normal = axisDir.Cross(tempVec).GetNormalized();
+	movementPlane.Normal = axisDir.Cross(tempVec).Normalized();
 
 	// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
 	FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
@@ -294,26 +339,86 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 
 	// --- 1. 마우스 레이와 이동 평면의 3D 교차점 찾기 ---
 	FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
-
-	// --- 2. 3D 교차점을 이동 축으로 투영하기 ---
 	FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
 	FVector axisDir = GetAxisVector(selectedAxis);
 
-	float projectedLength = startToIntersectionVec.Dot(axisDir);
-	FVector newPosition = dragStartLocation + axisDir * projectedLength;
-
-	// --- 3. Target 액터 위치 업데이트 ---
-	switch (translationType)
+	if (translationType == ETranslationType::Location)
 	{
-	case ETranslationType::Location:
+		// --- [위치] 업데이트 로직 ---
+		// 로컬 스페이스 모드일 경우, 축 벡터를 오브젝트의 회전만큼 회전시킵니다.
+		if (!isWorldSpace)
+		{
+			axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+		}
+
+		float projectedLength = startToIntersectionVec.Dot(axisDir);
+		FVector newPosition = dragStartLocation + axisDir * projectedLength;
+
 		targetObject->SetPosition(newPosition + dragOffset);
-		break;
-	case ETranslationType::Rotation:
-		targetObject->AddQuaternion(GetAxisVector(selectedAxis), (newPosition - dragStartLocation + dragOffset).Length() * 0.1f, isWorldSpace);
-		break;
-	case ETranslationType::Scale:
-		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));
-		break;
+	}
+	else if (translationType == ETranslationType::Scale)
+	{
+		// --- [스케일] 업데이트 로직 ---
+		// 스케일은 항상 로컬 축을 기준으로 하므로, 축을 회전시킵니다.
+		axisDir = targetObject->GetQuaternion().Rotate(axisDir);
+
+		// 드래그한 거리를 계산합니다.
+		float projectedLength = startToIntersectionVec.Dot(axisDir);
+
+		// 드래그 시작 시의 오프셋을 반영한 순수 이동량을 계산합니다.
+		float offsetLength = dragOffset.Dot(axisDir);
+		float finalDragAmount = projectedLength + offsetLength;
+
+		// 너무 급격하게 변하지 않도록 민감도를 조절할 수 있습니다.
+		float scaleSensitivity = 0.1f;
+		finalDragAmount *= scaleSensitivity;
+
+		FVector newScale = dragStartScale;
+		switch (selectedAxis)
+		{
+		case EAxis::X:
+			newScale.X += finalDragAmount;
+			break;
+		case EAxis::Y:
+			newScale.Y += finalDragAmount;
+			break;
+		case EAxis::Z:
+			newScale.Z += finalDragAmount;
+			break;
+		}
+
+		// 스케일 값이 0 이하로 내려가지 않도록 방지합니다.
+		newScale.X = max(0.01f, newScale.X);
+		newScale.Y = max(0.01f, newScale.Y);
+		newScale.Z = max(0.01f, newScale.Z);
+
+		targetObject->SetScale(newScale);
+	}
+	else // ETranslationType::Rotation
+	{
+		// --- 1. 마우스 레이와 이동 평면의 3D 교차점 찾기 ---
+		FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+
+		// --- 2. 3D 교차점을 이동 축으로 투영하기 ---
+		FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
+		FVector axisDir = dragRotationStartVector;
+		float projectedLength = startToIntersectionVec.Dot(axisDir);
+		float angle = projectedLength;
+
+		// 4. 회전 축과 각도로 새로운 회전 쿼터니언을 생성합니다.
+		FQuaternion deltaRotation;
+
+		if (isWorldSpace)
+		{
+			deltaRotation = dragStartQuaternion.RotatedWorldAxisAngle(GetAxisVector(selectedAxis), -angle);
+		}
+		else
+		{
+			deltaRotation = dragStartQuaternion.RotatedLocalAxisAngle(GetAxisVector(selectedAxis), -angle);
+		}
+
+		// 5. 드래그 시작 시의 회전값에 새로운 회전을 곱하여 최종 회전을 계산합니다.
+		targetObject->SetQuaternion(deltaRotation);
 	}
 }
 
@@ -333,6 +438,21 @@ FVector UGizmoManager::GetAxisVector(EAxis axis)
 		return { 0,1,0 };
 	case EAxis::Z:
 		return { 0,0,1 };
+	default:
+		return { 0,0,0 };
+	}
+}
+
+FVector UGizmoManager::GetRotationVector(EAxis axis)
+{
+	switch (axis)
+	{
+	case EAxis::X:
+		return { 0,0,1 };
+	case EAxis::Y:
+		return { 1,0,0 };
+	case EAxis::Z:
+		return { 0,1,0 };
 	default:
 		return { 0,0,0 };
 	}

@@ -12,7 +12,7 @@ FMatrix USceneComponent::GetWorldTransform()
 
 json::JSON USceneComponent::Serialize() const
 {
-    FVector tmpRot = FQuaternion::EulerXYZFrom(RelativeQuaternion);
+    FVector tmpRot = RelativeQuaternion.GetEulerXYZ();
     json::JSON result;
     result["Location"] = json::Array(RelativeLocation.X, RelativeLocation.Y, RelativeLocation.Z);
     result["Rotation"] = json::Array( tmpRot.X, tmpRot.Y, tmpRot.Z);
