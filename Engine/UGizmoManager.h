@@ -53,7 +53,7 @@ private:
 	bool isDragging = false;
 	EAxis selectedAxis = EAxis::None;
 	FVector dragRotationStartVector;
-	FVector dragOffset;
+	float projectedLengthOffset;
 
 	UMeshManager* meshManager;
 	UPrimitiveComponent* targetObject = nullptr; // 현재 선택된 객체

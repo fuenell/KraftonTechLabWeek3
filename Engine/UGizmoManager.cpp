@@ -286,24 +286,11 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
 	}
 	else if (translationType == ETranslationType::Scale)
 	{
-		// --- 이동 평면 생성 ---
+		// 이동 평면 생성
 		movementPlane.PointOnPlane = dragStartLocation;
 
-		FVector axisDir = GetAxisVector(selectedAxis);
-		FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).Normalized();
-
-		// 이동 축과 시선 벡터에 동시에 수직인 벡터를 찾고,
-		// 다시 외적하여 평면의 법선 벡터를 계산
-		FVector tempVec = axisDir.Cross(camToObjectDir);
-		movementPlane.Normal = axisDir.Cross(tempVec).Normalized();
-
-		// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
-		FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
-		FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
-		float projectedLength = startToIntersectionVec.Dot(axisDir);
-		FVector newPosition = dragStartLocation + axisDir * projectedLength;
-
-		dragOffset = dragStartLocation - newPosition;
+		// Scale 은 항상 로컬 스페이스 모드
+		axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
 	}
 	else // ETranslationType::Rotation
 	{
@@ -315,8 +302,6 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
 		FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
 		float projectedLength = startToIntersectionVec.Dot(GetRotationVector(selectedAxis));
 		FVector newPosition = dragStartLocation + GetRotationVector(selectedAxis) * projectedLength;
-
-		dragOffset = dragStartLocation - newPosition;
 
 		dragRotationStartVector = movementPlane.Normal.Cross(intersectionPoint - dragStartLocation);
 
@@ -341,9 +326,8 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
 	FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
 	FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
 	float projectedLength = startToIntersectionVec.Dot(axisDir);
-	FVector newPosition = dragStartLocation + axisDir * projectedLength;
 
-	dragOffset = dragStartLocation - newPosition;
+	projectedLengthOffset = projectedLength;
 }
 
 void UGizmoManager::UpdateDrag(const FRay& mouseRay)
@@ -364,25 +348,24 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 			axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
 		}
 
-		float projectedLength = startToIntersectionVec.Dot(axisDir);
+		float projectedLength = startToIntersectionVec.Dot(axisDir) - projectedLengthOffset;
 		FVector newPosition = dragStartLocation + axisDir * projectedLength;
 
-		targetObject->SetPosition(newPosition + dragOffset);
+		targetObject->SetPosition(newPosition);
 	}
 	else if (translationType == ETranslationType::Scale)
 	{
-		// --- 1. 마우스 레이와 이동 평면의 3D 교차점 찾기 ---
-		FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
+		axisDir = targetObject->GetQuaternion().RotateInverse(axisDir);
+		float projectedLength = startToIntersectionVec.Dot(axisDir) - projectedLengthOffset;
+		FVector newScale = dragStartScale + GetAxisVector(selectedAxis) * projectedLength;
 
-		// --- 2. 3D 교차점을 이동 축으로 투영하기 ---
-		FVector startToIntersectionVec = intersectionPoint - dragStartLocation;
-		FVector axisDir = GetAxisVector(selectedAxis);
+		const float minimumScale = 0.1f;
 
-		float projectedLength = startToIntersectionVec.Dot(axisDir);
-		FVector newPosition = dragStartLocation + axisDir * projectedLength;
+		newScale.X = max(newScale.X, minimumScale);
+		newScale.Y = max(newScale.Y, minimumScale);
+		newScale.Z = max(newScale.Z, minimumScale);
 
-		// --- 3. Target 액터 위치 업데이트 ---
-		targetObject->SetScale(dragStartScale + (newPosition - dragStartLocation + dragOffset));
+		targetObject->SetScale(newScale);
 	}
 	else // ETranslationType::Rotation
 	{
