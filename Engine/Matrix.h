@@ -468,7 +468,7 @@ struct FMatrix
 		O.M[0][0] = 2.0f / w;
 		O.M[1][1] = 2.0f / h;
 		O.M[2][2] = 1.0f / (zn - zf);         // 음수
-		O.M[2][3] = zn / (zn - zf);
+		O.M[3][2] = zn / (zn - zf);
 		O.M[3][3] = 1.0f;
 		return O;
 	}

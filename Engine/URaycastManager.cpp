@@ -77,6 +77,12 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 	RayOrigin = ray.Origin;
 	RayDirection = ray.Direction;
 
+	// std::cout << "Ray Origin: (" 
+	// 	  << RayOrigin.X << ", " << RayOrigin.Y << ", " << RayOrigin.Z 
+	// 	  << ") | Ray Dir: (" 
+	// 	  << RayDirection.X << ", " << RayDirection.Y << ", " << RayDirection.Z 
+	// 	  << ")\n";
+
 	bool hit = false;
 	float closestHit = FLT_MAX;
 	T* closestComponent = nullptr;
@@ -95,6 +101,14 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 				TransformVertexToWorld(mesh->Vertices[i + 1], worldTransform),
 				TransformVertexToWorld(mesh->Vertices[i + 2], worldTransform)
 			};
+
+			// std::cout << "Triangle: V0(" 
+		 //  << triangleVertices[0].X << ", " << triangleVertices[0].Y << ", " << triangleVertices[0].Z 
+		 //  << ") V1(" 
+		 //  << triangleVertices[1].X << ", " << triangleVertices[1].Y << ", " << triangleVertices[1].Z 
+		 //  << ") V2(" 
+		 //  << triangleVertices[2].X << ", " << triangleVertices[2].Y << ", " << triangleVertices[2].Z 
+		 //  << ")\n";
 
 			auto result = RayIntersectsTriangle(triangleVertices);
 			if (result.has_value())
@@ -218,6 +232,14 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 	FMatrix invViewMatrix = FMatrix::Inverse(camera->GetView());
 	FVector worldPos = invViewMatrix.TransformPointRow(viewPos);
 
+	if (camera->IsOrtho())
+	{
+		FRay resultRay;
+		resultRay.Origin = worldPos;
+		resultRay.Direction = camera->GetForward();
+		return resultRay;
+	}
+	
 	// 4단계: 방향 벡터 계산
 	FRay resultRay;
 	resultRay.Origin = camera->GetLocation(); // 카메라의 월드 위치
