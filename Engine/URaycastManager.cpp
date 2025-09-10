@@ -67,7 +67,7 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 }
 
 template <typename T>
-bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent)
+bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint)
 {
 	MouseX = static_cast<float>(InputManager->GetMouseX());
 	MouseY = static_cast<float>(InputManager->GetMouseY());
@@ -110,6 +110,7 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 					std::cout << "    -> Closest so far (was " << closestHit << ")" << std::endl;
 					hit = true;
 					closestComponent = component;
+					outImpactPoint = *result;
 				}
 			}
 		}
@@ -122,8 +123,8 @@ bool URaycastManager::RayIntersectsMeshes(UCamera* camera, TArray<T*>& component
 	return hit;
 }
 
-template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&);
-template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&);
+template bool URaycastManager::RayIntersectsMeshes<UGizmoComponent>(UCamera*, TArray<UGizmoComponent*>&, UGizmoComponent*&, FVector&);
+template bool URaycastManager::RayIntersectsMeshes<UPrimitiveComponent>(UCamera*, TArray<UPrimitiveComponent*>&, UPrimitiveComponent*&, FVector&);
 
 
 std::optional<FVector> URaycastManager::RayIntersectsTriangle(FVector triangleVertices[3])
