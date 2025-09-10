@@ -110,6 +110,7 @@ bool UScene::Deserialize(const json::JSON& data)
 	json::JSON primitivesJson = data.at("Primitives");
 
 	UEngineStatics::SetUUIDGeneration(false);
+	UObject::ClearFreeIndices();
 	for (auto& primitiveJson : primitivesJson.ObjectRange())
 	{
 		uint32 uuid = stoi(primitiveJson.first);
@@ -126,7 +127,6 @@ bool UScene::Deserialize(const json::JSON& data)
 		if (component->CountOnInspector())
 			++primitiveCount;
 	}
-	UEngineStatics::SetUUIDGeneration(true);
 
 	USceneComponent* gizmoGrid = new UGizmoGridComp(
 		{ 0.3f, 0.3f, 0.3f },
@@ -138,6 +138,7 @@ bool UScene::Deserialize(const json::JSON& data)
 	FString uuidStr = data.at("NextUUID").ToString();
 
 	UEngineStatics::SetNextUUID((uint32)stoi(uuidStr));
+	UEngineStatics::SetUUIDGeneration(true);
 
 	return true;
 }

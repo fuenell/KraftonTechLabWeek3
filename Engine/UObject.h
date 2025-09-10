@@ -143,4 +143,9 @@ public:
     {
         UUID = uuid;
     }
+
+    static void ClearFreeIndices()
+    {
+        FreeIndices.clear();
+    }
 };
