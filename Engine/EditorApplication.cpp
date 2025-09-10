@@ -206,4 +206,5 @@ void EditorApplication::OnSceneChange()
 {
 	propertyWindow->SetTarget(nullptr);
 	gizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
+	gizmoManager.SetTarget(nullptr);
 }
