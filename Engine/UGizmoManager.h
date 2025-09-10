@@ -31,6 +31,7 @@ public:
 	// 기즈모가 조작할 대상 객체를 설정합니다.
 	void SetTarget(UPrimitiveComponent* target);
 
+	void SetCamera(UCamera* cam) { camera = cam; }
 
 	void Update(float deltaTime);
 	// 매 프레임 호출되어 기즈모를 화면에 그립니다.
@@ -66,6 +67,7 @@ private:
 	FVector dragRotationStartVector;
 	float projectedLengthOffset;
 
+	UCamera* camera;
 	UMeshManager* meshManager;
 	UPrimitiveComponent* targetObject = nullptr; // 현재 선택된 객체
 

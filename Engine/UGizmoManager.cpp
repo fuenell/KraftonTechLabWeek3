@@ -11,6 +11,7 @@
 #include "UGizmoScaleHandleComp.h"
 #include "UObject.h"
 #include "UScene.h"
+#include "UCamera.h"
 
 IMPLEMENT_UCLASS(UGizmoManager, UEngineSubsystem)
 UGizmoManager::UGizmoManager()
@@ -251,6 +252,10 @@ void UGizmoManager::Draw(URenderer& renderer)
 				{
 					gizmoPart->SetQuaternion(targetObject->RelativeQuaternion);
 				}
+
+				float gizmoScale = (targetObject->RelativeLocation - camera->GetLocation()).Length() * 0.15f;
+				gizmoPart->SetScale({ gizmoScale, gizmoScale, gizmoScale });
+
 				gizmoPart->DrawOnTop(renderer);
 			}
 		}

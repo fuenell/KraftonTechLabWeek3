@@ -176,6 +176,7 @@ bool EditorApplication::OnInitialize()
 		MessageBox(GetWindowHandle(), L"Failed to initialize gizmo manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
+	gizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
 
 	return true;
 }
