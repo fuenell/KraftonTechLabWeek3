@@ -24,7 +24,10 @@ public:
 		return "USceneComponent";
 	}
 
-	virtual bool IsManageable() { return false; }
+	virtual bool IsManageable() 
+	{ 
+		return false; 
+	}
 
 	// 위치와 스케일 설정 함수들
 	void SetPosition(const FVector& pos) { RelativeLocation = pos; }
@@ -49,13 +52,22 @@ public:
 		RelativeQuaternion.Z = 0;
 		RelativeQuaternion.W = 1;
 	}
-	FVector GetPosition() const { return RelativeLocation; }
-	FVector GetScale() const { return RelativeScale3D; }
+	FVector GetPosition() const
+	{
+		return RelativeLocation;
+	}
+	FVector GetScale() const
+	{
+		return RelativeScale3D;
+	}
 	FVector GetRotation() const
 	{
-		return FQuaternion::EulerXYZDegFrom(RelativeQuaternion);
+		return RelativeQuaternion.GetEulerXYZDeg();
 	}
-	FQuaternion GetQuaternion() const { return RelativeQuaternion; }
+	FQuaternion GetQuaternion() const
+	{
+		return RelativeQuaternion;
+	}
 
 	json::JSON Serialize() const override;
 	bool Deserialize(const json::JSON& data) override;

@@ -11,6 +11,8 @@
 #endif
 inline float ToRad(float d) { return d * (float)(PI / 180.0); }
 inline float ToDeg(float r) { return r * (180.0f / (float)PI); }
+inline FVector ToRad(FVector v) { return { ToRad(v.X), ToRad(v.Y), ToRad(v.Z) }; }
+inline FVector ToDeg(FVector v) { return { ToDeg(v.X), ToDeg(v.Y), ToDeg(v.Z) }; }
 struct FQuaternion
 {
 	// (x,y,z,w) with w = scalar
@@ -36,9 +38,10 @@ struct FQuaternion
 	// 켤레
 	FQuaternion Conjugate() const { return FQuaternion(-X, -Y, -Z, W); }
 
+	// 단위쿼터니언이면 Inverse = conjugate
+	// Inverse는 비단위도 계산가능
 	FQuaternion Inverse() const
 	{
-		// 단위쿼터니언 가정(회전): inverse = conjugate
 		// 일반형: conj / |q|^2
 		float n2 = X * X + Y * Y + Z * Z + W * W;
 		if (n2 <= 0.0f) return Identity();
@@ -61,11 +64,14 @@ struct FQuaternion
 			q.W * p.W - q.X * p.X - q.Y * p.Y - q.Z * p.Z
 		);
 	}
-	FQuaternion operator*(const FQuaternion& rhs) const
+	// 사원수 곱셈은 교환법칙 성립 X 유의해서 사용
+	// 먼저 this, 그 다음 quat
+	FQuaternion operator*(const FQuaternion& quat) const
 	{
-		// row 규약 합성: 먼저 this, 그 다음 rhs
-		// → 표준 해밀턴으로는 Hamilton(this, rhs)가 아니라 Hamilton(rhs, this)
-		return Hamilton(rhs, *this);
+		// row 규약 합성: 먼저 this, 그 다음 quat
+		// → 표준 해밀턴으로는 Hamilton(this, quat)가 아니라 Hamilton(quat, this)
+		// *this ⊗ quat
+		return Hamilton(quat, *this);
 	}
 	// 스칼라 보간/SLERP
 	// 계산 빠름 (성분끼리 그냥 선형 보간)
@@ -114,7 +120,7 @@ struct FQuaternion
 		if (len <= 0.0f) return Identity();
 		float inv = 1.0f / len; axis.X *= inv; axis.Y *= inv; axis.Z *= inv;
 		float s = sinf(rad * 0.5f), c = cosf(rad * 0.5f);
-		return FQuaternion(axis.X * s, axis.Y * s, axis.Z * s, c);
+		return FQuaternion(axis.X * s, axis.Y * s, axis.Z * s, c).Normalized();
 	}
 
 	// 행벡터 규약: X→Y→Z 순서라면 실제 행렬은 S*Rx*Ry*Rz 같은 식으로 오른쪽에 쌓임.
@@ -126,47 +132,32 @@ struct FQuaternion
 		// 먼저 X, 그 다음 Y, 그 다음 Z → row 규약 합성
 		return qx * qy * qz;
 	}
-	static FQuaternion FromEulerXYZDeg(FVector v)
-	{
-		return FromEulerXYZDeg(v.X, v.Y, v.Z);
-	}
 	static FQuaternion FromEulerXYZDeg(float degX, float degY, float degZ)
 	{
 		return FromEulerXYZ(ToRad(degX), ToRad(degY), ToRad(degZ)).Normalized();
 	}
-	// TODO : 오브젝트에 쓰려면 조정이 필요함. 카메라 전용이었어서 잘 작동하지 않을 수 있음
-	static FQuaternion LookRotation(const FVector& fwd, const FVector& up)
+	static FQuaternion FromEulerXYZDeg(FVector v)
 	{
-		FVector F = fwd; F.Normalize();
-
-		// 1) up을 F에 직교하도록 정규화(Gram-Schmidt)
-		FVector Uref = up;
-		if (Uref.Length() < 1e-12f) Uref = FVector(0, 0, 1);
-		// U = up - proj_up_on_F
-		FVector U = (Uref - F * F.Dot(Uref));
-		float uLen2 = U.Length();
-		if (uLen2 < 1e-12f)
+		return FromEulerXYZDeg(v.X, v.Y, v.Z);
+	}
+	// forward 방향으로 물체가 돌아갑니다.
+	static FQuaternion LookRotation(const FVector& forward, const FVector& up)
+	{
+		FVector F = forward.Normalized();
+		// up을 F에 직교하도록 정규화(Gram-Schmidt)
+		FVector Uref = up.Normalized();
+		if (fabs(F.Dot(Uref)) > 0.999f) // 거의 평행
 		{
-			// fwd ≈ up 인 경우 대체 업벡터 선택
-			U = (fabsf(F.Z) < 0.9f) ? FVector(0, 0, 1) : FVector(1, 0, 0);
-			U = (U - F * F.Dot(U));
+			Uref = FVector(0, 1, 0); // 임시 다른 up (예: Y축)
 		}
-		U.Normalize();
-
-		// 2) RH 유지: R = U × F, U = F × R
-		FVector R = F.Cross(U).GetNormalized();
-		U = R.Cross(F).GetNormalized(); // 재직교(수치안정)
-
-		// 3) 열에 축을 넣는다 (columns are axes)
+		// R = F × U, U = R × F
+		FVector R = F.Cross(Uref).Normalized();
+		FVector U = R.Cross(F).Normalized(); // 재직교(수치안정)
 		FMatrix M = FMatrix::IdentityMatrix();
-		// col0 = Right = R
 		M.M[0][0] = R.X; M.M[0][1] = F.X; M.M[0][2] = U.X;
-		// col1 = Forward = +F   ★ 오브젝트는 +Y가 전방
-		M.M[1][0] = R.Y; M.M[1][1] = F.Y; M.M[2][1] = U.Y;
-		// col2 = Up = U
-		M.M[2][0] = R.Z; M.M[1][2] = F.Z; M.M[2][2] = U.Z;
-
-		return FQuaternion::FromMatrixRow(M).Normalized();
+		M.M[1][0] = R.Y; M.M[1][1] = F.Y; M.M[1][2] = U.Y;
+		M.M[2][0] = R.Z; M.M[2][1] = F.Z; M.M[2][2] = U.Z;
+		return FQuaternion::FromMatrixRow(M);
 	}
 
 	// 두 벡터 a→b 회전
@@ -179,7 +170,7 @@ struct FQuaternion
 		{
 			// 반대 방향: a와 직교하는 축으로 180도
 			FVector ortho = (fabsf(a.X) < 0.9f) ? FVector(1, 0, 0) : FVector(0, 1, 0);
-			FVector axis = a.Cross(ortho).GetNormalized();
+			FVector axis = a.Cross(ortho).Normalized();
 			return FromAxisAngle(axis, (float)PI);
 		}
 		FVector axis = a.Cross(b);
@@ -189,17 +180,45 @@ struct FQuaternion
 	}
 
 	// 벡터 회전 (쿼터니언 샌드위치)
+	// 단위 쿼터니언이 아니여도 된다.
+	// 해밀턴 곱은 연산량이 많아서 느립니다. 공부하실 때 참고해요
+
 	FVector Rotate(const FVector& v) const
 	{
 		FQuaternion qv(v.X, v.Y, v.Z, 0.0f);
 		FQuaternion inv = Inverse();
-		// tmp = q ⊗ v
-		FQuaternion tmp = Hamilton(qv, *this);   // Hamilton(p,q)=q⊗p 이므로 (qv, q)
 		// r = (q ⊗ v) ⊗ q^{-1}
-		FQuaternion r = Hamilton(inv, tmp);      // (tmp, inv) => tmp ⊗ inv
-
+		FQuaternion r = (*this) * qv * inv;      // (tmp, inv) => tmp ⊗ inv
 		return FVector(r.X, r.Y, r.Z);
 	}
+
+
+	FVector InverseRotate(const FVector& v) const
+	{
+		FQuaternion qv(v.X, v.Y, v.Z, 0.0f);
+		FQuaternion inv = Inverse();
+		// r = (q ⊗ v) ⊗ q^{-1}
+		FQuaternion r = inv * qv * (*this);      // (tmp, inv) => tmp ⊗ inv
+		return FVector(r.X, r.Y, r.Z);
+	}
+	/*
+	FVector Rotate(const FVector& v) const {
+		float n2 = X * X + Y * Y + Z * Z + W * W;
+		if (n2 <= 0.0f) return v;  // 안전가드
+
+		FVector u(X, Y, Z);
+		float  w = W;
+
+		// v' = ((w^2 - |u|^2) v + 2 u (u·v) + 2 w (u×v)) / |q|^2
+		float uu = u.Dot(u);
+		float uv = u.Dot(v);
+
+		FVector term1 = v * (w * w - uu);
+		FVector term2 = u * (2.0f * uv);
+		FVector term3 = (u.Cross(v)) * (2.0f * w);
+		return (term1 + term2 + term3) * (1.0f / n2);
+	}
+	*/
 	// === COLUMNS are axes (row-vector) ===
 	// col0 = q·(+X) = Right
 	FMatrix ToMatrixRow() const
@@ -214,15 +233,15 @@ struct FQuaternion
 		FMatrix R = FMatrix::IdentityMatrix();
 		// === columns are axes (col0=+X, col1=+Y, col2=+Z) ===
 		R.M[0][0] = 1.0f - 2.0f * (yy + zz);
-		R.M[0][1] = 2.0f * (xy - wz);
-		R.M[0][2] = 2.0f * (xz + wy);
-
 		R.M[1][0] = 2.0f * (xy + wz);
-		R.M[1][1] = 1.0f - 2.0f * (xx + zz);
-		R.M[1][2] = 2.0f * (yz - wx);
-
 		R.M[2][0] = 2.0f * (xz - wy);
+
+		R.M[0][1] = 2.0f * (xy - wz);
+		R.M[1][1] = 1.0f - 2.0f * (xx + zz);
 		R.M[2][1] = 2.0f * (yz + wx);
+
+		R.M[0][2] = 2.0f * (xz + wy);
+		R.M[1][2] = 2.0f * (yz - wx);
 		R.M[2][2] = 1.0f - 2.0f * (xx + yy);
 		return R;
 	}
@@ -271,61 +290,14 @@ struct FQuaternion
 		}
 		return q.Normalized();
 	}
-	// 규약: row-vector, columns are axes, R = Rx * Ry * Rz  (X→Y→Z 순서)
-	FVector ToEulerXYZ() const
+	// Return FVector(rx, ry, rz) rad(라디안)
+	FVector GetEulerXYZ() const
 	{
+		// 규약: row-vector, columns are axes, R = Rx * Ry * Rz  (X→Y→Z 순서)
 		FMatrix R = ToMatrixRow();
-		// 유도 결과: R[0][2] = -sin(ry)
-		float sy = -R.M[0][2];
-		if (sy > 1.0f) sy = 1.0f;
-		if (sy < -1.0f) sy = -1.0f;
-
-		float ry = asinf(sy);
-		float cy = cosf(ry);
-
-		float rx, rz;
-		const float EPS = 1e-6f;
-
-		if (fabsf(cy) > EPS)
-		{
-			// 일반 케이스:
-			// R[1][2] =  sin(rx)*cos(ry)
-			// R[2][2] =  cos(rx)*cos(ry)
-			rx = atan2f(R.M[1][2], R.M[2][2]);
-
-			// R[0][1] =  sin(rz)*cos(ry)
-			// R[0][0] =  cos(rz)*cos(ry)
-			rz = atan2f(R.M[0][1], R.M[0][0]);
-		}
-		else
-		{
-			// 짐벌락(cos(ry) ~ 0): rz 미정 → rz=0으로 두고 rx만 안정적으로 계산
-			rz = 0.0f;
-
-			// 부호 주의: ry≈+π/2, -π/2 모두에서 동작하도록 sign(sy) 보정
-			// ry=+π/2: R[1][0]=sin(rx), R[1][1]=cos(rx)
-			// ry=-π/2: R[1][0]=-sin(rx), R[1][1]=cos(rx)
-			float sgn = (sy >= 0.0f) ? 1.0f : -1.0f;
-			rx = atan2f(sgn * R.M[1][0], R.M[1][1]);
-		}
-
-		return FVector(rx, ry, rz); // (X, Y, Z) 라디안
-	}
-	FVector ToEulerXYZ_Deg() const
-	{
-		FVector r = ToEulerXYZ();
-		const float R2D = 180.0f / (float)PI;
-		return FVector(r.X * R2D, r.Y * R2D, r.Z * R2D);
-	}
-	// ============== Quaternion -> EulerXYZ (Rx * Ry * Rz) ==============
-// 반환: FVector(rx, ry, rz) 라디안
-	static FVector EulerXYZFrom(const FQuaternion& q)
-	{
-		FMatrix R = q.ToMatrixRow();
-
 		// 행벡터 + columns=axes + R = Rx*Ry*Rz 전개 결과:
-		// R[0][2] = -sin(ry)
-			// R = Rx * Ry * Rz (row-vector)
+		// R[0][2] = sin(ry)
+		// R = Rx * Ry * Rz (row-vector)
 		const float sy = std::clamp(R.M[0][2], -1.0f, 1.0f); // +Y가 col1, 그래서 R[0][2]가 +sinY
 		const float ry = asinf(sy);
 		const float cy = cosf(ry);
@@ -344,22 +316,32 @@ struct FQuaternion
 		}
 		return FVector(rx, ry, rz);
 	}
-
-	// 반환: FVector(rx, ry, rz) 도(deg)
-	static FVector EulerXYZDegFrom(const FQuaternion& q)
+	// Return FVector(rx, ry, rz) deg(도)
+	FVector GetEulerXYZDeg() const
 	{
-		FVector r = EulerXYZFrom(q);
-		return FVector(ToDeg(r.X), ToDeg(r.Y), ToDeg(r.Z));
+		return ToDeg(GetEulerXYZ());
 	}
+	// Return FVector(rx, ry, rz) rad
+	static FVector GetEulerXYZ(const FQuaternion& q)
+	{
+		return q.GetEulerXYZ();
+	}
+	// Return FVector(rx, ry, rz) deg(도)
+	static FVector GetEulerXYZDeg(const FQuaternion& q)
+	{
+		return ToDeg(q.GetEulerXYZ());
+	}
+	// 주어진 축(월드 축)을 기준으로 회전
 	FQuaternion RotatedWorldAxisAngle(const FVector& worldAxis, float radians) const
 	{
 		FQuaternion qW = FromAxisAngle(worldAxis, radians);
 		return (*this * qW).Normalized();
 	}
-	FQuaternion RotatedLocalAxisAngle(const FVector& worldAxis, float radians) const
+	// 주어진 축(로컬 축) 기준으로 회전
+	FQuaternion RotatedLocalAxisAngle(const FVector& LocalAxis, float radians) const
 	{
-		FQuaternion qW = FromAxisAngle(worldAxis, radians);
-		return (qW * *this).Normalized();
+		FQuaternion qL = FromAxisAngle(LocalAxis, radians);
+		return (qL * *this).Normalized();
 	}
 	// In-place 버전
 	void RotateWorldAxisAngleInPlace(const FVector& worldAxis, float radians)

@@ -317,12 +317,12 @@ void UGizmoManager::BeginDrag(const FRay& mouseRay, EAxis axis)
 
 	// --- 위치 및 스케일 공통 로직 ---
 	// 카메라 위치에서 객체를 향하는 벡터 (시선 벡터)
-	FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).GetNormalized();
+	FVector camToObjectDir = (dragStartLocation - mouseRay.Origin).Normalized();
 
 	// 이동 축과 시선 벡터에 동시에 수직인 벡터를 찾고,
 	// 다시 외적하여 평면의 법선 벡터를 계산
 	FVector tempVec = axisDir.Cross(camToObjectDir);
-	movementPlane.Normal = axisDir.Cross(tempVec).GetNormalized();
+	movementPlane.Normal = axisDir.Cross(tempVec).Normalized();
 
 	// 선택한 곳을 offset 으로 저장해서 드래그 시 중심점으로 이동하지 않게 하기
 	FVector intersectionPoint = FindCirclePlaneIntersection(mouseRay, movementPlane);
