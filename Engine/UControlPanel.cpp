@@ -158,33 +158,62 @@ void UControlPanel::CameraManagementSection()
 	}
 
 	// === FOV (perspective일 때만 활성화) ===
-	ImGui::Text("FOV");
+	ImGui::TextUnformatted("FOV");
+
 	float fovDeg = camera->GetFOV();
-	float tableWidth = ImGui::GetContentRegionAvail().x;
-	ImGui::SetNextItemWidth(tableWidth * 0.75f);
+	bool changed = false;
+
+	const float minFov = 10.0f;
+	const float maxFov = 120.0f;
+	const float dragSpeed = 0.2f; // 픽셀당 증가량(°)
+
+	float avail = ImGui::GetContentRegionAvail().x;
+
 	ImGui::BeginDisabled(isOrthogonal);
-	if (ImGui::InputFloat("##fov", &fovDeg, 0.0f, 0.0f, "%.3f"))
-	{
-		camera->SetFOV(fovDeg); // proj 재빌드 내부에서 함
+	ImGui::PushID("FOV");
+
+	// 드래그 박스 (좌우 드래그로 값 변경)
+	ImGui::SetNextItemWidth(avail * 0.55f);
+	changed |= ImGui::DragFloat("##fov_drag", &fovDeg, dragSpeed, minFov, maxFov, "%.1f",
+		ImGuiSliderFlags_AlwaysClamp);
+
+	// 직접 입력 박스(원하면 유지, 아니면 생략 가능)
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(avail * 0.30f);
+	changed |= ImGui::InputFloat("##fov_input", &fovDeg, 0.0f, 0.0f, "%.3f");
+
+	// 리셋 버튼(옵션)
+	ImGui::SameLine();
+	if (ImGui::Button("Reset")) { fovDeg = 60.0f; changed = true; }
+
+	if (changed) {
+		fovDeg = std::clamp(fovDeg, minFov, maxFov);
+		camera->SetFOV(fovDeg); // 내부에서 proj 재빌드
 	}
+
+	ImGui::PopID();
 	ImGui::EndDisabled();
 
 
+
 	// --- Euler(XYZ) 편집 ---
-	// 나머지는 테이블로
+	// Location
 	ImGui::Text("Camera Location");
-	if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None))
+	if (ImGui::BeginTable("EditableCameraTable", 3, ImGuiTableFlags_None))
 	{
-		// Camera Location 행
 		ImGui::TableNextRow();
 		for (int32 i = 0; i < 3; i++)
 		{
 			ImGui::TableSetColumnIndex(i);
 			ImGui::SetNextItemWidth(-1);
-			ImGui::InputFloat(("##loc" + std::to_string(i)).c_str(),
-				&cameraLocation[i], 0.0f, 0.0f, "%.3f");
-			if (ImGui::IsItemDeactivatedAfterEdit())
-				locCommitted = true;
+
+			// DragFloat로 교체
+			if (ImGui::DragFloat(("##loc" + std::to_string(i)).c_str(),
+				&cameraLocation[i], 0.1f, -FLT_MAX, FLT_MAX, "%.3f"))
+			{
+				locCommitted = true; // 값이 바뀐 순간 바로 commit
+			}
+			// 만약 "편집 종료 후만" commit 원하면 IsItemDeactivatedAfterEdit() 체크로 바꾸기
 		}
 		ImGui::EndTable();
 	}
