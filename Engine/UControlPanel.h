@@ -16,7 +16,7 @@ class UControlPanel : public ImGuiWindowWrapper
 	int32 primitiveChoiceIndex = 0;
 
 	// Scene Management Section
-	char sceneName[256] = "";
+	char sceneName[256] = "Default";
 
 	// Camera Management Section
 

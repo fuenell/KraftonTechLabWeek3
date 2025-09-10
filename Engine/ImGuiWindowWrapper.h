@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include "stdafx.h"
+#include "UObject.h"
 #include "UEngineStatics.h"
-#include <string>
 
-class ImGuiWindowWrapper
+class ImGuiWindowWrapper : public UObject
 {
 private:
     FString WindowName;
