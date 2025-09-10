@@ -182,7 +182,7 @@ struct FQuaternion
 	// 벡터 회전 (쿼터니언 샌드위치)
 	// 단위 쿼터니언이 아니여도 된다.
 	// 해밀턴 곱은 연산량이 많아서 느립니다. 공부하실 때 참고해요
-
+	/*
 	FVector Rotate(const FVector& v) const
 	{
 		FQuaternion qv(v.X, v.Y, v.Z, 0.0f);
@@ -191,8 +191,6 @@ struct FQuaternion
 		FQuaternion r = (*this) * qv * inv;      // (tmp, inv) => tmp ⊗ inv
 		return FVector(r.X, r.Y, r.Z);
 	}
-
-
 	FVector InverseRotate(const FVector& v) const
 	{
 		FQuaternion qv(v.X, v.Y, v.Z, 0.0f);
@@ -201,7 +199,7 @@ struct FQuaternion
 		FQuaternion r = inv * qv * (*this);      // (tmp, inv) => tmp ⊗ inv
 		return FVector(r.X, r.Y, r.Z);
 	}
-	/*
+	*/
 	FVector Rotate(const FVector& v) const {
 		float n2 = X * X + Y * Y + Z * Z + W * W;
 		if (n2 <= 0.0f) return v;  // 안전가드
@@ -218,7 +216,30 @@ struct FQuaternion
 		FVector term3 = (u.Cross(v)) * (2.0f * w);
 		return (term1 + term2 + term3) * (1.0f / n2);
 	}
-	*/
+	FVector RotateInverse(const FVector& v) const
+	{
+		const float n2 = X * X + Y * Y + Z * Z + W * W;
+		if (n2 <= 0.0f) return v; // 안전 가드
+
+		const FVector u(X, Y, Z);
+		const float   w = W;
+
+		const float uu = u.Dot(u);
+		const float uv = u.Dot(v);
+
+		const FVector term1 = v * (w * w - uu);
+		const FVector term2 = u * (2.0f * uv);
+		const FVector term3 = (u.Cross(v)) * (2.0f * w);
+		return (term1 + term2 - term3) * (1.0f / n2);  // ← 여기만 '-' 로 바뀜
+	}
+
+	//FVector InverseRotateUnit(const FVector& v) const
+	//{
+	//	const FVector u(X, Y, Z);
+	//	const FVector t = 2.0f * u.Cross(v);
+	//	return v - W * t + u.Cross(t);  // 정방향 v + W*t + u×t 와 w 항 부호만 반대
+	//}
+
 	// === COLUMNS are axes (row-vector) ===
 	// col0 = q·(+X) = Right
 	FMatrix ToMatrixRow() const
