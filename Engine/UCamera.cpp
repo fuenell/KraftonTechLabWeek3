@@ -127,46 +127,22 @@ void UCamera::SetYawPitch(float yawZ, float pitch)
 
 FVector UCamera::GetEulerXYZRad() const
 {
-	const FMatrix R = mRot.ToMatrixRow(); // col0=+X, col1=+Y, col2=+Z
-
-	// R = Rx * Ry * Rz (row-vector)
-	const float sy = std::clamp(R.M[0][2], -1.0f, 1.0f); // +Y가 col1, 그래서 R[0][2]가 +sinY
-	const float ry = asinf(sy);
-	const float cy = cosf(ry);
-
-	float rx, rz;
-	if (fabsf(cy) > 1e-6f)
-	{
-		rx = atan2f(-R.M[1][2], R.M[2][2]); // X
-		rz = atan2f(-R.M[0][1], R.M[0][0]); // Z
-	}
-	else
-	{
-		// gimbal lock
-		rz = 0.0f;
-		rx = (sy > 0.0f) ? atan2f(R.M[2][0], R.M[1][0])
-			: atan2f(-R.M[2][0], -R.M[1][0]);
-	}
-	return FVector(rx, ry, rz);
+	return mRot.GetEulerXYZ();
 }
 
 
 FVector UCamera::GetEulerXYZDeg() const
 {
-	FVector r = GetEulerXYZRad();
-	return FVector(ToDeg(r.X), ToDeg(r.Y), ToDeg(r.Z));
+	return mRot.GetEulerXYZDeg();
 }
 
 void UCamera::SetEulerXYZRad(float rx, float ry, float rz)
 {
 	if (bLockRoll) rz = 0.0f;            // 롤 잠그고 싶으면 유지, 아니면 제거/토글
 	mRot = FQuaternion::FromEulerXYZ(rx, ry, rz).Normalized();
-	//RecalcAxesFromQuat();
-
 	// pitch 캐시(편의): forward.z = sin(pitch)
 	float fz = std::clamp(mForward.Z, -1.0f, 1.0f);
 	mPitch = asinf(fz);
-
 	UpdateView();
 }
 
