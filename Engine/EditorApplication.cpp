@@ -205,4 +205,5 @@ UScene* EditorApplication::CreateDefaultScene()
 void EditorApplication::OnSceneChange()
 {
 	propertyWindow->SetTarget(nullptr);
+	gizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
 }
