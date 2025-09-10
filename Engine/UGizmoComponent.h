@@ -24,6 +24,7 @@ public:
 
 	FMatrix GetWorldTransform() override;
 
+	virtual void Update(float deltaTime);
 	virtual void Draw(URenderer& renderer);
 	virtual void DrawOnTop(URenderer& renderer);
 	virtual void UpdateConstantBuffer(URenderer& renderer);
@@ -36,7 +37,11 @@ public:
 	}
 
 	void SetColor(const FVector4& newColor) { Color = newColor; }
-	FVector4 GetColor() const { return Color; }
+	FVector4 GetColor() const { 
+		if (bIsSelected)
+			return FVector4(1.0f, 1.0f, 0.0f, 1.0f);
+		return Color; 
+	}
 
 protected:
 	UMesh* mesh;

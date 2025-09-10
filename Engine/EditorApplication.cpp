@@ -15,6 +15,7 @@ void EditorApplication::Update(float deltaTime)
 {
 	// Basic update logic
 	UApplication::Update(deltaTime);
+	gizmoManager.Update(deltaTime);
 
 	if (GetInputManager().IsKeyDown(VK_ESCAPE))
 	{
@@ -37,6 +38,17 @@ void EditorApplication::Update(float deltaTime)
 
 	if (GetInputManager().IsMouseButtonReleased(0))
 	{
+		TArray<UGizmoComponent*> gizmos;
+
+		TArray<UGizmoComponent*>& g = gizmoManager.GetRaycastableGizmos();
+		if (g.size() > 0)
+		{
+			for (UGizmoComponent* gizmo : g)
+			{
+				gizmos.push_back(gizmo);
+				gizmo->bIsSelected = false;
+			}
+		}
 		gizmoManager.EndDrag();
 		return;
 	}
