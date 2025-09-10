@@ -66,10 +66,14 @@ struct ImguiConsole
         Items.push_back(Strdup(buf));
     }
 
-    void    Draw(const char* title, bool* p_open)
+    void Draw(const char* title, bool* p_open)
     {
-        ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
-        if (!ImGui::Begin(title, p_open))
+        ImGui::SetNextWindowPos(ImVec2(0, 535));            // fixed position
+        ImGui::SetNextWindowSize(ImVec2(275, 355));          // fixed size
+        if (!ImGui::Begin(title, p_open,
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove   |
+            ImGuiWindowFlags_NoCollapse))
         {
             ImGui::End();
             return;

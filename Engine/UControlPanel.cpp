@@ -8,7 +8,7 @@
 
 
 UControlPanel::UControlPanel(USceneManager* sceneManager)
-    : ImGuiWindowWrapper("Jungle Control Panel"), SceneManager(sceneManager)
+    : ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 350)), SceneManager(sceneManager)
 {
     for (const auto& registeredType : UClass::GetClassList())
     {
@@ -42,8 +42,6 @@ void UControlPanel::RenderContent()
 
 void UControlPanel::PrimaryInformationSection()
 {
-    ImGui::Text("Hello Jungle World!");
-
     float frameRate = ImGui::GetIO().Framerate;
     ImGui::Text("FPS %.0f (%.0f ms)", frameRate, 1000.0f / frameRate);
 }
@@ -56,7 +54,8 @@ USceneComponent* UControlPanel::CreateSceneComponentFromChoice(int index) {
 
 void UControlPanel::SpawnPrimitiveSection()
 {
-    ImGui::Combo("Primitive", &primitiveChoiceIndex, choices.data(), static_cast<int32>(choices.size()));
+    ImGui::SetNextItemWidth(150);
+    ImGui::Combo("Type", &primitiveChoiceIndex, choices.data(), static_cast<int32>(choices.size()));
 
     int32 objectCount = SceneManager->GetScene()->GetObjectCount();
     if (ImGui::Button("Spawn"))
@@ -84,14 +83,17 @@ void UControlPanel::SpawnPrimitiveSection()
     }
     ImGui::SameLine();
     ImGui::BeginDisabled();
+    ImGui::SetNextItemWidth(60);
     ImGui::SameLine();
-    ImGui::InputInt("Number of spawned primitives", &objectCount, 0);
+    ImGui::InputInt("Spawned", &objectCount, 0);
     ImGui::EndDisabled();
 }
 
 void UControlPanel::SceneManagementSection()
 {
-    ImGui::InputText("Scene Name", sceneName, sizeof(sceneName));
+    ImGui::Text("Scene Name");                // Label on top
+    ImGui::SetNextItemWidth(200);             // Optional: set input width
+    ImGui::InputText("##SceneNameInput", sceneName, sizeof(sceneName)); // invisible label
 
     if (ImGui::Button("New scene"))
     {
@@ -99,13 +101,14 @@ void UControlPanel::SceneManagementSection()
         SceneManager->SetScene(new UDefaultScene());
         
     }
-
+    ImGui::SameLine();
     if (ImGui::Button("Save scene") && strcmp(sceneName, "") != 0)
     {
         std::filesystem::path _path("./data/");
         std::filesystem::create_directory(_path);
         SceneManager->SaveScene(_path.string() + FString(sceneName) + ".Scene");
     }
+    ImGui::SameLine();
     if (ImGui::Button("Load scene") && strcmp(sceneName, "") != 0)
     {
         SceneManager->LoadScene("./data/" + FString(sceneName) + ".Scene");
@@ -139,6 +142,7 @@ void UControlPanel::CameraManagementSection()
     }
 
     // === FOV (perspective일 때만 활성화) ===
+    ImGui::Text("FOV");
     float fovDeg = camera->GetFOV();
     float tableWidth = ImGui::GetContentRegionAvail().x;
     ImGui::SetNextItemWidth(tableWidth * 0.75f);
@@ -148,12 +152,11 @@ void UControlPanel::CameraManagementSection()
         camera->SetFOV(fovDeg); // proj 재빌드 내부에서 함
     }
     ImGui::EndDisabled();
-    ImGui::SameLine();
-    ImGui::Text("FOV");
 
 
     // --- Euler(XYZ) 편집 ---
     // 나머지는 테이블로
+    ImGui::Text("Camera Location");
     if (ImGui::BeginTable("EditableCameraTable", 4, ImGuiTableFlags_None))
     {
         // Camera Location 행
@@ -167,8 +170,16 @@ void UControlPanel::CameraManagementSection()
             if (ImGui::IsItemDeactivatedAfterEdit())
                 locCommitted = true;
         }
-        ImGui::TableSetColumnIndex(3);
-        ImGui::Text("Camera Location");
+        ImGui::EndTable();
+    }
+
+    ImGui::Text("Camera Rotation");
+    if (ImGui::BeginTable("CameraRotTable", 3, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchProp))
+    {
+        ImGui::TableNextRow(ImGuiTableRowFlags_Headers);
+        ImGui::TableSetColumnIndex(0); ImGui::Text("Pitch");
+        ImGui::TableSetColumnIndex(1); ImGui::Text("Yaw");
+        ImGui::TableSetColumnIndex(2); ImGui::Text("Roll");
 
         // Camera Rotation 행
         ImGui::TableNextRow();
@@ -181,8 +192,7 @@ void UControlPanel::CameraManagementSection()
             if (ImGui::IsItemDeactivatedAfterEdit())
                 rotCommitted = true;
         }
-        ImGui::TableSetColumnIndex(3);
-        ImGui::Text("Camera Rotation");
+        // ImGui::TableSetColumnIndex(3);
 
         ImGui::EndTable();
     }
