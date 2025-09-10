@@ -1,5 +1,4 @@
-﻿#pragma once
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "UApplication.h"
 #include "EditorApplication.h"
 #include "UMeshManager.h"
@@ -146,7 +145,7 @@ void EditorApplication::RenderGUI()
 	controlPanel->Render();
 	propertyWindow->Render();
 
-	ImGui::SetNextWindowPos(ImVec2(0, 460));         // Fixed position (x=20, y=20)
+	ImGui::SetNextWindowPos(ImVec2(0, 500));         // Fixed position (x=20, y=20)
 	ImGui::SetNextWindowSize(ImVec2(275, 75));      // Fixed size (width=300, height=100)
 	ImGui::Begin("Memory Stats", nullptr,
 		ImGuiWindowFlags_NoResize |
