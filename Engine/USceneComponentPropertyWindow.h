@@ -9,7 +9,7 @@ private:
 	USceneComponent* Target = nullptr;
 
 public:
-	USceneComponentPropertyWindow() : ImGuiWindowWrapper("Jungle Property Window")
+	USceneComponentPropertyWindow() : ImGuiWindowWrapper("Property Window", ImVec2(0, 350), ImVec2(275, 110))
 	{
 
 	}
