@@ -11,6 +11,7 @@ struct FVector;
 
 struct FRay
 {
+	FVector MousePos;
 	FVector Origin;
 	FVector Direction;
 };
