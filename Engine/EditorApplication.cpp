@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "UApplication.h"
+#include "Application.h"
 #include "EditorApplication.h"
 #include "UMeshManager.h"
 #include "ImguiConsole.h"
@@ -13,7 +13,7 @@
 void EditorApplication::Update(float deltaTime)
 {
 	// Basic update logic
-	UApplication::Update(deltaTime);
+	Application::Update(deltaTime);
 	gizmoManager.Update(deltaTime);
 
 	if (GetInputManager().IsKeyDown(VK_ESCAPE))
@@ -136,7 +136,7 @@ void EditorApplication::Update(float deltaTime)
 
 void EditorApplication::Render()
 {
-	UApplication::Render();
+	Application::Render();
 	gizmoManager.Draw(GetRenderer());
 }
 
@@ -164,7 +164,7 @@ void EditorApplication::RenderGUI()
 
 bool EditorApplication::OnInitialize()
 {
-	UApplication::OnInitialize();
+	Application::OnInitialize();
 	// 리사이즈/초기화
 
 	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager);

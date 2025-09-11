@@ -9,7 +9,7 @@
 #include "USceneManager.h"
 #include "UGizmoManager.h"
 
-class UApplication
+class Application
 {
 private:
 	// Core systems
@@ -39,8 +39,8 @@ private:
 
 
 public:
-	UApplication();
-	virtual ~UApplication();
+	Application();
+	virtual ~Application();
 
 	// Application lifecycle
 	bool Initialize(HINSTANCE hInstance, const std::wstring& title = L"Engine Application",

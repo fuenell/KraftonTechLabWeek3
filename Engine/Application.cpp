@@ -1,18 +1,18 @@
 ﻿#include "stdafx.h"
-#include "UApplication.h"
+#include "Application.h"
 #include "UScene.h"
 
 // Static member definitions
-WCHAR UApplication::WindowClass[] = L"EngineWindowClass";
-WCHAR UApplication::DefaultTitle[] = L"Engine Application";
+WCHAR Application::WindowClass[] = L"EngineWindowClass";
+WCHAR Application::DefaultTitle[] = L"Engine Application";
 
 // Global application pointer for window procedure
-UApplication* g_pApplication = nullptr;
+Application* g_pApplication = nullptr;
 
 // Forward declaration for ImGui
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-UApplication::UApplication()
+Application::Application()
 	: hWnd(nullptr)
 	, bIsRunning(false)
 	, bIsInitialized(false)
@@ -23,7 +23,7 @@ UApplication::UApplication()
 	g_pApplication = this;
 }
 
-UApplication::~UApplication()
+Application::~Application()
 {
 	if (bIsInitialized)
 	{
@@ -32,7 +32,7 @@ UApplication::~UApplication()
 	g_pApplication = nullptr;
 }
 
-bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, int32 width, int32 height)
+bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int32 width, int32 height)
 {
 	if (bIsInitialized)
 		return false;
@@ -107,7 +107,7 @@ bool UApplication::Initialize(HINSTANCE hInstance, const std::wstring& title, in
 	return true;
 }
 
-void UApplication::Run()
+void Application::Run()
 {
 	if (!bIsInitialized)
 		return;
@@ -130,7 +130,7 @@ void UApplication::Run()
 	}
 }
 
-void UApplication::Shutdown()
+void Application::Shutdown()
 {
 	if (!bIsInitialized)
 		return;
@@ -149,7 +149,7 @@ void UApplication::Shutdown()
 	bIsInitialized = false;
 }
 
-void UApplication::Update(float deltaTime)
+void Application::Update(float deltaTime)
 {
 	// Base class update - can be overridden by derived classes
 	// Update core engine systems here if needed
@@ -157,7 +157,7 @@ void UApplication::Update(float deltaTime)
 	sceneManager.GetScene()->Update(deltaTime);
 }
 
-void UApplication::Render()
+void Application::Render()
 {
 	// Base class render - handles GUI rendering
 	// Derived classes should call this after their rendering
@@ -165,7 +165,7 @@ void UApplication::Render()
 	sceneManager.GetScene()->Render();
 }
 
-bool UApplication::CreateMainWindow(HINSTANCE hInstance)
+bool Application::CreateMainWindow(HINSTANCE hInstance)
 {
 	// Register window class
 	WNDCLASSW wndclass = {};
@@ -209,7 +209,7 @@ bool UApplication::CreateMainWindow(HINSTANCE hInstance)
 	return true;
 }
 
-void UApplication::ProcessMessages()
+void Application::ProcessMessages()
 {
 	MSG msg;
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -225,7 +225,7 @@ void UApplication::ProcessMessages()
 	}
 }
 
-void UApplication::InternalUpdate()
+void Application::InternalUpdate()
 {
 	float deltaTime = static_cast<float>(timeManager.GetDeltaTime());
 
@@ -234,7 +234,7 @@ void UApplication::InternalUpdate()
 	Update(deltaTime);
 }
 
-void UApplication::InternalRender()
+void Application::InternalRender()
 {
 	// Prepare rendering
 	renderer.Prepare();
@@ -253,7 +253,7 @@ void UApplication::InternalRender()
 	renderer.SwapBuffer();
 }
 
-LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	// Let ImGui handle the message first
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
@@ -321,13 +321,13 @@ LRESULT CALLBACK UApplication::WndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	return 0;
 }
 
-bool UApplication::OnInitialize()
+bool Application::OnInitialize()
 {
 	return true;
 
 }
 
-UScene* UApplication::CreateDefaultScene()
+UScene* Application::CreateDefaultScene()
 {
 	return new UScene();
 }

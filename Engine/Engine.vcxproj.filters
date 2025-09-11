@@ -129,7 +129,7 @@
     <ClCompile Include="UScene.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="UApplication.cpp">
+    <ClCompile Include="Application.cpp">
       <Filter>Engine\Application</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -228,7 +228,7 @@
     <ClInclude Include="Quaternion.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="UApplication.h">
+    <ClInclude Include="Application.h">
       <Filter>Engine\Application</Filter>
     </ClInclude>
     <ClInclude Include="UEngineStatics.h">

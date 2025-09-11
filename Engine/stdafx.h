@@ -43,7 +43,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 // Engine forward declarations
-class UApplication;
+class Application;
 class URenderer;
 class UInputManager;
 class UGUI;

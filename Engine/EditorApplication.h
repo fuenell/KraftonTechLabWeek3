@@ -1,13 +1,13 @@
 ﻿#pragma once
 #include "stdafx.h"
-#include "UApplication.h"
+#include "Application.h"
 #include "USphereComp.h"
 #include "URaycastManager.h"
 #include "UControlPanel.h"
 #include "USceneComponentPropertyWindow.h"
 
 // Simple application that inherits from UApplication
-class EditorApplication : public UApplication
+class EditorApplication : public Application
 {
 private:
 	UGizmoManager gizmoManager;

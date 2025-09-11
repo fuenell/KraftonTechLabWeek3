@@ -2,17 +2,17 @@
 #include "UEngineSubsystem.h"
 
 class UScene;
-class UApplication;
+class Application;
 
 class USceneManager : UEngineSubsystem
 {
     DECLARE_UCLASS(USceneManager, UEngineSubsystem)
 private:
-    UApplication* application;
+    Application* application;
     UScene* currentScene = nullptr;
 public:
     ~USceneManager() override;
-    bool Initialize(UApplication* _application);
+    bool Initialize(Application* _application);
 
     UScene* GetScene();
     void SetScene(UScene* scene);

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "USceneManager.h"
 #include "UScene.h"
-#include "UApplication.h"
+#include "Application.h"
 
 
 IMPLEMENT_UCLASS(USceneManager, UEngineSubsystem)
@@ -11,7 +11,7 @@ USceneManager::~USceneManager()
 		delete currentScene;
 }
 
-bool USceneManager::Initialize(UApplication* _application)
+bool USceneManager::Initialize(Application* _application)
 {
 	application = _application;
 	currentScene = _application->CreateDefaultScene();
