@@ -451,12 +451,23 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 
 void UGizmoManager::EndDrag()
 {
+	for (UGizmoComponent* gizmo : locationGizmos)
+	{
+		gizmo->bIsSelected = false;
+	}
+
+	for (UGizmoComponent* gizmo : rotationGizmos)
+	{
+		gizmo->bIsSelected = false;
+	}
+
+	for (UGizmoComponent* gizmo : scaleGizmos)
+	{
+		gizmo->bIsSelected = false;
+	}
+
 	isDragging = false;
 	selectedAxis = EAxis::None;
-	if (gridPrimitive)
-	{
-		gridPrimitive->bIsSelected = false;
-	}
 }
 
 void UGizmoManager::SetTranslationType(ETranslationType type)

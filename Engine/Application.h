@@ -48,9 +48,9 @@ public:
 	void Run();
 	void Shutdown();
 
-	// Core update loop - can be overridden by derived classes
-	virtual void Update(float deltaTime);
-	virtual void Render();
+	// 순수 가상 함수
+	virtual void Update(float deltaTime) = 0;
+	virtual void Render() = 0;
 
 	// System access
 	URenderer& GetRenderer() { return renderer; }

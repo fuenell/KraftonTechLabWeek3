@@ -37,4 +37,7 @@ protected:
 	void RenderGUI() override;
 	bool OnInitialize() override;
 	void OnResize(int32 width, int32 height) override;
+private:
+	void ProcessKeyboardInput();
+	void ProcessMouseInteraction();
 };

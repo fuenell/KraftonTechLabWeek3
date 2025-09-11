@@ -149,22 +149,6 @@ void Application::Shutdown()
 	bIsInitialized = false;
 }
 
-void Application::Update(float deltaTime)
-{
-	// Base class update - can be overridden by derived classes
-	// Update core engine systems here if needed
-
-	sceneManager.GetScene()->Update(deltaTime);
-}
-
-void Application::Render()
-{
-	// Base class render - handles GUI rendering
-	// Derived classes should call this after their rendering
-
-	sceneManager.GetScene()->Render();
-}
-
 bool Application::CreateMainWindow(HINSTANCE hInstance)
 {
 	// Register window class
