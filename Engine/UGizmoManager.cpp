@@ -438,14 +438,12 @@ void UGizmoManager::UpdateDrag(const FRay& mouseRay)
 		FQuaternion finalQuaternion;
 		FVector rotationAxis = GetAxisVector(selectedAxis);
 
-		if (isWorldSpace)
+		if (!isWorldSpace)
 		{
-			finalQuaternion = dragStartQuaternion.RotatedWorldAxisAngle(rotationAxis, angle);
+			rotationAxis = dragStartQuaternion.RotateInverse(rotationAxis);
 		}
-		else
-		{
-			finalQuaternion = dragStartQuaternion.RotatedLocalAxisAngle(rotationAxis, angle);
-		}
+
+		finalQuaternion = dragStartQuaternion.RotatedWorldAxisAngle(rotationAxis, angle);
 
 		targetObject->SetQuaternion(finalQuaternion);
 	}
