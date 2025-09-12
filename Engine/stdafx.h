@@ -6,7 +6,6 @@
 #endif
 #include <windows.h>
 
-
 // C++ 표준 라이브러리
 #include <iostream>
 #include <fstream>
@@ -36,6 +35,12 @@
 #include "ImGui/imgui_impl_dx11.h"
 #include "ImGui/imgui_impl_win32.h"
 #include "ImguiConsole.h"
+
+// --- 엔진 핵심 헤더 (Engine Core Headers) ---
+// 이 헤더들은 변경 빈도가 낮고, 의존성이 높아야 합니다.
+#include "UClass.h"
+#include "RTTI.h"			// RTTI 시스템
+#include "UObject.h"		// 최상위 오브젝트
 
 // 라이브러리 링킹
 #pragma comment(lib, "user32.lib")

@@ -1,6 +1,4 @@
 ﻿#include "stdafx.h"
-#include "UClass.h"
-#include "UObject.h"
 
 UClass* UClass::RegisterToFactory(const FString& typeName, const TFunction<UObject* ()>& createFunction, const FString& superClassTypeName)
 {
