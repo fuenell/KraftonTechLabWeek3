@@ -2,7 +2,6 @@
 #include "UGizmoComponent.h"
 #include "UMeshManager.h"
 #include "URenderer.h"
-#include "UClass.h"
 
 IMPLEMENT_UCLASS(UGizmoComponent, USceneComponent)
 

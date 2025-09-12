@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "json.hpp"
 #include "UScene.h"
-#include "UObject.h"
 #include "USceneComponent.h"
 #include "UPrimitiveComponent.h"
 #include "UGizmoGridComp.h"
@@ -118,7 +117,7 @@ bool UScene::Deserialize(const json::JSON& data)
 
 		UClass* _class = UClass::FindClassWithDisplayName(_data.at("Type").ToString());
 		USceneComponent* component = nullptr;
-			if(_class != nullptr) component = _class->CreateDefaultObject()->Cast<USceneComponent>();
+		if (_class != nullptr) component = _class->CreateDefaultObject()->Cast<USceneComponent>();
 
 		component->Deserialize(_data);
 		component->SetUUID(uuid);

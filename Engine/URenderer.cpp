@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "URenderer.h"
-#include "UClass.h"
 
 IMPLEMENT_UCLASS(URenderer, UEngineSubsystem)
 
@@ -523,7 +522,7 @@ void URenderer::DrawMeshOnTop(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())
 		return;
-	
+
 	// Create a depth-stencil state with depth testing disabled
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = FALSE;  // disable depth testing

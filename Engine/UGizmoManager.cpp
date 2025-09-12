@@ -9,7 +9,6 @@
 #include "UGizmoArrowComp.h"
 #include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
-#include "UObject.h"
 #include "UScene.h"
 #include "UCamera.h"
 

@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Matrix.h"
-#include "UObject.h"
 #include "Vector.h"
 #include "Quaternion.h"
 

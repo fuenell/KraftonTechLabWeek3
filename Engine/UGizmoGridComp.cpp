@@ -1,5 +1,4 @@
 ﻿#include "stdafx.h"
-#include "UClass.h"
 #include "UGizmoComponent.h"
 #include "UGizmoGridComp.h"
 

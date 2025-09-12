@@ -1,5 +1,4 @@
 ﻿#include "stdafx.h"
-#include "UClass.h"
 #include "UPrimitiveComponent.h"
 #include "UCubeComp.h"
 

@@ -1,8 +1,6 @@
 ﻿#include "stdafx.h"
 #include "UMesh.h"
 #include "FVertexPosColor.h"
-#include "UObject.h"
-#include "UClass.h"
 
 IMPLEMENT_UCLASS(UMesh, UObject)
 
@@ -15,7 +13,8 @@ UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY pr
 {
 }
 
-void UMesh::Init(ID3D11Device* device) {
+void UMesh::Init(ID3D11Device* device)
+{
 	D3D11_BUFFER_DESC vbd = {};
 	vbd.Usage = D3D11_USAGE_IMMUTABLE;
 	vbd.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;

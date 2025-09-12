@@ -4,7 +4,6 @@
 #include "Sphere.h"
 #include "PlaneVertices.h"
 #include "CubeVertices.h"
-#include "UClass.h"
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
 UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)

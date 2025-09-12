@@ -3,7 +3,6 @@
 #include "UMesh.h"
 #include "USceneComponent.h"
 #include "Vector.h"
-#include "UClass.h"
 
 class UMeshManager; // 전방 선언
 

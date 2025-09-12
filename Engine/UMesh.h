@@ -2,7 +2,6 @@
 #pragma once
 #include "stdafx.h"
 #include "FVertexPosColor.h"
-#include "UObject.h"
 #include "Vector4.h"
 
 struct FVertexPosColor4; // 전방 선언

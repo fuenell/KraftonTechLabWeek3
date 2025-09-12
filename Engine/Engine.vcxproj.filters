@@ -156,7 +156,6 @@
     <ClCompile Include="UCamera.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
-    <ClCompile Include="UClass.cpp" />
     <ClCompile Include="UGizmoScaleHandleComp.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
@@ -177,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="ULineBatcherManager.cpp" />
     <ClCompile Include="FName.cpp" />
+    <ClCompile Include="UClass.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -327,7 +329,6 @@
     <ClInclude Include="UGizmoScaleHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
-    <ClInclude Include="UClass.h" />
     <ClInclude Include="FDynamicBitset.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
@@ -336,6 +337,10 @@
     </ClInclude>
     <ClInclude Include="ULineBatcherManager.h" />
     <ClInclude Include="FName.h" />
+    <ClInclude Include="RTTI.h" />
+    <ClInclude Include="UClass.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

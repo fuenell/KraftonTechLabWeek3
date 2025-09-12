@@ -239,6 +239,7 @@
     <ClInclude Include="FName.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="RTTI.h" />
     <ClInclude Include="UCamera.h" />
     <ClInclude Include="FVertexPosColor.h" />
     <ClInclude Include="GizmoVertices.h" />
