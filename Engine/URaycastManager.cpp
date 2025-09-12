@@ -59,7 +59,7 @@ FVector URaycastManager::GetRaycastDirection(UCamera* camera)
 	rayViewDir.Normalize();
 
 	// convert the camera-space ray direction to world direction
-	FMatrix V = FMatrix::LookAtRH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
+	FMatrix V = FMatrix::LookAtLH(camera->GetLocation(), camera->GetLocation() + camera->GetForward(), camera->GetUp());
 	V = FMatrix::Inverse(V);
 	FVector4 rayDirection = FMatrix::MultiplyVector(V, FVector4(rayViewDir.X, rayViewDir.Y, rayViewDir.Z, 0.0f));
 
@@ -223,7 +223,7 @@ FRay URaycastManager::CreateRayFromScreenPosition(UCamera* camera)
 	FVector ndcPos;
 	ndcPos.X = (MouseX / viewportWidth) * 2.0f - 1.0f;
 	ndcPos.Y = 1.0f - (MouseY / viewportHeight) * 2.0f;
-	ndcPos.Z = 0.0f; // Near Plane
+	ndcPos.Z = 1.0f; // Far Plane
 
 	FMatrix invProjectionMatrix = FMatrix::Inverse(camera->GetProj());
 	FVector viewPos = invProjectionMatrix.TransformPointRow(ndcPos);

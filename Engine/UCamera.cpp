@@ -158,8 +158,8 @@ void UCamera::SetEulerXYZDeg(float rxDeg, float ryDeg, float rzDeg)
 void UCamera::RecalcAxesFromQuat()
 {
 	// 로컬 단위축을 회전
-	mRight = mRot.Rotate(FVector(1, 0, 0)).Normalized(); // +X
-	mForward = mRot.Rotate(FVector(0, 1, 0)).Normalized(); // +Y
+	mRight = mRot.Rotate(FVector(0, 1, 0)).Normalized(); // +X
+	mForward = mRot.Rotate(FVector(1, 0, 0)).Normalized(); // +Y
 	mUp = mRot.Rotate(FVector(0, 0, 1)).Normalized(); // +Z
 }
 
@@ -169,7 +169,7 @@ void UCamera::UpdateProj(bool leftHanded)
 	if (!mUseOrtho)
 	{
 		// RH + row-vector + D3D depth [0,1]
-		mProj = FMatrix::PerspectiveFovRHRow(mFovY, mAspect, mNearZ, mFarZ);
+		mProj = FMatrix::PerspectiveFovLHRow(mFovY, mAspect, mNearZ, mFarZ);
 	}
 	else
 	{
@@ -184,16 +184,16 @@ void UCamera::UpdateView()
 {
 	// f = (eye - target) = -forward → forward = -f
 	// 여기서 f(Back)는 카메라가 보는 -Z 방향과 대응시키기 위해 사용
-	FVector s = mRight;                 // Right
+	FVector r = mRight;                 // Right
 	FVector u = mUp;                    // Up
-	FVector f = (-mForward).Normalized(); // Back = -Forward
+	FVector f = (mForward).Normalized(); // Back = -Forward
 	FMatrix V = FMatrix::IdentityMatrix();
 	// 회전 성분: 열에 [s u f] 배치 (row-vector 규약)
-	V.M[0][0] = s.X; V.M[0][1] = u.X; V.M[0][2] = f.X;
-	V.M[1][0] = s.Y; V.M[1][1] = u.Y; V.M[1][2] = f.Y;
-	V.M[2][0] = s.Z; V.M[2][1] = u.Z; V.M[2][2] = f.Z;
+	V.M[0][0] = r.X; V.M[0][1] = u.X; V.M[0][2] = f.X;
+	V.M[1][0] = r.Y; V.M[1][1] = u.Y; V.M[1][2] = f.Y;
+	V.M[2][0] = r.Z; V.M[2][1] = u.Z; V.M[2][2] = f.Z;
 	// 평행이동(마지막 행)
-	V.M[3][0] = -(mEye.Dot(s));
+	V.M[3][0] = -(mEye.Dot(r));
 	V.M[3][1] = -(mEye.Dot(u));
 	V.M[3][2] = -(mEye.Dot(f));
 	V.M[3][3] = 1.0f;
