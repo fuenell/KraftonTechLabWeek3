@@ -144,7 +144,7 @@ void EditorApplication::ProcessMouseInteraction()
 void EditorApplication::Render()
 {
 	GetSceneManager().GetScene()->Render();
-
+	
 	gizmoManager.Draw(GetRenderer());
 }
 

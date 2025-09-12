@@ -95,6 +95,17 @@ bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int
 		return false;
 	}
 
+	if (!LineBatcherManager.Initialize(renderer.GetDevice(),100))
+	{
+		MessageBox(hWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
+
+	
+
+
+
 	// Allow derived classes to initialize
 	if (!OnInitialize())
 	{
@@ -115,6 +126,10 @@ void Application::Run()
 	while (bIsRunning)
 	{
 		timeManager.BeginFrame();
+
+		LineBatcherManager.BeginFrame();
+
+
 
 		inputManager.Update();
 		ProcessMessages();

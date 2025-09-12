@@ -20,7 +20,7 @@ UGizmoManager::UGizmoManager()
 
 UGizmoManager::~UGizmoManager()
 {
-	gridPrimitive = nullptr;
+	//gridPrimitive = nullptr;
 
 	for (auto gizmo : locationGizmos)
 	{
@@ -43,7 +43,7 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 {
 	// --- 1. 그리드 생성 ---
 	// 그리드는 항상 원점에 고정
-	gridPrimitive = new UGizmoGridComp();
+	//gridPrimitive = new UGizmoGridComp();
 
 	// =================================================
 
@@ -110,11 +110,11 @@ bool UGizmoManager::Initialize(UMeshManager* meshManager)
 
 	// =================================================
 
-	if (!gridPrimitive->Init(meshManager) || !arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager)
+	if (!arrowX->Init(meshManager) || !arrowY->Init(meshManager) || !arrowZ->Init(meshManager)
 		|| !rotationX->Init(meshManager) || !rotationY->Init(meshManager) || !rotationZ->Init(meshManager)
 		|| !scaleX->Init(meshManager) || !scaleY->Init(meshManager) || !scaleZ->Init(meshManager))
 	{
-		delete gridPrimitive;
+
 
 		delete arrowX;
 		delete arrowY;
@@ -200,19 +200,16 @@ TArray<UGizmoComponent*>& UGizmoManager::GetRaycastableGizmos()
 
 void UGizmoManager::Update(float deltaTime)
 {
-	if (gridPrimitive)
-	{
-		gridPrimitive->Update(deltaTime);
-	}
+
 }
 
 void UGizmoManager::Draw(URenderer& renderer)
 {
 	// --- 파트 1: 타겟 유무와 상관없이 항상 그리는 요소 ---
-	if (gridPrimitive)
-	{
-		gridPrimitive->Draw(renderer);
-	}
+	//if (gridPrimitive)
+	//{
+	//	gridPrimitive->Draw(renderer);
+	//}
 
 	// --- 파트 2: 타겟이 있을 때만 그리는 요소 ---
 

@@ -175,6 +175,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
+    <ClCompile Include="ULineBatcherManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -332,6 +333,7 @@
     <ClInclude Include="UGizmoRotationHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
+    <ClInclude Include="ULineBatcherManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
@@ -340,5 +342,10 @@
     <None Include="ShaderW0.vs">
       <Filter>Shader</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="ShaderLine.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

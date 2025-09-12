@@ -211,6 +211,7 @@
     <ClCompile Include="UGizmoManager.cpp" />
     <ClCompile Include="UGizmoRotationHandleComp.cpp" />
     <ClCompile Include="UGizmoScaleHandleComp.cpp" />
+    <ClCompile Include="ULineBatcherManager.cpp" />
     <ClCompile Include="UPrimitiveComponent.cpp" />
     <ClCompile Include="USceneComponentPropertyWindow.cpp" />
     <ClCompile Include="USceneManager.cpp" />
@@ -265,6 +266,7 @@
     <ClInclude Include="UGizmoManager.h" />
     <ClInclude Include="UGizmoRotationHandleComp.h" />
     <ClInclude Include="UGizmoScaleHandleComp.h" />
+    <ClInclude Include="ULineBatcherManager.h" />
     <ClInclude Include="USceneComponentPropertyWindow.h" />
     <ClInclude Include="USceneManager.h" />
     <ClInclude Include="URaycastManager.h" />
@@ -300,6 +302,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="ShaderLine.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

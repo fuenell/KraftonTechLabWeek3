@@ -7,8 +7,7 @@
 #include "UClass.h"
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
-UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices,
-	D3D_PRIMITIVE_TOPOLOGY primitiveType)
+UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
 {
 	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
 	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
@@ -22,7 +21,7 @@ UMeshManager::UMeshManager()
 	meshes["Sphere"] = CreateMeshInternal(sphere_vertices);
 	meshes["Plane"] = CreateMeshInternal(plane_vertices);
 	meshes["Cube"] = CreateMeshInternal(cube_vertices);
-	meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+	//meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);
 	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
 	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
