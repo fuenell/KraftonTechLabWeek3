@@ -176,6 +176,7 @@
       <Filter>PCH</Filter>
     </ClCompile>
     <ClCompile Include="ULineBatcherManager.cpp" />
+    <ClCompile Include="FName.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -334,6 +335,7 @@
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
     <ClInclude Include="ULineBatcherManager.h" />
+    <ClInclude Include="FName.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

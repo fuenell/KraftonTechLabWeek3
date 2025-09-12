@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FName.cpp" />
     <ClCompile Include="GizmoVertices.cpp" />
     <ClCompile Include="ImGuiWindowWrapper.cpp" />
     <ClCompile Include="ImguiConsole.cpp" />
@@ -235,6 +236,7 @@
   <ItemGroup>
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="FDynamicBitset.h" />
+    <ClInclude Include="FName.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="PlaneVertices.h" />
     <ClInclude Include="UCamera.h" />
