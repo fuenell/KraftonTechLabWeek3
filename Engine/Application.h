@@ -8,6 +8,7 @@
 #include "URaycastManager.h"
 #include "USceneManager.h"
 #include "UGizmoManager.h"
+#include "ULineBatcherManager.h"
 
 class Application
 {
@@ -21,6 +22,7 @@ private:
 	UMeshManager meshManager;
 	USceneManager sceneManager;
 	URaycastManager raycastManager;
+	ULineBatcherManager LineBatcherManager;
 
 	// Application state
 	bool bIsRunning;
