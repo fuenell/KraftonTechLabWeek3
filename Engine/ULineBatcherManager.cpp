@@ -104,36 +104,32 @@ void ULineBatcherManager::AddLine(const FVector& InPointStart, const FVector& In
     CpuIndices.push_back(base + 1);
 }
 
-//void ULineBatcherManager::AddBoundingBox(const FBoundingBox& BoundingBox, const FMatrix& WorldMatrix)
-//{
-//    // 로컬 AABB의 8개 점
-//    FVector corners[8] = {
-//        { BoundingBox.minX, BoundingBox.minY, BoundingBox.minZ },
-//        { BoundingBox.maxX, BoundingBox.minY, BoundingBox.minZ },
-//        { BoundingBox.minX, BoundingBox.maxY, BoundingBox.minZ },
-//        { BoundingBox.maxX, BoundingBox.maxY, BoundingBox.minZ },
-//        { BoundingBox.minX, BoundingBox.minY, BoundingBox.maxZ },
-//        { BoundingBox.maxX, BoundingBox.minY, BoundingBox.maxZ },
-//        { BoundingBox.minX, BoundingBox.maxY, BoundingBox.maxZ },
-//        { BoundingBox.maxX, BoundingBox.maxY, BoundingBox.maxZ }
-//    };
-//
-//    // 월드 변환 적용
-//    for (int i = 0; i < 8; i++)
-//        corners[i] = WorldMatrix.TransformPosition(corners[i]);
-//
-//    // 12개의 엣지 연결
-//    int edges[12][2] = {
-//        {0,1},{0,2},{1,3},{2,3}, // bottom face
-//        {4,5},{4,6},{5,7},{6,7}, // top face
-//        {0,4},{1,5},{2,6},{3,7}  // vertical edges
-//    };
-//
-//    for (int i = 0; i < 12; i++)
-//    {
-//        AddLine(corners[edges[i][0]], corners[edges[i][1]], 1);
-//    }
-//}
+void ULineBatcherManager::AddBoundingBox(const FBounds& WorldBox, uint32_t color)
+{
+    // 월드 AABB의 8개 코너 (Min/Max가 모두 월드 좌표)
+    FVector corners[8] = {
+        { WorldBox.Min.X, WorldBox.Min.Y, WorldBox.Min.Z },
+        { WorldBox.Max.X, WorldBox.Min.Y, WorldBox.Min.Z },
+        { WorldBox.Min.X, WorldBox.Max.Y, WorldBox.Min.Z },
+        { WorldBox.Max.X, WorldBox.Max.Y, WorldBox.Min.Z },
+        { WorldBox.Min.X, WorldBox.Min.Y, WorldBox.Max.Z },
+        { WorldBox.Max.X, WorldBox.Min.Y, WorldBox.Max.Z },
+        { WorldBox.Min.X, WorldBox.Max.Y, WorldBox.Max.Z },
+        { WorldBox.Max.X, WorldBox.Max.Y, WorldBox.Max.Z }
+    };
+
+    // 12개의 엣지 인덱스 (LINELIST로 그릴 선분)
+    static const int edges[12][2] = {
+        {0,1},{0,2},{1,3},{2,3}, // “아랫면” (MinZ)
+        {4,5},{4,6},{5,7},{6,7}, // “윗면”   (MaxZ)
+        {0,4},{1,5},{2,6},{3,7}  // 수직 엣지
+    };
+
+    for (int i = 0; i < 12; ++i)
+    {
+        AddLine(corners[edges[i][0]], corners[edges[i][1]], color);
+    }
+}
 
 void ULineBatcherManager::AddGrid(float InSpacing, int InCount, uint32_t InColorMain, uint32_t InColorAxis)
 {

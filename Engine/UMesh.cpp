@@ -11,6 +11,7 @@ UMesh::UMesh()
 UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
 	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
 {
+
 }
 
 void UMesh::Init(ID3D11Device* device)
@@ -32,5 +33,7 @@ void UMesh::Init(ID3D11Device* device)
 		throw std::runtime_error("Failed to create vertex buffer for mesh");
 	}
 
+	// 미리 계산된 최소점, 최대점 셋
+	LocalBounds = ComputeLocalBounds(Vertices);
 	isInitialized = true;
 }

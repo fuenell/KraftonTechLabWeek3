@@ -41,6 +41,7 @@
 #include "UClass.h"
 #include "RTTI.h"			// RTTI 시스템
 #include "UObject.h"		// 최상위 오브젝트
+#include "Vector.h"
 
 // 라이브러리 링킹
 #pragma comment(lib, "user32.lib")
@@ -69,3 +70,16 @@ namespace Engine
 {
 	// Common engine types and utilities can go here
 }
+
+struct FBounds {
+	FVector Min;
+	FVector Max;
+};
+
+enum class PrimitiveType
+{
+	Sphere,
+	Cube,
+	Plane,
+	End
+};
