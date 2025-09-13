@@ -10,6 +10,9 @@
 #include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
 
+
+
+
 void EditorApplication::Update(float deltaTime)
 {
 	GetSceneManager().GetScene()->Update(deltaTime);
@@ -145,7 +148,51 @@ void EditorApplication::Render()
 {
 	GetSceneManager().GetScene()->Render();
 	
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Batch Rendering
+	// 여기서 라인들 초기화
+	LineBatcherManager.BeginFrame();
 	gizmoManager.Draw(GetRenderer());
+
+	const FMatrix View = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
+	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
+
+
+	// 1) aabb 쌓기 : 메쉬에 저장된 기본 bounds를 가져온다
+	UPrimitiveComponent* PickedPrimitive = gizmoManager.GetTarget();
+	
+	// 픽 된 메쉬가 존재할때만
+	if (PickedPrimitive != nullptr)
+	{
+		UMesh* Mesh = PickedPrimitive->GetMesh();
+		const FBounds& LocalBounds = Mesh->GetLocalBounds();
+		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
+		FBounds WorldBounds;
+
+		if (PrimitiveType::Sphere == PickedPrimitive->GetType())
+		{
+			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
+		}
+		else
+		{
+			ULineBatcherManager::LocalAABBtoWorldAABB(LocalBounds, WorldMatrix, WorldBounds);
+		}
+		
+		LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
+	}
+
+	// 2) 그리드 쌓기 (원하는 색/간격/개수)
+	const int GridCount = 100;
+	const uint32_t ColMain = 0x40AAAAAA; // ABGR
+	const uint32_t ColAxis = 0x80FFFFFF;
+	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
+
+	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
+	
+	LineBatcherManager.Render(DeviceContext, View, Proj);
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	
 }
 
 void EditorApplication::RenderGUI()
@@ -175,7 +222,7 @@ bool EditorApplication::OnInitialize()
 	Application::OnInitialize();
 	// 리사이즈/초기화
 
-	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager);
+	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetLineBatcherManager());
 	propertyWindow = new USceneComponentPropertyWindow();
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))

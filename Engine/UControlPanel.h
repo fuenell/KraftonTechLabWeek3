@@ -3,11 +3,13 @@
 #include "USceneManager.h"
 #include "USceneComponent.h"
 #include "UGizmoManager.h"
+#include "ULineBatcherManager.h"
 
 class UControlPanel : public ImGuiWindowWrapper
 {
 	USceneManager* SceneManager;
 	UGizmoManager* GizmoManager;
+	ULineBatcherManager* LineBatcherManager;
 
 	// Spawn Primitive Section
 	TArray<UClass*> registeredTypes;
@@ -22,12 +24,13 @@ class UControlPanel : public ImGuiWindowWrapper
 
 
 public:
-	UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager);
+	UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, ULineBatcherManager* LineBatcherManager);
 	void RenderContent() override;
 	void PrimaryInformationSection();
 	void SpawnPrimitiveSection();
 	void SceneManagementSection();
 	void CameraManagementSection();
+	void GridManagementSection();
 	USceneComponent* CreateSceneComponentFromChoice(int index);
 };
 

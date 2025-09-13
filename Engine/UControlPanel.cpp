@@ -6,6 +6,7 @@
 #include "UScene.h"
 #include "UDefaultScene.h"
 
+
 // 활성화(선택) 상태면 버튼색을 Active 계열로 바꿔서 '눌린 버튼'처럼 보이게 하는 헬퍼
 static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVec2(0, 0))
 {
@@ -22,8 +23,8 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 	return pressed;
 }
 
-UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager)
-	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager)
+UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, ULineBatcherManager* InLineBatcherManager)
+	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager), LineBatcherManager(InLineBatcherManager)
 {
 	for (const auto& registeredType : UClass::GetClassList())
 	{
@@ -53,6 +54,11 @@ void UControlPanel::RenderContent()
 	SceneManagementSection();
 	ImGui::Separator();
 	CameraManagementSection();
+
+
+	// 그리드 조절
+	ImGui::Separator();
+	GridManagementSection();
 }
 
 void UControlPanel::PrimaryInformationSection()
@@ -281,3 +287,30 @@ void UControlPanel::CameraManagementSection()
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
 	}
 }
+
+void UControlPanel::GridManagementSection()
+{
+	if (!LineBatcherManager) return;
+
+	// 실제 그리드 간격 가져오기
+	float gridSpace = LineBatcherManager->GetGridSpace();
+
+	ImGui::Text("Grid Spacing");
+	if (ImGui::BeginTable("GridTable", 1, ImGuiTableFlags_None))
+	{
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::SetNextItemWidth(-1);
+
+		// 카메라 Location과 동일하게: Drag 중 변경되면 즉시 커밋
+		if (ImGui::DragFloat("##GridSpacing", &gridSpace, 0.5f, 0.001f, FLT_MAX, "%.3f"))
+		{
+			// 방어적 클램프 (0 이하 방지)
+			gridSpace = gridSpace < 1.0f ? 1.0f : gridSpace;
+			LineBatcherManager->SetGridSpace(gridSpace);
+		}
+
+		ImGui::EndTable();
+	}
+}
+

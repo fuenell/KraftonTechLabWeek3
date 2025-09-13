@@ -12,7 +12,7 @@
 
 class Application
 {
-private:
+protected:
 	// Core systems
 	HWND hWnd;
 	URenderer renderer;
@@ -62,6 +62,7 @@ public:
 	UGUI& GetGUI() { return gui; }
 	UTimeManager& GetTimeManager() { return timeManager; }
 	URaycastManager& GetRaycastManager() { return raycastManager; }
+	ULineBatcherManager& GetLineBatcherManager() { return LineBatcherManager; }
 
 	// Window management
 	HWND GetWindowHandle() const { return hWnd; }

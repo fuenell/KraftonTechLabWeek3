@@ -18,6 +18,8 @@ private:
 	UControlPanel* controlPanel;
 	USceneComponentPropertyWindow* propertyWindow;
 
+
+
 public:
 	EditorApplication() = default;
 	~EditorApplication()
@@ -30,6 +32,9 @@ public:
 	UScene* CreateDefaultScene() override;
 
 	void OnSceneChange() override;
+
+	
+
 
 protected:
 	void Update(float deltaTime) override;
