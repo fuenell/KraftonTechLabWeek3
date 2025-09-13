@@ -34,6 +34,8 @@ bool FName::operator!=(const FName& Other) const
 	return this->ComparisonIndex != Other.ComparisonIndex;
 }
 
+FName::operator FString() const { return ToString(); }
+
 void FName::GetOrCreateName(FString String)
 {
 	// Hash 테이블에 값이 있으면 Index에 저장하고 그렇지 않으면 새로 만든다.

@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 
+UClass::UClass() : className(""), superClassTypeName("") {}
+
 UClass* UClass::RegisterToFactory(const FName& typeName, const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName)
 {
 	TUniquePtr<UClass> classType = MakeUnique<UClass>();
@@ -64,8 +66,4 @@ void UClass::ResolveTypeBitset(UClass* classPtr)
 
 		stack.pop_back();
 	}
-}
-
-UClass::UClass() : className(""), superClassTypeName("")
-{
 }

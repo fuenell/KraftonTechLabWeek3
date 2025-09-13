@@ -12,6 +12,7 @@ struct FName
     int32 Compare(const FName& Other) const;
     bool operator==(const FName& Other) const;
     bool operator!=(const FName& Other) const;
+    operator FString() const;
 
     void GetOrCreateName(FString);
     FString ToString() const;

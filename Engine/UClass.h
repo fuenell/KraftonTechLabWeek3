@@ -98,9 +98,9 @@ public:
 		return baseClass && typeBitset.Test(baseClass->typeId);
 	}
 
-	FString GetUClassName() const { return className.ToString(); }
+	FName GetUClassName() const { return className; }
 
-	FString GetDisplayName() const
+	FName GetDisplayName() const
 	{
 		FString Name = GetMeta("DIsplayName");
 		if (Name == "")
@@ -120,10 +120,10 @@ public:
 	}
 
 
-	FString GetMeta(const FString& key) const
+	FName GetMeta(const FString& key) const
 	{
 		try {
-			return metadata.at(FName(key)).ToString();
+			return metadata.at(FName(key));
 		}
 		catch (const std::out_of_range&) {
 			return FString("");
