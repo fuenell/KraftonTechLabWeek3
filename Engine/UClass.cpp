@@ -1,30 +1,34 @@
 ﻿#include "stdafx.h"
 
-UClass* UClass::RegisterToFactory(const FString& typeName, const TFunction<UObject* ()>& createFunction, const FString& superClassTypeName)
+UClass* UClass::RegisterToFactory(const FName& typeName, const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName)
 {
 	TUniquePtr<UClass> classType = MakeUnique<UClass>();
 
-	classType->typeId = registeredCount++;
+	//classType->typeId = registeredCount++;
 	classType->className = typeName;
 	classType->superClassTypeName = superClassTypeName;
 	classType->createFunction = createFunction;
 
-	nameToId[typeName] = classType->typeId;
+
+	//nameToId[typeName] = classType->typeId;
 
 	UClass* rawPtr = classType.get();
 	classList.push_back(std::move(classType));
 	return rawPtr;
 }
 
+
 void UClass::ResolveTypeBitsets()
 {
 	for (const TUniquePtr<UClass>& _class : classList)
 	{
-		if (!_class->superClassTypeName.empty())
-		{
-			auto it = nameToId.find(_class->superClassTypeName);
+		if (!(_class->superClassTypeName == FName("")))
+		{			
+			_class->superClass = FindClass(_class->superClassTypeName);
+
+			/*auto it = nameToId.find(_class->superClassTypeName);
 			_class->superClass = (it != nameToId.end()) ? classList[it->second].get() : nullptr;
-		}
+		*/}
 	}
 	for (const TUniquePtr<UClass>& _class : classList)
 	{
@@ -58,4 +62,8 @@ void UClass::ResolveTypeBitset(UClass* classPtr)
 
 		stack.pop_back();
 	}
+}
+
+UClass::UClass() : className(""), superClassTypeName("")
+{
 }

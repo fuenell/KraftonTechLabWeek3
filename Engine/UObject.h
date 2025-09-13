@@ -5,6 +5,7 @@
 #include <type_traits>
 #include "UClass.h"
 #include "RTTI.h"
+#include "FName.h"
 
 typedef int int32;
 typedef unsigned int uint32;
@@ -19,8 +20,9 @@ public:
 	static inline TArray<UObject*> GUObjectArray;
 	uint32 UUID;
 	uint32 InternalIndex;
+	FName Name;
 
-	UObject()
+	UObject() : Name("UObject")
 	{
 		UUID = UEngineStatics::GenUUID();
 

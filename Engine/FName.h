@@ -10,9 +10,10 @@ struct FName
 
     int32 Compare(const FName& Other) const;
     bool operator==(const FName& Other) const;
+    bool operator!=(const FName& Other) const;
 
     void GetOrCreateName(FString);
-    FString ToString();
+    FString ToString() const;
 
     int32 DisplayIndex;
     int32 ComparisonIndex;

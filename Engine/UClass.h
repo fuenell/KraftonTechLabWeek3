@@ -3,26 +3,28 @@
 #include "FDynamicBitset.h"
 #include "json.hpp"
 #include "UObject.h"
+#include "FName.h"
 #include <memory>
 
 class UClass
 {
 private:
 	static inline TArray<TUniquePtr<UClass>> classList;
-	static inline TMap<FString, uint32> nameToId;
+	//static inline TMap<FString, uint32> nameToId;
+	// DisplayName은 typeName을 나타내는 사용자 정의 메타데이터다.
 	static inline TMap<FString, uint32> displayNameToId;
 	static inline uint32 registeredCount = 0;
 
 	TMap<FString, FString> metadata;
 	uint32 typeId;
 	FDynamicBitset typeBitset;
-	FString className, superClassTypeName;
+	FName className, superClassTypeName;
 	UClass* superClass;
 	TFunction<UObject* ()> createFunction;
 	bool processed = false;
 public:
-	static UClass* RegisterToFactory(const FString& typeName,
-		const TFunction<UObject* ()>& createFunction, const FString& superClassTypeName);
+	static UClass* RegisterToFactory(const FName& typeName,
+		const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName);
 
 	static void ResolveTypeBitsets();
 	void ResolveTypeBitset(UClass* classPtr);
@@ -32,10 +34,20 @@ public:
 		return (typeId < classList.size()) ? classList[typeId].get() : nullptr;
 	}
 
-	static UClass* FindClass(const FString& name)
+	static UClass* FindClass(const FName& Name)
 	{
-		auto it = nameToId.find(name);
-		return (it != nameToId.end()) ? GetClass(it->second) : nullptr;
+		FName key(Name);
+
+		for (const TUniquePtr<UClass>& Class : classList)
+		{
+			if (key == Class.get()->className)
+				return Class.get();
+		}
+
+		return nullptr;
+
+		/*auto it = nameToId.find(name);
+		return (it != nameToId.end()) ? GetClass(it->second) : nullptr;*/
 	}
 
 	static UClass* FindClassWithDisplayName(const FString& name)
@@ -46,8 +58,7 @@ public:
 			return GetClass(it->second);
 
 		// 2) className fallback
-		it = nameToId.find(name);
-		return (it != nameToId.end()) ? GetClass(it->second) : nullptr;
+		return FindClass(name);
 	}
 
 
@@ -56,12 +67,30 @@ public:
 		return classList;
 	}
 
+	UClass();
+
 	bool IsChildOrSelfOf(UClass* baseClass) const
 	{
+		/*FName Parent = superClassTypeName;
+		FName Child = className;
+
+		UClass* Temp = superClass;
+
+		while (className != baseClass->className)
+		{
+			if (Temp->className == baseClass->className) {
+				return true;
+			}
+
+			Temp = superClass->superClass;
+		}
+
+		return false;*/
+
 		return baseClass && typeBitset.Test(baseClass->typeId);
 	}
 
-	const FString& GetUClassName() const { return className; }
+	const FString& GetUClassName() const { return className.ToString(); }
 
 	const FString& GetDisplayName() const
 	{

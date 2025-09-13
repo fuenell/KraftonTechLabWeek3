@@ -29,6 +29,11 @@ bool FName::operator==(const FName& Other) const
 	return this->ComparisonIndex == Other.ComparisonIndex;
 }
 
+bool FName::operator!=(const FName& Other) const
+{
+	return this->ComparisonIndex != Other.ComparisonIndex;
+}
+
 void FName::GetOrCreateName(FString String)
 {
 	// Hash 테이블에 값이 있으면 Index에 저장하고 그렇지 않으면 새로 만든다.
@@ -56,7 +61,7 @@ void FName::GetOrCreateName(FString String)
 	}
 }
 
-FString FName::ToString()
+FString FName::ToString() const
 {
 	return CaseSensitiveFNamesIndexKey[DisplayIndex];
 }
