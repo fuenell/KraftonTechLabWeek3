@@ -25,8 +25,9 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager)
 	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager)
 {
-	for (const auto& registeredType : UClass::GetClassList())
+	for (const auto& Pair : UClass::GetClassPool())
 	{
+		UClass* registeredType = Pair.second.get();
 		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
 			continue;
 
@@ -34,7 +35,7 @@ UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoMa
 		if (displayName.empty())
 			continue;
 
-		registeredTypes.push_back(registeredType.get());
+		registeredTypes.push_back(registeredType);
 		choiceStrList.push_back(registeredType->GetMeta("DisplayName"));
 	}
 

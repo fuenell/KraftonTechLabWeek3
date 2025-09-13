@@ -7,6 +7,7 @@ struct FName
 {
     FName(char* pStr);
     FName(FString str);
+    FName() { GetOrCreateName(""); }
 
     int32 Compare(const FName& Other) const;
     bool operator==(const FName& Other) const;
@@ -28,3 +29,13 @@ struct FName
     static int32 DisplayIndexCount;
     static int32 ComparisonIndexCount;
 };
+
+// TMap에서의 사용을 위한 hash<FName> 오버로딩
+namespace std {
+    template<>
+    struct hash<FName> {
+        size_t operator()(const FName& name) const noexcept {
+            return std::hash<int>()(name.ComparisonIndex);
+        }
+    };
+}

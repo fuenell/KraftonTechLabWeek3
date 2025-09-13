@@ -65,3 +65,11 @@ FString FName::ToString() const
 {
 	return CaseSensitiveFNamesIndexKey[DisplayIndex];
 }
+
+/*
+
+Fname name("unique!!");
+
+name = FName("unique!!");
+
+*/
