@@ -22,20 +22,19 @@ public:
     void BeginFrame();
 
     // 월드 좌표로 라인 추가 (그리드/스포트라이트/AABB 전부 여기로)
-    void AddLine(const FVector& a, const FVector& b, uint32_t color);
+    void AddLine(const FVector& InPointStart, const FVector& InPointEnd, uint32_t InColor);
     //void AddBoundingBox(const FBoundingBox& BoundingBox, const FMatrix& WorldMatrix);
 
     // 그리드도 이제 IB 경로로 쌓음
-    void AddGrid(float spacing, int count, uint32_t colorMain, uint32_t colorAxis);
+    void AddGrid(float Spacing, int Count, uint32_t ColorMain, uint32_t ColorAxis); 
 
-
-    void Render(ID3D11DeviceContext* ctx, const FMatrix& View, const FMatrix& Proj);
+    void Render(ID3D11DeviceContext* InDeviecContext, const FMatrix& View, const FMatrix& Proj);
 
     // Grid spacing 저장/로드
-    void LoadSettings(const char* iniPath);
-    void SaveSettings(const char* iniPath);
+    void LoadSettings(const char* IniPath);
+    void SaveSettings(const char* IniPath);
 
-    float GridSpacing = 100.0f;
+    float GridSpacing = 1.0f;
 
 private:
     TArray<FLineVertex> CpuVertices;
