@@ -168,36 +168,6 @@ void ULineBatcherManager::AddGrid(float InSpacing, int InCount, uint32_t InColor
 
 }
 
-void ULineBatcherManager::BuildGridGeometry(int halfCount, float spacing, uint32_t colorMain, uint32_t colorAxis, TArray<FLineVertex>& outVerts, std::vector<uint32_t>& outInds)
-{
-    outVerts.clear();
-    outInds.clear();
-
-    // -halfCount..+halfCount (선 개수: 2*(2*halfCount+1))
-    for (int i = -halfCount; i <= halfCount; ++i)
-    {
-        uint32_t c = (i == 0) ? colorAxis : colorMain;
-
-        // 세로줄 (X=i*spacing 고정, Y가 -~+)
-        {
-            uint32_t base = (uint32_t)outVerts.size();
-            outVerts.push_back({ i * spacing, -halfCount * spacing, 0.0f, c });
-            outVerts.push_back({ i * spacing,  halfCount * spacing, 0.0f, c });
-            outInds.push_back(base + 0);
-            outInds.push_back(base + 1);
-        }
-        // 가로줄 (Y=i*spacing 고정, X가 -~+)
-        {
-            uint32_t base = (uint32_t)outVerts.size();
-            outVerts.push_back({ -halfCount * spacing, i * spacing, 0.0f, c });
-            outVerts.push_back({ halfCount * spacing, i * spacing, 0.0f, c });
-            outInds.push_back(base + 0);
-            outInds.push_back(base + 1);
-        }
-    }
-}
-
-
 
 /*
 CPU에서 쌓인 CpuLines → GPU VertexBuffer에 Map/Unmap으로 복사.
@@ -210,27 +180,27 @@ void ULineBatcherManager::Render(ID3D11DeviceContext* InDeviceContext, const FMa
 {
     if (CpuIndices.empty()) return;
 
-    D3D11_MAPPED_SUBRESOURCE mapped;
-    InDeviceContext->Map(VertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-    memcpy(mapped.pData, CpuVertices.data(), sizeof(FLineVertex) * CpuVertices.size());
+    D3D11_MAPPED_SUBRESOURCE Mapped;
+    InDeviceContext->Map(VertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
+    memcpy(Mapped.pData, CpuVertices.data(), sizeof(FLineVertex) * CpuVertices.size());
     InDeviceContext->Unmap(VertexBuffer, 0);
 
     // 2) IB 업로드
-    InDeviceContext->Map(IndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-    memcpy(mapped.pData, CpuIndices.data(), sizeof(uint32_t) * CpuIndices.size());
+    InDeviceContext->Map(IndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
+    memcpy(Mapped.pData, CpuIndices.data(), sizeof(uint32_t) * CpuIndices.size());
     InDeviceContext->Unmap(IndexBuffer, 0);
 
     // === 2. View/Proj 상수버퍼 업데이트 ===
-    ViewProjCB cb;
-    cb.View = View; // HLSL row_major 일 때 맞춰주기
-    cb.Proj = Proj;
-    InDeviceContext->UpdateSubresource(ConstantBuffer, 0, nullptr, &cb, 0, 0);
+    ViewProjCB Cb;
+    Cb.View = View; // HLSL row_major 일 때 맞춰주기
+    Cb.Proj = Proj;
+    InDeviceContext->UpdateSubresource(ConstantBuffer, 0, nullptr, &Cb, 0, 0);
 
     // === 3. 파이프라인 바인딩 ===
-    UINT stride = sizeof(FLineVertex);
-    UINT offset = 0;
+    UINT Stride = sizeof(FLineVertex);
+    UINT Offset = 0;
     InDeviceContext->IASetInputLayout(InputLayout);
-    InDeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &stride, &offset);
+    InDeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &Offset);
     InDeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
     InDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
@@ -242,18 +212,18 @@ void ULineBatcherManager::Render(ID3D11DeviceContext* InDeviceContext, const FMa
     InDeviceContext->DrawIndexed((UINT)CpuIndices.size(), 0, 0);
 }
 
-void ULineBatcherManager::LoadSettings(const char* iniPath)
+void ULineBatcherManager::LoadSettings(const char* IniPath)
 {
     char buf[64];
-    GetPrivateProfileStringA("Grid", "Spacing", "100", buf, 64, iniPath);
+    GetPrivateProfileStringA("Grid", "Spacing", "100", buf, 64, IniPath);
     GridSpacing = (float)atof(buf);
 }
 
-void ULineBatcherManager::SaveSettings(const char* iniPath)
+void ULineBatcherManager::SaveSettings(const char* IniPath)
 {
     char buf[64];
     sprintf_s(buf, "%f", GridSpacing);
-    WritePrivateProfileStringA("Grid", "Spacing", buf, iniPath);
+    WritePrivateProfileStringA("Grid", "Spacing", buf, IniPath);
 }
 
 

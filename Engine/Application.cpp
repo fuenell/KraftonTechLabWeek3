@@ -255,15 +255,15 @@ void Application::InternalRender()
 	LineBatcherManager.BeginFrame();
 
 	// 2) 그리드 쌓기 (원하는 색/간격/개수)
-	const int gridCount = 100;
-	const uint32_t colMain = 0x40AAAAAA; // ABGR
-	const uint32_t colAxis = 0x80FFFFFF;
-	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, gridCount, colMain, colAxis);
+	const int GridCount = 100;
+	const uint32_t ColMain = 0x40AAAAAA; // ABGR
+	const uint32_t ColAxis = 0x80FFFFFF;
+	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
 
-	ID3D11DeviceContext* ctx = renderer.GetDeviceContext();
-	const FMatrix view = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
-	const FMatrix proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
-	LineBatcherManager.Render(ctx, view, proj);
+	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
+	const FMatrix View = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
+	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
+	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Render GUI
