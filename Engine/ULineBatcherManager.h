@@ -28,6 +28,8 @@ public:
     // 그리드도 이제 IB 경로로 쌓음
     void AddGrid(float spacing, int count, uint32_t colorMain, uint32_t colorAxis);
 
+    static void BuildGridGeometry(int halfCount, float spacing, uint32_t colorMain, uint32_t colorAxis, TArray<FLineVertex>& outVerts, std::vector<uint32_t>& outInds);
+   
 
     void Render(ID3D11DeviceContext* ctx, const FMatrix& View, const FMatrix& Proj);
 
@@ -35,7 +37,7 @@ public:
     void LoadSettings(const char* iniPath);
     void SaveSettings(const char* iniPath);
 
-    float GridSpacing = 100.0f;
+    float GridSpacing = 1.0f;
 
 private:
     TArray<FLineVertex> CpuVertices;

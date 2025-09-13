@@ -95,15 +95,13 @@ bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int
 		return false;
 	}
 
-	if (!LineBatcherManager.Initialize(renderer.GetDevice(),100))
+	// 여기서 일단은 그리드 렌더링에 필요한 vb, ib ,cb, vs, ps, ia 설정
+	// 추후 수정예정 why? => 아직은 그리드만 구현했기 때문 
+	if (!LineBatcherManager.Initialize(renderer.GetDevice(), 1024))
 	{
 		MessageBox(hWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
-
-
-	
-
 
 
 	// Allow derived classes to initialize
@@ -127,8 +125,16 @@ void Application::Run()
 	{
 		timeManager.BeginFrame();
 
-		LineBatcherManager.BeginFrame();
+		
 
+
+		// 대강 이런식으로 추가 구현 예정
+		/*
+		for (auto& bb : BBoxes)                                     // 3) 디버그 라인/박스 등
+			LineBatcherManager.AddBoundingBox(bb, bbWorld);
+		for (auto& dl : DebugLines)
+			LineBatcherManager.AddLine(dl.a, dl.b, dl.color);
+		*/
 
 
 		inputManager.Update();
@@ -241,6 +247,24 @@ void Application::InternalRender()
 
 	// Call derived class render
 	Render();
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Batch Rendering
+	// 여기서 라인들 초기화
+	LineBatcherManager.BeginFrame();
+
+	// 2) 그리드 쌓기 (원하는 색/간격/개수)
+	const int gridCount = 100;
+	const uint32_t colMain = 0x40AAAAAA; // ABGR
+	const uint32_t colAxis = 0x80FFFFFF;
+	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, gridCount, colMain, colAxis);
+
+	ID3D11DeviceContext* ctx = renderer.GetDeviceContext();
+	const FMatrix view = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
+	const FMatrix proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
+	LineBatcherManager.Render(ctx, view, proj);
+	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	// Render GUI
 	gui.BeginFrame();

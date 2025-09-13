@@ -13,10 +13,10 @@ struct ViewProjCB
 D3D11_USAGE_DYNAMIC 버퍼를 만들어서 매 프레임 CPU에서 갱신할 수 있게 함.
 최대 라인 개수(maxLines)를 받아서 버퍼 크기 계산.
 */
-bool ULineBatcherManager::Initialize(ID3D11Device* device, size_t maxLines)
+bool ULineBatcherManager::Initialize(ID3D11Device* InDevice, size_t MaxLines)
 {
-    MaxVertices = maxLines * 2; // ★ 누락되어 있던 줄. 한 라인=2정점
-    MaxIndices = maxLines * 2;   // 라인당 2 인덱스(양 끝점)
+    MaxVertices = MaxLines * 2; // ★ 누락되어 있던 줄. 한 라인=2정점
+    MaxIndices = MaxLines * 2;   // 라인당 2 인덱스(양 끝점)
 
 
     // === 1. Vertex Buffer ===
@@ -25,7 +25,7 @@ bool ULineBatcherManager::Initialize(ID3D11Device* device, size_t maxLines)
     bd.ByteWidth = UINT(sizeof(FLineVertex) * MaxVertices);
     bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    device->CreateBuffer(&bd, nullptr, &VertexBuffer);
+    InDevice->CreateBuffer(&bd, nullptr, &VertexBuffer);
 
     // 3) IB (R32_UINT로 통일; 6만 정점 이하만 보장되면 R16_UINT로 줄일 수 있음)
     D3D11_BUFFER_DESC ibd = {};
@@ -33,46 +33,48 @@ bool ULineBatcherManager::Initialize(ID3D11Device* device, size_t maxLines)
     ibd.ByteWidth = UINT(sizeof(uint32_t) * MaxIndices);
     ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
     ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    device->CreateBuffer(&ibd, nullptr, &IndexBuffer);
+    InDevice->CreateBuffer(&ibd, nullptr, &IndexBuffer);
 
-    // === 4. Constant Buffer (View/Proj) ===
-    D3D11_BUFFER_DESC cbd = {};
-    cbd.Usage = D3D11_USAGE_DEFAULT;
-    cbd.ByteWidth = sizeof(ViewProjCB);
-    cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    device->CreateBuffer(&cbd, nullptr, &ConstantBuffer);
-
-    // === 3. Compile Shaders ===
-    ID3DBlob* vsBlob = nullptr;
-    ID3DBlob* psBlob = nullptr;
-
-    // Vertex Shader
-    HRESULT hr = D3DCompileFromFile(L"ShaderLine.hlsl", nullptr, nullptr,"VSmain", "vs_5_0",D3DCOMPILE_ENABLE_STRICTNESS, 0, &vsBlob, nullptr);
-    device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &VertexShader);
-
-    // Pixel Shader
-    hr = D3DCompileFromFile(L"ShaderLine.hlsl", nullptr, nullptr, "PSmain", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, &psBlob, nullptr);
-    device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &PixelShader);
-
-    // === 4. Input Layout ===
-    D3D11_INPUT_ELEMENT_DESC layout[] =
+    // === 3) Constant Buffer ===
     {
-        { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
-          offsetof(FLineVertex, X), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        D3D11_BUFFER_DESC cbd{};
+        cbd.Usage = D3D11_USAGE_DEFAULT;
+        cbd.ByteWidth = sizeof(ViewProjCB);
+        cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        InDevice->CreateBuffer(&cbd, nullptr, &ConstantBuffer);
+    }
 
-        { "COLOR",    0, DXGI_FORMAT_R32_UINT,        0,
-          offsetof(FLineVertex, Abgr), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-    };
+    // === 4) 셰이더/레이아웃 ===
+    {
+        ID3DBlob* vsBlob = nullptr;
+        ID3DBlob* psBlob = nullptr;
 
-    device->CreateInputLayout(layout, ARRAYSIZE(layout), vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &InputLayout);
+        D3DCompileFromFile(L"ShaderLine.hlsl", nullptr, nullptr, "VSmain", "vs_5_0",
+            D3DCOMPILE_ENABLE_STRICTNESS, 0, &vsBlob, nullptr);
+        InDevice->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
+            nullptr, &VertexShader);
 
-    if (vsBlob) vsBlob->Release();
-    if (psBlob) psBlob->Release();
+        D3DCompileFromFile(L"ShaderLine.hlsl", nullptr, nullptr, "PSmain", "ps_5_0",
+            D3DCOMPILE_ENABLE_STRICTNESS, 0, &psBlob, nullptr);
+        InDevice->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(),
+            nullptr, &PixelShader);
 
+        D3D11_INPUT_ELEMENT_DESC layout[] =
+        {
+            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0,
+              offsetof(FLineVertex, X), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
+              // ABGR를 uint로 줄 거면 R32_UINT로, HLSL에서 uint COLOR 받아서 float4로 변환
+              { "COLOR",    0, DXGI_FORMAT_R32_UINT,        0,
+                offsetof(FLineVertex, Abgr), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+        };
+        InDevice->CreateInputLayout(layout, ARRAYSIZE(layout),
+            vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
+            &InputLayout);
 
-
-
+        if (vsBlob) vsBlob->Release();
+        if (psBlob) psBlob->Release();
+    }
     return true;
 }
 
@@ -87,7 +89,7 @@ void ULineBatcherManager::BeginFrame()
     CpuIndices.clear();
 }
 
-void ULineBatcherManager::AddLine(const FVector& a, const FVector& b, uint32_t color)
+void ULineBatcherManager::AddLine(const FVector& InPointStart, const FVector& InPointEnd, uint32_t InColor)
 {
     // 용량 체크
     if (CpuVertices.size() + 2 > MaxVertices)   return;
@@ -95,8 +97,8 @@ void ULineBatcherManager::AddLine(const FVector& a, const FVector& b, uint32_t c
 
     uint32_t base = (uint32_t)CpuVertices.size();
 
-    CpuVertices.push_back({ a.X, a.Y, a.Z, color });
-    CpuVertices.push_back({ b.X, b.Y, b.Z, color });
+    CpuVertices.push_back({ InPointStart.X, InPointStart.Y, InPointStart.Z, InColor });
+    CpuVertices.push_back({ InPointEnd.X, InPointEnd.Y, InPointEnd.Z, InColor });
 
     CpuIndices.push_back(base + 0);
     CpuIndices.push_back(base + 1);
@@ -133,13 +135,65 @@ void ULineBatcherManager::AddLine(const FVector& a, const FVector& b, uint32_t c
 //    }
 //}
 
-void ULineBatcherManager::AddGrid(float spacing, int count, uint32_t colorMain, uint32_t colorAxis)
+void ULineBatcherManager::AddGrid(float InSpacing, int InCount, uint32_t InColorMain, uint32_t InColorAxis)
 {
-    for (int i = -count; i <= count; i++)
+    // ABGR(0xAABBGGRR) 기준
+    const uint32_t Red = 0xFF0000FF; // X축
+    const uint32_t Green = 0xFF00FF00; // Y축
+    const uint32_t Blue = 0xFFFF0000; // Z축
+
+    // 그리드
+
+    const float Ext = InCount * InSpacing;
+    for (int i = -InCount; i <= InCount; i++)
+    {
+        const float X = i * InSpacing;
+        const float Y = i * InSpacing;
+
+        //  Y축
+        uint32_t ColVert = (i == 0) ? Green : InColorMain;
+        AddLine({ X, -Ext, 0.0f }, { X,  Ext, 0.0f }, ColVert);
+
+        //  X축 
+        uint32_t ColHorz = (i == 0) ? Red : InColorMain;
+        AddLine({ -Ext, Y, 0.0f }, { Ext, Y, 0.0f }, ColHorz);
+    }
+    // Z축(파랑) — 원점에서 ±Z로 한 줄
+    AddLine({ 0.0f, 0.0f, -Ext }, { 0.0f, 0.0f,  Ext }, Blue);
+
+    // spotlight
+
+
+    // bounding box
+
+}
+
+void ULineBatcherManager::BuildGridGeometry(int halfCount, float spacing, uint32_t colorMain, uint32_t colorAxis, TArray<FLineVertex>& outVerts, std::vector<uint32_t>& outInds)
+{
+    outVerts.clear();
+    outInds.clear();
+
+    // -halfCount..+halfCount (선 개수: 2*(2*halfCount+1))
+    for (int i = -halfCount; i <= halfCount; ++i)
     {
         uint32_t c = (i == 0) ? colorAxis : colorMain;
-        AddLine({ i * spacing, -count * spacing, 0 }, { i * spacing, count * spacing, 0 }, c);
-        AddLine({ -count * spacing, i * spacing, 0 }, { count * spacing, i * spacing, 0 }, c);
+
+        // 세로줄 (X=i*spacing 고정, Y가 -~+)
+        {
+            uint32_t base = (uint32_t)outVerts.size();
+            outVerts.push_back({ i * spacing, -halfCount * spacing, 0.0f, c });
+            outVerts.push_back({ i * spacing,  halfCount * spacing, 0.0f, c });
+            outInds.push_back(base + 0);
+            outInds.push_back(base + 1);
+        }
+        // 가로줄 (Y=i*spacing 고정, X가 -~+)
+        {
+            uint32_t base = (uint32_t)outVerts.size();
+            outVerts.push_back({ -halfCount * spacing, i * spacing, 0.0f, c });
+            outVerts.push_back({ halfCount * spacing, i * spacing, 0.0f, c });
+            outInds.push_back(base + 0);
+            outInds.push_back(base + 1);
+        }
     }
 }
 
@@ -152,40 +206,40 @@ IA에 바인딩 후 Draw로 한 방에 출력.
 
 Topology는 LINELIST라서 (v0,v1), (v2,v3)… 식으로 라인이 나감.
 */
-void ULineBatcherManager::Render(ID3D11DeviceContext* ctx, const FMatrix& View, const FMatrix& Proj)
+void ULineBatcherManager::Render(ID3D11DeviceContext* InDeviceContext, const FMatrix& View, const FMatrix& Proj)
 {
     if (CpuIndices.empty()) return;
 
     D3D11_MAPPED_SUBRESOURCE mapped;
-    ctx->Map(VertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
-    memcpy(mapped.pData, CpuIndices.data(), sizeof(FLineVertex) * CpuIndices.size());
-    ctx->Unmap(VertexBuffer, 0);
+    InDeviceContext->Map(VertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    memcpy(mapped.pData, CpuVertices.data(), sizeof(FLineVertex) * CpuVertices.size());
+    InDeviceContext->Unmap(VertexBuffer, 0);
 
     // 2) IB 업로드
-    ctx->Map(IndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    InDeviceContext->Map(IndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
     memcpy(mapped.pData, CpuIndices.data(), sizeof(uint32_t) * CpuIndices.size());
-    ctx->Unmap(IndexBuffer, 0);
+    InDeviceContext->Unmap(IndexBuffer, 0);
 
     // === 2. View/Proj 상수버퍼 업데이트 ===
     ViewProjCB cb;
     cb.View = View; // HLSL row_major 일 때 맞춰주기
     cb.Proj = Proj;
-    ctx->UpdateSubresource(ConstantBuffer, 0, nullptr, &cb, 0, 0);
+    InDeviceContext->UpdateSubresource(ConstantBuffer, 0, nullptr, &cb, 0, 0);
 
     // === 3. 파이프라인 바인딩 ===
     UINT stride = sizeof(FLineVertex);
     UINT offset = 0;
-    ctx->IASetInputLayout(InputLayout);
-    ctx->IASetVertexBuffers(0, 1, &VertexBuffer, &stride, &offset);
-    ctx->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-    ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+    InDeviceContext->IASetInputLayout(InputLayout);
+    InDeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &stride, &offset);
+    InDeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+    InDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
-    ctx->VSSetShader(VertexShader, nullptr, 0);
-    ctx->VSSetConstantBuffers(0, 1, &ConstantBuffer);
-    ctx->PSSetShader(PixelShader, nullptr, 0);
+    InDeviceContext->VSSetShader(VertexShader, nullptr, 0);
+    InDeviceContext->VSSetConstantBuffers(0, 1, &ConstantBuffer);
+    InDeviceContext->PSSetShader(PixelShader, nullptr, 0);
 
     // === 4. Draw ===
-    ctx->Draw((UINT)CpuIndices.size(), 0);
+    InDeviceContext->DrawIndexed((UINT)CpuIndices.size(), 0, 0);
 }
 
 void ULineBatcherManager::LoadSettings(const char* iniPath)
@@ -201,6 +255,8 @@ void ULineBatcherManager::SaveSettings(const char* iniPath)
     sprintf_s(buf, "%f", GridSpacing);
     WritePrivateProfileStringA("Grid", "Spacing", buf, iniPath);
 }
+
+
 
 
 //gLine.BeginFrame();
