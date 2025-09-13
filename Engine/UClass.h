@@ -3,93 +3,96 @@
 #include "FDynamicBitset.h"
 #include "json.hpp"
 #include "UObject.h"
+#include "FName.h"
 #include <memory>
 
 class UClass
 {
 private:
-	static inline TArray<TUniquePtr<UClass>> classList;
-	static inline TMap<FString, uint32> nameToId;
-	static inline TMap<FString, uint32> displayNameToId;
+	static inline TMap<FName, TUniquePtr<UClass>> classList;
+	//static inline TMap<FString, uint32> nameToId;
+	// DisplayName은 typeName을 나타내는 사용자 정의 메타데이터다.
+	static inline TMap<FName, FName> TypeNameToId;
 	static inline uint32 registeredCount = 0;
 
-	TMap<FString, FString> metadata;
+	TMap<FName, FName> metadata;
 	uint32 typeId;
 	FDynamicBitset typeBitset;
-	FString className, superClassTypeName;
+	FName className, superClassTypeName;
 	UClass* superClass;
 	TFunction<UObject* ()> createFunction;
 	bool processed = false;
 public:
-	static UClass* RegisterToFactory(const FString& typeName,
-		const TFunction<UObject* ()>& createFunction, const FString& superClassTypeName);
+	static UClass* RegisterToFactory(const FName& typeName,
+		const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName);
 
 	static void ResolveTypeBitsets();
 	void ResolveTypeBitset(UClass* classPtr);
 
-	static UClass* GetClass(uint32 typeId)
+	static UClass* FindClass(const FName& Name)
 	{
-		return (typeId < classList.size()) ? classList[typeId].get() : nullptr;
+		FName key(Name);
+
+		if (classList.count(Name))
+			return classList[Name].get();
+		else
+			return nullptr;
 	}
 
-	static UClass* FindClass(const FString& name)
+	static UClass* FindClassWithTypeName(const FString& Name)
 	{
-		auto it = nameToId.find(name);
-		return (it != nameToId.end()) ? GetClass(it->second) : nullptr;
-	}
+		if (!TypeNameToId.count(Name))
+			return nullptr;
 
-	static UClass* FindClassWithDisplayName(const FString& name)
-	{
-		// 1) DisplayName lookup
-		auto it = displayNameToId.find(name);
-		if (it != displayNameToId.end())
-			return GetClass(it->second);
-
-		// 2) className fallback
-		it = nameToId.find(name);
-		return (it != nameToId.end()) ? GetClass(it->second) : nullptr;
+		const FName& Key = TypeNameToId[Name];
+		return FindClass(Key);
 	}
 
 
-	static const TArray<TUniquePtr<UClass>>& GetClassList()
+	static const TMap<FName, TUniquePtr<UClass>>& GetClassPool()
 	{
 		return classList;
 	}
+
+	UClass();
 
 	bool IsChildOrSelfOf(UClass* baseClass) const
 	{
 		return baseClass && typeBitset.Test(baseClass->typeId);
 	}
 
-	const FString& GetUClassName() const { return className; }
+	FName GetUClassName() const { return className; }
 
-	const FString& GetDisplayName() const
+	FName GetTypeName() const
 	{
-		auto itr = metadata.find("DisplayName");
-		if (itr != metadata.end())
-		{
-			return itr->second;
-		}
+		FString Name = GetMeta("TypeName");
+		if (Name == "")
+			return GetUClassName();
 
-		return GetUClassName();
+		return Name;
 	}
 
 	void SetMeta(const FString& key, const FString& value)
 	{
 		metadata[key] = value;
 
-		if (key == "DisplayName")
+		if (key == "TypeName")
 		{
-			displayNameToId[value] = typeId;  // typeId는 인스턴스 멤버
+			TypeNameToId[value] = className;  // typeId는 인스턴스 멤버
 		}
 	}
 
 
-	const FString& GetMeta(const FString& key) const
+	FName GetMeta(const FString& key) const
 	{
-		static FString empty;
-		auto it = metadata.find(key);
-		return (it != metadata.end()) ? it->second : empty;
+		try
+		{
+			return metadata.at(FName(key));
+		}
+		catch (const std::out_of_range&)
+		{
+			return FString("");
+		}
 	}
 
 	UObject* CreateDefaultObject() const

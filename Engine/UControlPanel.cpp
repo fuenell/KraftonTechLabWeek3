@@ -26,17 +26,18 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, ULineBatcherManager* InLineBatcherManager)
 	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager), LineBatcherManager(InLineBatcherManager)
 {
-	for (const auto& registeredType : UClass::GetClassList())
+	for (const auto& Pair : UClass::GetClassPool())
 	{
+		UClass* registeredType = Pair.second.get();
 		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
 			continue;
 
-		FString displayName = registeredType->GetMeta("DisplayName");
-		if (displayName.empty())
+		FString TypeName = registeredType->GetMeta("TypeName");
+		if (TypeName.empty())
 			continue;
 
-		registeredTypes.push_back(registeredType.get());
-		choiceStrList.push_back(registeredType->GetMeta("DisplayName"));
+		registeredTypes.push_back(registeredType);
+		choiceStrList.push_back(registeredType->GetMeta("TypeName"));
 	}
 
 	for (const FString& str : choiceStrList)

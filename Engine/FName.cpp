@@ -10,7 +10,7 @@ TMap<FString, int32> FName::CaseSensitiveFNamesStringKey;
 TMap<int32, FString> FName::CaseSensitiveFNamesIndexKey;
 
 FName::FName(char* pStr)
-{	
+{
 	GetOrCreateName(FString(pStr));
 }
 
@@ -28,6 +28,13 @@ bool FName::operator==(const FName& Other) const
 {
 	return this->ComparisonIndex == Other.ComparisonIndex;
 }
+
+bool FName::operator!=(const FName& Other) const
+{
+	return this->ComparisonIndex != Other.ComparisonIndex;
+}
+
+FName::operator FString() const { return ToString(); }
 
 void FName::GetOrCreateName(FString String)
 {
@@ -52,11 +59,19 @@ void FName::GetOrCreateName(FString String)
 		CaseInsensitiveFNamesWithStringKey[String] = ComparisonIndexCount;
 		ComparisonIndex = ComparisonIndexCount;
 		CaseInsensitiveFNamesWithIndexKey[ComparisonIndex] = String;
-		ComparisonIndex++;
+		ComparisonIndexCount++;
 	}
 }
 
-FString FName::ToString()
+FString FName::ToString() const
 {
 	return CaseSensitiveFNamesIndexKey[DisplayIndex];
 }
+
+/*
+
+Fname name("unique!!");
+
+name = FName("unique!!");
+
+*/

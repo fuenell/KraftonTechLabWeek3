@@ -1,36 +1,44 @@
 ﻿#include "stdafx.h"
 
-UClass* UClass::RegisterToFactory(const FString& typeName, const TFunction<UObject* ()>& createFunction, const FString& superClassTypeName)
+UClass::UClass() : className(""), superClassTypeName("") {}
+
+UClass* UClass::RegisterToFactory(const FName& typeName, const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName)
 {
 	TUniquePtr<UClass> classType = MakeUnique<UClass>();
 
-	classType->typeId = registeredCount++;
+	//classType->typeId = registeredCount++;
 	classType->className = typeName;
 	classType->superClassTypeName = superClassTypeName;
 	classType->createFunction = createFunction;
 
-	nameToId[typeName] = classType->typeId;
+
+	//nameToId[typeName] = classType->typeId;
 
 	UClass* rawPtr = classType.get();
-	classList.push_back(std::move(classType));
+	classList[classType->className] = std::move(classType);
 	return rawPtr;
 }
 
+
 void UClass::ResolveTypeBitsets()
 {
-	for (const TUniquePtr<UClass>& _class : classList)
+	for (std::pair<const FName, TUniquePtr<UClass>> &_class : classList)
 	{
-		if (!_class->superClassTypeName.empty())
-		{
-			auto it = nameToId.find(_class->superClassTypeName);
-			_class->superClass = (it != nameToId.end()) ? classList[it->second].get() : nullptr;
+		const FName& Name = _class.first;
+		UClass* Object = _class.second.get();
+
+		if (Object->superClassTypeName != FName(""))
+		{			
+			Object->superClass = FindClass(Object->superClassTypeName);
 		}
 	}
-	for (const TUniquePtr<UClass>& _class : classList)
+	for (std::pair<const FName, TUniquePtr<UClass>>& _class : classList)
 	{
-		if (_class->processed) continue;
+		UClass* Object = _class.second.get();
 
-		_class->ResolveTypeBitset(_class.get());
+		if (Object->processed) continue;
+
+		Object->ResolveTypeBitset(Object);
 	}
 }
 

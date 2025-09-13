@@ -13,7 +13,7 @@ private: \
 #define IMPLEMENT_ROOT_UCLASS(ClassName) \
 UObject* ClassName::CreateInstance() { return new ClassName(); } \
 UClass* ClassName::s_StaticClass = UClass::RegisterToFactory( \
-    #ClassName, &ClassName::CreateInstance, ""); \
+    FName(#ClassName), &ClassName::CreateInstance, FName("")); \
 UClass* ClassName::StaticClass() { return s_StaticClass; } \
 UClass* ClassName::GetClass() const { return StaticClass(); }
 
@@ -29,7 +29,7 @@ private: \
 #define IMPLEMENT_UCLASS(ClassName, ParentClass) \
 UObject* ClassName::CreateInstance() { return new ClassName(); } \
 UClass* ClassName::s_StaticClass = UClass::RegisterToFactory( \
-    #ClassName, &ClassName::CreateInstance, #ParentClass); \
+    FName(#ClassName), &ClassName::CreateInstance, FName(#ParentClass)); \
 UClass* ClassName::StaticClass() { return s_StaticClass; } \
 UClass* ClassName::GetClass() const { return StaticClass(); }
 
