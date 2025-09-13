@@ -17,6 +17,12 @@ public:
 
 	}
 
+	~USceneManagerWindow()
+	{
+		SceneManager = nullptr;
+		Target = nullptr;
+	}
+
 	void SetTarget(USceneComponent* target)
 	{
 		Target = target;

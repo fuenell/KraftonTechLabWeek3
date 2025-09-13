@@ -70,16 +70,3 @@ namespace Engine
 {
 	// Common engine types and utilities can go here
 }
-
-struct FBounds {
-	FVector Min;
-	FVector Max;
-};
-
-enum class PrimitiveType
-{
-	Sphere,
-	Cube,
-	Plane,
-	End
-};

@@ -9,9 +9,9 @@
 #include "UGizmoArrowComp.h"
 #include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
-
-
-
+#include "USphereComp.h"
+#include "UCubeComp.h"
+#include "UPlaneComp.h"
 
 void EditorApplication::Update(float deltaTime)
 {
@@ -140,38 +140,47 @@ void EditorApplication::ProcessMouseInteraction()
 
 void EditorApplication::Render()
 {
+	// 씬의 오브젝트 모두 그리기
 	GetSceneManager().GetScene()->Render();
-	
+
+	// 기즈모 그리기
+	gizmoManager.Draw(GetRenderer());
+
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Batch Rendering
 	// 여기서 라인들 초기화
 	LineBatcherManager.BeginFrame();
-	gizmoManager.Draw(GetRenderer());
-
-	const FMatrix View = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
-	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
-
 
 	// 1) aabb 쌓기 : 메쉬에 저장된 기본 bounds를 가져온다
 	UPrimitiveComponent* PickedPrimitive = gizmoManager.GetTarget();
-	
+
 	// 픽 된 메쉬가 존재할때만
 	if (PickedPrimitive != nullptr)
 	{
 		UMesh* Mesh = PickedPrimitive->GetMesh();
-		const FBounds& LocalBounds = Mesh->GetLocalBounds();
-		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
-		FBounds WorldBounds;
+		if (Mesh == nullptr)
+		{
+			return; // 처리할 메쉬나 정점이 없으면 종료
+		}
 
-		if (PrimitiveType::Sphere == PickedPrimitive->GetType())
+		FBounds WorldBounds;
+		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
+
+		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
 			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
 		}
+		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
+		{
+			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
+		}
 		else
 		{
-			ULineBatcherManager::LocalAABBtoWorldAABB(LocalBounds, WorldMatrix, WorldBounds);
+			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
+			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		}
-		
+
 		LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
 	}
 
@@ -184,13 +193,13 @@ void EditorApplication::Render()
 	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
 
 
+	const FMatrix View = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
+	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
 
-
-	
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	
+
 }
 
 void EditorApplication::RenderGUI()

@@ -63,12 +63,15 @@ struct FVertexPosColor4
 		return newVertices;
 	}
 
-	FVector GetPosition()
+	const FVector GetPosition()
 	{
-		return {x, y, z};
+		return { x, y, z };
 	}
 
+	void SetPosition(FVector Position)
+	{
+		x = Position.X;
+		y = Position.Y;
+		z = Position.Z;
+	}
 };
-
-
-
