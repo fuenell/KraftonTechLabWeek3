@@ -188,6 +188,10 @@ void EditorApplication::Render()
 	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
 
 	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
+
+
+
+
 	
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
