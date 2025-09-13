@@ -94,6 +94,10 @@ bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int
 	{
 		return false;
 	}
+	if (!BillBoardManager.Initialize(renderer.GetDevice()))
+	{
+		return false;
+	}
 
 	// 여기서 일단은 그리드 렌더링에 필요한 vb, ib ,cb, vs, ps, ia 설정
 	// 추후 수정예정 why? => 아직은 그리드만 구현했기 때문 

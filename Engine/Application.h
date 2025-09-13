@@ -9,6 +9,7 @@
 #include "USceneManager.h"
 #include "UGizmoManager.h"
 #include "ULineBatcherManager.h"
+#include "BillBoardManager.h"
 
 class Application
 {
@@ -23,6 +24,7 @@ protected:
 	USceneManager sceneManager;
 	URaycastManager raycastManager;
 	ULineBatcherManager LineBatcherManager;
+	BillBoardManager BillBoardManager;
 
 	// Application state
 	bool bIsRunning;

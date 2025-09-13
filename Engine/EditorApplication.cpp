@@ -186,7 +186,8 @@ void EditorApplication::Render()
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	
+	BillBoardManager.Bind(DeviceContext);
+	BillBoardManager.Render(DeviceContext);
 }
 
 void EditorApplication::RenderGUI()

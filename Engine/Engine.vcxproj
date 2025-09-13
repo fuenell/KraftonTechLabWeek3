@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BillBoardManager.cpp" />
     <ClCompile Include="FName.cpp" />
     <ClCompile Include="GizmoVertices.cpp" />
     <ClCompile Include="ImGuiWindowWrapper.cpp" />
@@ -234,6 +235,7 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BillBoardManager.h" />
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="FDynamicBitset.h" />
     <ClInclude Include="FName.h" />
@@ -294,6 +296,9 @@
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BillBoard.ps">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="ShaderW0.ps">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -308,6 +313,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="BillBoard.vs">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="ShaderLine.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
