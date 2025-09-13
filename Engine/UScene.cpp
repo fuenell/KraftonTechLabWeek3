@@ -115,7 +115,7 @@ bool UScene::Deserialize(const json::JSON& data)
 		uint32 uuid = stoi(primitiveJson.first);
 		json::JSON _data = primitiveJson.second;
 
-		UClass* _class = UClass::FindClassWithDisplayName(_data.at("Type").ToString());
+		UClass* _class = UClass::FindClassWithTypeName(_data.at("Type").ToString());
 		USceneComponent* component = nullptr;
 		if (_class != nullptr) component = _class->CreateDefaultObject()->Cast<USceneComponent>();
 

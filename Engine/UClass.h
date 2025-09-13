@@ -12,7 +12,7 @@ private:
 	static inline TMap<FName, TUniquePtr<UClass>> classList;
 	//static inline TMap<FString, uint32> nameToId;
 	// DisplayName은 typeName을 나타내는 사용자 정의 메타데이터다.
-	static inline TMap<FName, FName> displayNameToId;
+	static inline TMap<FName, FName> TypeNameToId;
 	static inline uint32 registeredCount = 0;
 
 	TMap<FName, FName> metadata;
@@ -29,22 +29,9 @@ public:
 	static void ResolveTypeBitsets();
 	void ResolveTypeBitset(UClass* classPtr);
 
-	/*static UClass* GetClass(uint32 typeId)
-	{
-		return (typeId < classList.size()) ? classList[typeId].get() : nullptr;
-	}*/
-
 	static UClass* FindClass(const FName& Name)
 	{
 		FName key(Name);
-
-		/*for (const TUniquePtr<UClass>& Class : classList)
-		{
-			if (key == Class.get()->className)
-				return Class.get();
-		}
-
-		return nullptr;*/
 
 		if (classList.count(Name))
 			return classList[Name].get();
@@ -52,20 +39,12 @@ public:
 			return nullptr;
 	}
 
-	static UClass* FindClassWithDisplayName(const FString& Name)
+	static UClass* FindClassWithTypeName(const FString& Name)
 	{
-		//// 1) DisplayName lookup
-		//auto it = displayNameToId.find(name);
-		//if (it != displayNameToId.end())
-		//	return GetClass(it->second);
-
-		//// 2) className fallback
-		//return FindClass(name);
-
-		if (!displayNameToId.count(Name))
+		if (!TypeNameToId.count(Name))
 			return nullptr;
-		
-		const FName& Key = displayNameToId[Name];
+
+		const FName& Key = TypeNameToId[Name];
 		return FindClass(Key);
 	}
 
@@ -79,30 +58,14 @@ public:
 
 	bool IsChildOrSelfOf(UClass* baseClass) const
 	{
-		/*FName Parent = superClassTypeName;
-		FName Child = className;
-
-		UClass* Temp = superClass;
-
-		while (className != baseClass->className)
-		{
-			if (Temp->className == baseClass->className) {
-				return true;
-			}
-
-			Temp = superClass->superClass;
-		}
-
-		return false;*/
-
 		return baseClass && typeBitset.Test(baseClass->typeId);
 	}
 
 	FName GetUClassName() const { return className; }
 
-	FName GetDisplayName() const
+	FName GetTypeName() const
 	{
-		FString Name = GetMeta("DIsplayName");
+		FString Name = GetMeta("TypeName");
 		if (Name == "")
 			return GetUClassName();
 
@@ -113,19 +76,21 @@ public:
 	{
 		metadata[key] = value;
 
-		if (key == "DisplayName")
+		if (key == "TypeName")
 		{
-			displayNameToId[value] = className;  // typeId는 인스턴스 멤버
+			TypeNameToId[value] = className;  // typeId는 인스턴스 멤버
 		}
 	}
 
 
 	FName GetMeta(const FString& key) const
 	{
-		try {
+		try
+		{
 			return metadata.at(FName(key));
 		}
-		catch (const std::out_of_range&) {
+		catch (const std::out_of_range&)
+		{
 			return FString("");
 		}
 	}

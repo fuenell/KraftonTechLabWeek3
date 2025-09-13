@@ -31,12 +31,12 @@ UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoMa
 		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
 			continue;
 
-		FString displayName = registeredType->GetMeta("DisplayName");
-		if (displayName.empty())
+		FString TypeName = registeredType->GetMeta("TypeName");
+		if (TypeName.empty())
 			continue;
 
 		registeredTypes.push_back(registeredType);
-		choiceStrList.push_back(registeredType->GetMeta("DisplayName"));
+		choiceStrList.push_back(registeredType->GetMeta("TypeName"));
 	}
 
 	for (const FString& str : choiceStrList)
