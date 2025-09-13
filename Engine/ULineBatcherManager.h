@@ -36,7 +36,7 @@ public:
     void Render(ID3D11DeviceContext* InDeviecContext, const FMatrix& View, const FMatrix& Proj);
 
 
-    static void LocalAABBtoWorldAABB(const FBounds& L, const FMatrix& M, FBounds& Out)
+    static void LocalAABBtoWorldAABB(const FBounds& L, const FMatrix& InMatrix, FBounds& Out)
     {
         //// 1) center / extents
         //const FVector c = (L.Min + L.Max) * 0.5f;
@@ -62,12 +62,12 @@ public:
         const FVector c = (L.Min + L.Max) * 0.5f;
         const FVector e = (L.Max - L.Min) * 0.5f;
 
-        const FVector cw = M.TransformPointRow(c);
+        const FVector cw = InMatrix.TransformPointRow(c);
 
         // 열 0,1,2를 사용 (row-vector 규약)
-        const float m00 = M.M[0][0], m10 = M.M[1][0], m20 = M.M[2][0];
-        const float m01 = M.M[0][1], m11 = M.M[1][1], m21 = M.M[2][1];
-        const float m02 = M.M[0][2], m12 = M.M[1][2], m22 = M.M[2][2];
+        const float m00 = InMatrix.M[0][0], m10 = InMatrix.M[1][0], m20 = InMatrix.M[2][0];
+        const float m01 = InMatrix.M[0][1], m11 = InMatrix.M[1][1], m21 = InMatrix.M[2][1];
+        const float m02 = InMatrix.M[0][2], m12 = InMatrix.M[1][2], m22 = InMatrix.M[2][2];
 
         FVector ew;
         ew.X = fabsf(m00) * e.X + fabsf(m10) * e.Y + fabsf(m20) * e.Z;
