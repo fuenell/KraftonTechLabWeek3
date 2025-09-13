@@ -80,7 +80,7 @@ public:
     static void LocalSphereToWorldAABB(const FVector& InSphereLocation, const FMatrix& InMatrix, FBounds& Out)
     {
         // 1) 중심 이동(평행이동 포함)
-        const FVector cw = InMatrix.TransformPointRow(InSphereLocation);
+        const FVector cw = InSphereLocation;
 
         // 2) 선형부의 열(column) L2 노름 * r  => 축별 엑스텐트
         const float m00 = InMatrix.M[0][0], m10 = InMatrix.M[1][0], m20 = InMatrix.M[2][0]; // col 0
