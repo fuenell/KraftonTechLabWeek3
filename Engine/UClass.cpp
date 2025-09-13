@@ -19,16 +19,15 @@ UClass* UClass::RegisterToFactory(const FName& typeName, const TFunction<UObject
 	return rawPtr;
 }
 
-
 void UClass::ResolveTypeBitsets()
 {
-	for (std::pair<const FName, TUniquePtr<UClass>> &_class : classList)
+	for (std::pair<const FName, TUniquePtr<UClass>>& _class : classList)
 	{
 		const FName& Name = _class.first;
 		UClass* Object = _class.second.get();
 
 		if (Object->superClassTypeName != FName(""))
-		{			
+		{
 			Object->superClass = FindClass(Object->superClassTypeName);
 		}
 	}

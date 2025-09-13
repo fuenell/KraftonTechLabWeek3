@@ -184,6 +184,9 @@
     <ClCompile Include="ImguiConsole.cpp">
       <Filter>IMGUI</Filter>
     </ClCompile>
+    <ClCompile Include="USceneManagerWindow.cpp">
+      <Filter>Engine\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -357,6 +360,9 @@
     </ClInclude>
     <ClInclude Include="UPlaneComp.h">
       <Filter>Engine\Core\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="USceneManagerWindow.h">
+      <Filter>Engine\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

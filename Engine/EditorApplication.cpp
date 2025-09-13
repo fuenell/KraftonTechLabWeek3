@@ -99,43 +99,37 @@ void EditorApplication::ProcessMouseInteraction()
 			// 1. 기즈모에 대한 피킹을 먼저 시도합니다.
 			if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), gizmos, hitGizmo, outImpactPoint))
 			{
-				if (auto target = gizmoManager.GetTarget())
+				hitGizmo->bIsSelected = true;
+				FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
+
+				// 히트된 기즈모의 종류에 따라 적절한 드래그를 시작합니다.
+				if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
 				{
-					target->bIsSelected = true;
-					hitGizmo->bIsSelected = true;
-					FRay ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
-
-					// 히트된 기즈모의 종류에 따라 적절한 드래그를 시작합니다.
-					if (UGizmoArrowComp* arrow = hitGizmo->Cast<UGizmoArrowComp>())
-					{
-						gizmoManager.BeginDrag(ray, arrow->Axis, outImpactPoint, GetSceneManager().GetScene());
-					}
-					else if (UGizmoRotationHandleComp* rotationHandle = hitGizmo->Cast<UGizmoRotationHandleComp>())
-					{
-						gizmoManager.BeginDrag(ray, rotationHandle->Axis, outImpactPoint, GetSceneManager().GetScene());
-					}
-					else if (UGizmoScaleHandleComp* scaleHandle = hitGizmo->Cast<UGizmoScaleHandleComp>())
-					{
-						gizmoManager.BeginDrag(ray, scaleHandle->Axis, outImpactPoint, GetSceneManager().GetScene());
-					}
-
-					if (target->IsManageable())
-						propertyWindow->SetTarget(target);
+					gizmoManager.BeginDrag(ray, arrow->Axis, outImpactPoint, GetSceneManager().GetScene());
+				}
+				else if (UGizmoRotationHandleComp* rotationHandle = hitGizmo->Cast<UGizmoRotationHandleComp>())
+				{
+					gizmoManager.BeginDrag(ray, rotationHandle->Axis, outImpactPoint, GetSceneManager().GetScene());
+				}
+				else if (UGizmoScaleHandleComp* scaleHandle = hitGizmo->Cast<UGizmoScaleHandleComp>())
+				{
+					gizmoManager.BeginDrag(ray, scaleHandle->Axis, outImpactPoint, GetSceneManager().GetScene());
 				}
 			}
 			// 2. 기즈모가 아니라면, 일반 오브젝트에 대한 피킹을 시도합니다.
 			else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), primitives, hitPrimitive, outImpactPoint))
 			{
-				gizmoManager.SetTarget(hitPrimitive);
 				hitPrimitive->bIsSelected = true;
+
 				if (hitPrimitive->IsManageable())
-					propertyWindow->SetTarget(hitPrimitive);
+				{
+					SetTarget(hitPrimitive);
+				}
 			}
 			// 3. 아무것도 피킹되지 않았다면 모든 선택을 해제합니다.
 			else
 			{
-				gizmoManager.SetTarget(nullptr);
-				propertyWindow->SetTarget(nullptr);
+				SetTarget(nullptr);
 			}
 		}
 	}
@@ -144,7 +138,7 @@ void EditorApplication::ProcessMouseInteraction()
 void EditorApplication::Render()
 {
 	GetSceneManager().GetScene()->Render();
-	
+
 	gizmoManager.Draw(GetRenderer());
 }
 
@@ -152,6 +146,7 @@ void EditorApplication::RenderGUI()
 {
 	controlPanel->Render();
 	propertyWindow->Render();
+	SceneManagerWindow->Render();
 
 	ImGui::SetNextWindowPos(ImVec2(0, 500));         // Fixed position (x=20, y=20)
 	ImGui::SetNextWindowSize(ImVec2(275, 75));      // Fixed size (width=300, height=100)
@@ -177,6 +172,12 @@ bool EditorApplication::OnInitialize()
 
 	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager);
 	propertyWindow = new USceneComponentPropertyWindow();
+	SceneManagerWindow = new USceneManagerWindow(
+		&GetSceneManager(),
+		[this](UPrimitiveComponent* UTemp)
+		{
+			SetTarget(UTemp);
+		});
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))
 	{
@@ -211,7 +212,14 @@ UScene* EditorApplication::CreateDefaultScene()
 
 void EditorApplication::OnSceneChange()
 {
-	propertyWindow->SetTarget(nullptr);
+	SetTarget(nullptr);
+
 	gizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
-	gizmoManager.SetTarget(nullptr);
+}
+
+void EditorApplication::SetTarget(UPrimitiveComponent* Target)
+{
+	propertyWindow->SetTarget(Target);
+	SceneManagerWindow->SetTarget(Target);
+	gizmoManager.SetTarget(Target);
 }
