@@ -10,7 +10,7 @@ TMap<FString, int32> FName::CaseSensitiveFNamesStringKey;
 TMap<int32, FString> FName::CaseSensitiveFNamesIndexKey;
 
 FName::FName(char* pStr)
-{	
+{
 	GetOrCreateName(FString(pStr));
 }
 
@@ -57,7 +57,7 @@ void FName::GetOrCreateName(FString String)
 		CaseInsensitiveFNamesWithStringKey[String] = ComparisonIndexCount;
 		ComparisonIndex = ComparisonIndexCount;
 		CaseInsensitiveFNamesWithIndexKey[ComparisonIndex] = String;
-		ComparisonIndex++;
+		ComparisonIndexCount++;
 	}
 }
 
