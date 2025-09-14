@@ -216,7 +216,10 @@ void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMa
     CpuVertices.push_back({ InLightPosition.X, InLightPosition.Y, InLightPosition.Z, PackedColor });
     //CpuIndices.push_back(base);
 
-
+    // 각도 디버그용 
+    UE_LOG("USpotLightComponent angle : %f", InAngle);
+    UE_LOG("USpotLightComponent tan : %f", tanf(InAngle * DegreeToRadian));
+ 
     // 여기서 계산식 토대로 라인들을 넣음
     for (int32_t i = 0; i < 360; ++i)
     {
