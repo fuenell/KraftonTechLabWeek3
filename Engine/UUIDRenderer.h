@@ -10,7 +10,8 @@ public:
 	// BillBoard를 그리기 위해 필요한 자원들을 생성
 	bool Initialize(ID3D11Device* Device);
 	// 버퍼 생성
-	void SetUUIDVertices(
+	// BillBoard가 카메라 뒤에 있으면 false 반환
+	bool SetUUIDVertices(
 		ID3D11Device* Device,
 		float AspectRatio,
 		uint32 UUID,
