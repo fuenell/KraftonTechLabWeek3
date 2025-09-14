@@ -7,11 +7,11 @@
 
 struct FVertexPosColor4; // 전방 선언
 
-struct FBounds
-{
-	FVector Min;
-	FVector Max;
-};
+//struct FBounds
+//{
+//	FVector Min;
+//	FVector Max;
+//};
 
 class UMesh : public UObject
 {

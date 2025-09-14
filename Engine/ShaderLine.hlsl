@@ -20,12 +20,12 @@ struct VS_OUT
     float4 Color : COLOR0;
 };
 
-float4 UnpackABGR(uint c)
+float4 UnpackRGBA(uint c)
 {
-    float r = (c & 255) / 255.0;
-    float g = ((c >> 8) & 255) / 255.0;
-    float b = ((c >> 16) & 255) / 255.0;
-    float a = ((c >> 24) & 255) / 255.0;
+    float a = (c & 255) / 255.0;
+    float b = ((c >> 8) & 255) / 255.0;
+    float g = ((c >> 16) & 255) / 255.0;
+    float r = ((c >> 24) & 255) / 255.0;
     return float4(r, g, b, a);
 }
 
@@ -35,7 +35,7 @@ VS_OUT VSmain(VS_IN input)
     float4 wp = float4(input.Pos, 1.0);
     float4 vp = mul(wp, View); // row-vector
     o.SvPos = mul(vp, Proj);
-    o.Color = UnpackABGR(input.Color);
+    o.Color = UnpackRGBA(input.Color);
     return o;
 }
 

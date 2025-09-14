@@ -34,6 +34,10 @@ private:
 	// Constant buffer
 	ID3D11Buffer* constantBuffer;
 
+
+	// blendstate buffer
+	ID3D11BlendState* BlendState;
+
 	// Viewport
 	D3D11_VIEWPORT viewport;
 	D3D11_VIEWPORT currentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
@@ -58,6 +62,7 @@ public:
 	bool Initialize(HWND windowHandle);
 	bool CreateShader();
 	bool CreateRasterizerState();
+	bool CreateBlendState();
 	bool CreateConstantBuffer();
 	void Release();
 	void ReleaseShader();

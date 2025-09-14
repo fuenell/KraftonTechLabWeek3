@@ -69,6 +69,15 @@ bool URenderer::Initialize(HWND windowHandle)
 		return false;
 	}
 
+	if (!CreateBlendState())
+	{
+		LogError("CreateBlendState", E_FAIL);
+		return false;
+	}
+
+
+	
+
 	bIsInitialized = true;
 	return true;
 }
@@ -169,6 +178,23 @@ bool URenderer::CreateShader()
 	SAFE_RELEASE(psBlob);
 
 	return CheckResult(hr, "CreatePixelShader");
+}
+
+bool URenderer::CreateBlendState()
+{
+	D3D11_BLEND_DESC bd = {};
+	auto& rt = bd.RenderTarget[0];
+	rt.BlendEnable = TRUE;
+	rt.SrcBlend = D3D11_BLEND_SRC_ALPHA;      // 스트레이트 알파
+	rt.DestBlend = D3D11_BLEND_INV_SRC_ALPHA;  // (프리멀티면 ONE / INV_SRC_ALPHA)
+	rt.BlendOp = D3D11_BLEND_OP_ADD;
+	rt.SrcBlendAlpha = D3D11_BLEND_ONE;
+	rt.DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
+	rt.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	rt.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+	HRESULT hr = device->CreateBlendState(&bd, &BlendState);
+	return CheckResult(hr, "CreateBlendState");
 }
 
 bool URenderer::CreateRasterizerState()
@@ -425,6 +451,9 @@ void URenderer::Prepare()
 	if (!deviceContext)
 		return;
 
+	float BlendFactor[4] = { 0, 0, 0, 0 };
+	deviceContext->OMSetBlendState(BlendState, BlendFactor, 0xffffffff);
+
 	// Set render target and depth stencil view
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
@@ -439,6 +468,8 @@ void URenderer::PrepareShader()
 {
 	if (!deviceContext)
 		return;
+
+
 
 	// Set shaders
 	deviceContext->VSSetShader(vertexShader, nullptr, 0);

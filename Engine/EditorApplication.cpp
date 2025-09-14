@@ -12,6 +12,7 @@
 #include "USphereComp.h"
 #include "UCubeComp.h"
 #include "UPlaneComp.h"
+#include "USpotLightComponent.h"
 
 void EditorApplication::Update(float deltaTime)
 {
@@ -169,30 +170,32 @@ void EditorApplication::Render()
 
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
-			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
-			LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
+			//ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
+			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			//LineBatcherManager.AddBoundingBox(WorldBounds, 0x00FFFFFF);
 		}
-		else if (PrimitiveType::SpotLight == PickedPrimitive->GetType())
+		else if (PickedPrimitive->GetClass() == USpotLightComponent::StaticClass())
 		{
+			//ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
 			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), 15, 3);
 		}
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{
-			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
+			//ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
 		}
 		else
 		{
 			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
 			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		}
-
-		LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
+		WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
+		LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 	}
 
 	// 2) 그리드 쌓기 (원하는 색/간격/개수)
 	const int GridCount = 100;
-	const uint32_t ColMain = 0x40AAAAAA; // ABGR
-	const uint32_t ColAxis = 0x80FFFFFF;
+	const uint32_t ColMain = 0xFFFFFF60; // RGBA
+	const uint32_t ColAxis = 0xFFFFFFFF;
 	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
 
 	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();

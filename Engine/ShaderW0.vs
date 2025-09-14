@@ -27,6 +27,7 @@ VS_OUTPUT main(VS_INPUT input)
         baseColor.rgb = baseColor.rgb + 0.25f;
     }
     
+
     output.Color = baseColor * MeshColor;
 
     float4 wpos = float4(input.Position.xyz, 1.0f);

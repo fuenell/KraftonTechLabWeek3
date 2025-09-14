@@ -136,8 +136,8 @@ void ULineBatcherManager::AddGrid(float InSpacing, int InCount, uint32_t InColor
 {
     // ABGR(0xAABBGGRR) 기준
     const uint32_t Red = 0xFF0000FF; // X축
-    const uint32_t Green = 0xFF00FF00; // Y축
-    const uint32_t Blue = 0xFFFF0000; // Z축
+    const uint32_t Green = 0x00FF00FF; // Y축
+    const uint32_t Blue = 0x0000FFFF; // Z축
 
     // 그리드
 
@@ -159,8 +159,7 @@ void ULineBatcherManager::AddGrid(float InSpacing, int InCount, uint32_t InColor
     AddLine({ 0.0f, 0.0f, -Ext }, { 0.0f, 0.0f,  Ext }, Blue);
 
     // spotlight
-
-
+     
     // bounding box
 
 }
@@ -198,7 +197,7 @@ void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMa
 
 
 
-    const uint32_t InColor = 0x40AAAAAA;
+    const uint32_t InColor = 0xFFFFFF80;
 
 
     //우선 시작점 (location)을 버텍스에 넣음 
