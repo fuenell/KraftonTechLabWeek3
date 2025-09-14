@@ -147,7 +147,8 @@ void EditorApplication::Render()
 	const FMatrix View = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
 	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
 
-	GetSceneManager().GetScene()->Render();
+	if (ShowPrimitives == EEngineShowFlags::SF_Primitives)
+		GetSceneManager().GetScene()->Render();
 
 	// 기즈모 그리기
 	gizmoManager.Draw(GetRenderer());
@@ -197,17 +198,20 @@ void EditorApplication::Render()
 		WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 
-		UUIDRenderer.SetUUIDVertices(
-			Device,
-			(float)windowWidth / (float)windowHeight,
-			PickedPrimitive->UUID,
-			0.05f,
-			PickedPrimitive->GetScale().Z,
-			WorldMatrix,
-			View,
-			Proj);
-		UUIDRenderer.Bind(DeviceContext);
-		UUIDRenderer.Render(DeviceContext);
+		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
+		{
+			UUIDRenderer.SetUUIDVertices(
+				Device,
+				(float)windowWidth / (float)windowHeight,
+				PickedPrimitive->UUID,
+				0.05f,
+				PickedPrimitive->GetScale().Z,
+				WorldMatrix,
+				View,
+				Proj);
+			UUIDRenderer.Bind(DeviceContext);
+			UUIDRenderer.Render(DeviceContext);
+		}
 	}
 
 	// 2) 그리드 쌓기 (원하는 색/간격/개수)
@@ -226,6 +230,7 @@ void EditorApplication::RenderGUI()
 	controlPanel->Render();
 	propertyWindow->Render();
 	SceneManagerWindow->Render();
+	ToggleWindow->Render();
 
 	ImGui::SetNextWindowPos(ImVec2(0, 500));         // Fixed position (x=20, y=20)
 	ImGui::SetNextWindowSize(ImVec2(275, 75));      // Fixed size (width=300, height=100)
@@ -257,6 +262,7 @@ bool EditorApplication::OnInitialize()
 		{
 			SetTarget(UTemp);
 		});
+	ToggleWindow = new UToggleWindow();
 
 	if (!gizmoManager.Initialize(&GetMeshManager()))
 	{

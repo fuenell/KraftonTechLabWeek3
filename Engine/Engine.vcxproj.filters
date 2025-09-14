@@ -189,6 +189,8 @@
     </ClCompile>
     <ClCompile Include="BillBoardManager.cpp" />
     <ClCompile Include="UUIDRenderer.cpp" />
+    <ClCompile Include="USpotLightComponent.cpp" />
+    <ClCompile Include="ToggleWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -368,6 +370,8 @@
     </ClInclude>
     <ClInclude Include="BillBoardManager.h" />
     <ClInclude Include="UUIDRenderer.h" />
+    <ClInclude Include="USpotLightComponent.h" />
+    <ClInclude Include="ToggleWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

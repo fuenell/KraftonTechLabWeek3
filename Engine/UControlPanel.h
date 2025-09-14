@@ -7,6 +7,7 @@
 
 class UControlPanel : public ImGuiWindowWrapper
 {
+private:
 	USceneManager* SceneManager;
 	UGizmoManager* GizmoManager;
 	ULineBatcherManager* LineBatcherManager;

@@ -6,6 +6,7 @@
 #include "UControlPanel.h"
 #include "USceneComponentPropertyWindow.h"
 #include "USceneManagerWindow.h"
+#include "ToggleWindow.h"
 
 class USceneManagerWindow;
 
@@ -19,9 +20,11 @@ public:
 		delete controlPanel;
 		delete propertyWindow;
 		delete SceneManagerWindow;
+		delete ToggleWindow;
 		controlPanel = nullptr;
 		propertyWindow = nullptr;
 		SceneManagerWindow = nullptr;
+		ToggleWindow = nullptr;
 	}
 	UScene* CreateDefaultScene() override;
 
@@ -48,4 +51,5 @@ private:
 	UControlPanel* controlPanel;
 	USceneComponentPropertyWindow* propertyWindow;
 	USceneManagerWindow* SceneManagerWindow;
+	UToggleWindow* ToggleWindow;
 };
