@@ -199,26 +199,26 @@ void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMa
 
     //const uint32_t InColor = 0xFFFFFF80;
     // 0~1 -> 0~255 반올림(클램프 없음)
-    auto To8 = [](float v)->uint32_t { return static_cast<uint32_t>(v * 255.0f + 0.5f); };
+    //auto To8 = [](float v)->uint32_t { return static_cast<uint32_t>(v * 255.0f + 0.5f); };
 
     // ABGR(0xAABBGGRR)로 패킹
-    const uint32_t R8 = To8(InColor.X);
-    const uint32_t G8 = To8(InColor.Y);
-    const uint32_t B8 = To8(InColor.Z);
-    const uint32_t A8 = 255; // 필요하면 인자로 받도록 변경
+    const uint32_t R8 = InColor.X;
+    const uint32_t G8 = InColor.Y;
+    const uint32_t B8 = InColor.Z;
+    const uint32_t A8 = InColor.W; // 필요하면 인자로 받도록 변경
 
     const uint32 PackedColor =
-        (uint32(A8) << 24) | (uint32(B8) << 16) | (uint32(G8) << 8) | uint32(R8);
+        (uint32(R8) << 24) | (uint32(G8) << 16) | (uint32(B8) << 8) | uint32(A8);
 
-
+    //UE_LOG("Packed Color R: %f  G : %f   B: %f  A: %f", InColor.X, InColor.Y, InColor.Z, InColor.W);
 
     //우선 시작점 (location)을 버텍스에 넣음 
     CpuVertices.push_back({ InLightPosition.X, InLightPosition.Y, InLightPosition.Z, PackedColor });
     //CpuIndices.push_back(base);
 
     // 각도 디버그용 
-    UE_LOG("USpotLightComponent angle : %f", InAngle);
-    UE_LOG("USpotLightComponent tan : %f", tanf(InAngle * DegreeToRadian));
+    //UE_LOG("USpotLightComponent angle : %f", InAngle);
+    //UE_LOG("USpotLightComponent tan : %f", tanf(InAngle * DegreeToRadian));
  
     // 여기서 계산식 토대로 라인들을 넣음
     for (int32_t i = 0; i < 360; ++i)

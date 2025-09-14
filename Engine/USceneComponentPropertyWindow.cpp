@@ -149,6 +149,8 @@ void USceneComponentPropertyWindow::RenderContent()
 				const uint32_t B = static_cast<uint32_t>(Col[2] * 255.0f + 0.5f);
 				const uint32_t A = static_cast<uint32_t>(Col[3] * 255.0f + 0.5f);
 
+				UE_LOG("Alpha value : %d ", A);
+
 				const FVector4 NewColor(R, G, B, A);
 				SpotLightComponent->SetColor(NewColor);
 			}
