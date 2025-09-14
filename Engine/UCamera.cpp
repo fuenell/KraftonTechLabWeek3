@@ -152,6 +152,16 @@ void UCamera::SetEulerXYZDeg(float rxDeg, float ryDeg, float rzDeg)
 	SetEulerXYZRad(rxDeg * DegreeToRadian, ryDeg * DegreeToRadian, rzDeg * DegreeToRadian);
 }
 
+float UCamera::GetSensitivity() const
+{
+	return Sensitivity;
+}
+
+void UCamera::SetSensitivity(float Sensitivity)
+{
+	this->Sensitivity = Sensitivity;
+}
+
 // ==== 내부 구현(private 함수들) ====
 
 // mRot로부터 mRight, mUp, mForward 갱신

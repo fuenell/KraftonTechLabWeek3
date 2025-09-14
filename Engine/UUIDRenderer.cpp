@@ -20,25 +20,13 @@ void UUIDRenderer::SetUUIDVertices(
 	FMatrix MVP = Modeling * View * Projection;
 	FMatrix MV = Modeling * View;
 
-	FString UUIDString = std::to_string(UUID);
-	OutputDebugStringA((UUIDString + "\n").c_str());
+	FString UUIDString = FString("UID : ") + std::to_string(UUID);
 
 	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
 	
-	/*FVector4 ObjectBoundary = MV.TransformVectorRow(ObjectCenter);
-	ObjectBoundary.Z += 0.5f * ModelScale;
-	ObjectBoundary = Projection.TransformVectorRow(ObjectBoundary);*/
-	
 	ObjectCenter = MVP.TransformVectorRow(ObjectCenter);
 
-	/*float CenterToBoundary =
-		(
-			(ObjectBoundary / ObjectBoundary.W) -
-			(ObjectCenter / ObjectCenter.W)
-		).Length();*/
-
 	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
-	/*RenderCenter.Y += CenterToBoundary;*/
 	
 	uint64 StringLen = UUIDString.size();
 	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSize * 0.5f * (1 / AspectRatio));

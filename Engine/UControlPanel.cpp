@@ -147,10 +147,12 @@ void UControlPanel::CameraManagementSection()
 	float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
 	FVector eulDeg = camera->GetEulerXYZDeg();
 	float eulerXYZ[3] = { eulDeg.X, eulDeg.Y, eulDeg.Z };
+	float CameraSensitivity = camera->GetSensitivity() * 200.0f;
 
 	// --- 테이블 UI ---
 	bool locCommitted = false;
 	bool rotCommitted = false;
+	bool sensCommitted = false;
 
 	bool isOrthogonal = camera->IsOrtho();
 	ImGui::Checkbox("Orthogonal", &isOrthogonal);
@@ -250,6 +252,17 @@ void UControlPanel::CameraManagementSection()
 
 		ImGui::EndTable();
 	}
+
+	ImGui::Text("Camera Sensitivity");
+
+	const float SensitivityMin = 0.1f;
+	const float SensitivityMax = 2.0f;
+	// DragFloat로 교체
+	if (ImGui::DragFloat("##sens",
+		&CameraSensitivity, 0.01f, SensitivityMin, SensitivityMax, "%.3f"))
+	{
+		sensCommitted = true; // 값이 바뀐 순간 바로 commit
+	}
 	// World / Local 선택 (체크박스 대신, 버튼처럼 보이는 상호배타 토글)
 
 	if (ModeButton("World", GizmoManager->GetIsWorldSpace()))
@@ -288,6 +301,11 @@ void UControlPanel::CameraManagementSection()
 	if (rotCommitted)
 	{
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
+	}
+	
+	if (sensCommitted)
+	{
+		camera->SetSensitivity(CameraSensitivity / 200.0f);
 	}
 }
 
