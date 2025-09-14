@@ -187,6 +187,8 @@
     <ClCompile Include="USceneManagerWindow.cpp">
       <Filter>Engine\UI</Filter>
     </ClCompile>
+    <ClCompile Include="BillBoardManager.cpp" />
+    <ClCompile Include="UUIDRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -364,6 +366,8 @@
     <ClInclude Include="USceneManagerWindow.h">
       <Filter>Engine\UI</Filter>
     </ClInclude>
+    <ClInclude Include="BillBoardManager.h" />
+    <ClInclude Include="UUIDRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
@@ -372,9 +376,15 @@
     <None Include="ShaderW0.vs">
       <Filter>Shader</Filter>
     </None>
+    <None Include="BillBoard.ps">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderLine.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="BillBoard.vs">
       <Filter>Shader</Filter>
     </FxCompile>
   </ItemGroup>

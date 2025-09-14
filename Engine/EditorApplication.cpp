@@ -141,7 +141,12 @@ void EditorApplication::ProcessMouseInteraction()
 
 void EditorApplication::Render()
 {
-	// 씬의 오브젝트 모두 그리기
+	ID3D11Device* Device = renderer.GetDevice();
+	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
+
+	const FMatrix View = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
+	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
+
 	GetSceneManager().GetScene()->Render();
 
 	// 기즈모 그리기
@@ -188,8 +193,21 @@ void EditorApplication::Render()
 			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
 			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		}
+
 		WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+
+		UUIDRenderer.SetUUIDVertices(
+			Device,
+			(float)windowWidth / (float)windowHeight,
+			PickedPrimitive->UUID,
+			0.05f,
+			PickedPrimitive->GetScale().Z,
+			WorldMatrix,
+			View,
+			Proj);
+		UUIDRenderer.Bind(DeviceContext);
+		UUIDRenderer.Render(DeviceContext);
 	}
 
 	// 2) 그리드 쌓기 (원하는 색/간격/개수)
@@ -198,17 +216,9 @@ void EditorApplication::Render()
 	const uint32_t ColAxis = 0xFFFFFFFF;
 	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
 
-	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
-
 	//LineBatcherManager.AddSpotLight({0,0,0}, FMatrix::Identity, 15, 3);
-
-	const FMatrix View = sceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
-	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
-
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
-
-
 }
 
 void EditorApplication::RenderGUI()

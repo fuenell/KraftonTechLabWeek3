@@ -87,44 +87,14 @@ bool URenderer::Initialize(HWND windowHandle)
 bool URenderer::CreateShader()
 {
 	// Load vertex shader from file
-	ID3DBlob* vsBlob = nullptr;
-	ID3DBlob* errorBlob = nullptr;
-
-	HRESULT hr = D3DCompileFromFile(
-		L"ShaderW0.vs",           // 파일 경로
-		nullptr,                  // 매크로 정의
-		nullptr,                  // Include 핸들러
-		"main",                   // 진입점 함수명
-		"vs_5_0",                 // 셰이더 모델
-		0,                        // 컴파일 플래그
-		0,                        // 효과 플래그
-		&vsBlob,                  // 컴파일된 셰이더
-		&errorBlob                // 에러 메시지
-	);
-
-	if (FAILED(hr))
-	{
-		if (errorBlob)
-		{
-			OutputDebugStringA("Vertex Shader Compile Error:\n");
-			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			SAFE_RELEASE(errorBlob);
-		}
-		else
-		{
-			OutputDebugStringA("Failed to load vertex shader file: ShaderW0.vs\n");
-		}
+	ID3DBlob* VSBlob = CompileShader(L"ShaderW0.vs", "main", "vs_5_0");
+	if (!VSBlob)
 		return false;
-	}
 
 	// Create vertex shader
-	hr = device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
-		nullptr, &vertexShader);
-	if (!CheckResult(hr, "CreateVertexShader"))
-	{
-		SAFE_RELEASE(vsBlob);
+	vertexShader = CreateVertexShader(device, VSBlob);
+	if (!vertexShader)
 		return false;
-	}
 
 	// Create input layout
 	D3D11_INPUT_ELEMENT_DESC inputElements[] = {
@@ -132,52 +102,21 @@ bool URenderer::CreateShader()
 		{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-
-	hr = device->CreateInputLayout(inputElements, ARRAYSIZE(inputElements),
-		vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(),
-		&inputLayout);
-	SAFE_RELEASE(vsBlob);
-
-	if (!CheckResult(hr, "CreateInputLayout"))
-	{
+	inputLayout = CreateInputLayout(device, inputElements, ARRAYSIZE(inputElements),
+		VSBlob);
+	if (!inputLayout)
 		return false;
-	}
 
-	// Load pixel shader from file
-	ID3DBlob* psBlob = nullptr;
-	hr = D3DCompileFromFile(
-		L"ShaderW0.ps",           // 파일 경로
-		nullptr,                  // 매크로 정의
-		nullptr,                  // Include 핸들러
-		"main",                   // 진입점 함수명
-		"ps_5_0",                 // 셰이더 모델
-		0,                        // 컴파일 플래그
-		0,                        // 효과 플래그
-		&psBlob,                  // 컴파일된 셰이더
-		&errorBlob                // 에러 메시지
-	);
-
-	if (FAILED(hr))
-	{
-		if (errorBlob)
-		{
-			OutputDebugStringA("Pixel Shader Compile Error:\n");
-			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
-			SAFE_RELEASE(errorBlob);
-		}
-		else
-		{
-			OutputDebugStringA("Failed to load pixel shader file: ShaderW0.ps\n");
-		}
+	ID3DBlob* PSBlob = nullptr;
+	PSBlob = CompileShader(L"ShaderW0.ps", "main", "ps_5_0");
+	if (!PSBlob)
 		return false;
-	}
 
-	// Create pixel shader
-	hr = device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(),
-		nullptr, &pixelShader);
-	SAFE_RELEASE(psBlob);
+	pixelShader = CreatePixelShader(device, PSBlob);
+	if (!pixelShader)
+		return false;
 
-	return CheckResult(hr, "CreatePixelShader");
+	return true;
 }
 
 bool URenderer::CreateBlendState()
@@ -227,31 +166,6 @@ bool URenderer::CreateConstantBuffer()
 	return CheckResult(hr, "CreateConstantBuffer");
 }
 
-ID3D11Buffer* URenderer::CreateVertexBuffer(const void* data, size_t sizeInBytes)
-{
-	if (!device || !data || sizeInBytes == 0)
-		return nullptr;
-
-	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.ByteWidth = static_cast<UINT>(sizeInBytes);
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-	D3D11_SUBRESOURCE_DATA initData = {};
-	initData.pSysMem = data;
-
-	ID3D11Buffer* buffer = nullptr;
-	HRESULT hr = device->CreateBuffer(&bufferDesc, &initData, &buffer);
-
-	if (FAILED(hr))
-	{
-		LogError("CreateVertexBuffer", hr);
-		return nullptr;
-	}
-
-	return buffer;
-}
-
 bool URenderer::UpdateConstantBuffer(const void* data, size_t sizeInBytes)
 {
 	if (!constantBuffer || !data)
@@ -269,23 +183,6 @@ bool URenderer::UpdateConstantBuffer(const void* data, size_t sizeInBytes)
 	memcpy(mappedResource.pData, data, sizeInBytes);
 	deviceContext->Unmap(constantBuffer, 0);
 
-	return true;
-}
-
-void URenderer::LogError(const char* function, HRESULT hr)
-{
-	char errorMsg[512];
-	sprintf_s(errorMsg, "URenderer::%s failed with HRESULT: 0x%08X", function, hr);
-	OutputDebugStringA(errorMsg);
-}
-
-bool URenderer::CheckResult(HRESULT hr, const char* function)
-{
-	if (FAILED(hr))
-	{
-		LogError(function, hr);
-		return false;
-	}
 	return true;
 }
 
@@ -340,31 +237,6 @@ bool URenderer::ReleaseIndexBuffer(ID3D11Buffer* buffer)
 		return true;
 	}
 	return false;
-}
-
-ID3D11Buffer* URenderer::CreateIndexBuffer(const void* data, size_t sizeInBytes)
-{
-	if (!device || !data || sizeInBytes == 0)
-		return nullptr;
-
-	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.ByteWidth = static_cast<UINT>(sizeInBytes);
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-	D3D11_SUBRESOURCE_DATA initData = {};
-	initData.pSysMem = data;
-
-	ID3D11Buffer* buffer = nullptr;
-	HRESULT hr = device->CreateBuffer(&bufferDesc, &initData, &buffer);
-
-	if (FAILED(hr))
-	{
-		LogError("CreateIndexBuffer", hr);
-		return nullptr;
-	}
-
-	return buffer;
 }
 
 ID3D11Texture2D* URenderer::CreateTexture2D(int32 width, int32 height, DXGI_FORMAT format, const void* data)
@@ -824,4 +696,148 @@ D3D11_VIEWPORT URenderer::MakeAspectFitViewport(int32 winW, int32 winH) const
 		vp.TopLeftY = 0.5f * (winH - vp.Height);
 	}
 	return vp;
+}
+
+void URenderer::LogError(const char* function, HRESULT hr)
+{
+	char errorMsg[512];
+	sprintf_s(errorMsg, "URenderer::%s failed with HRESULT: 0x%08X", function, hr);
+	OutputDebugStringA(errorMsg);
+}
+
+bool URenderer::CheckResult(HRESULT hr, const char* function)
+{
+	if (FAILED(hr))
+	{
+		LogError(function, hr);
+		return false;
+	}
+	return true;
+}
+
+ID3DBlob* URenderer::CompileShader(
+	LPCWSTR pFileName,
+	LPCSTR pEntrypoint,
+	LPCSTR pTarget)
+{
+	// Load vertex shader from file
+	ID3DBlob* ShaderBlob;
+	ID3DBlob* errorBlob = nullptr;
+
+	HRESULT hr = D3DCompileFromFile(
+		pFileName,           // 파일 경로
+		nullptr,                  // 매크로 정의
+		nullptr,                  // Include 핸들러
+		pEntrypoint,                   // 진입점 함수명
+		pTarget,                 // 셰이더 모델
+		0,                        // 컴파일 플래그
+		0,                        // 효과 플래그
+		&ShaderBlob,               // 컴파일된 셰이더
+		&errorBlob                // 에러 메시지
+	);
+
+	if (FAILED(hr))
+	{
+		if (errorBlob)
+		{
+			OutputDebugStringA("Vertex Shader Compile Error:\n");
+			OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+			SAFE_RELEASE(errorBlob);
+		}
+		else
+		{
+			OutputDebugStringA("Failed to load vertex shader file");
+		}
+		return nullptr;
+	}
+	return ShaderBlob;
+}
+
+ID3D11VertexShader* URenderer::CreateVertexShader(
+	ID3D11Device* Device,
+	ID3DBlob* VSBlob
+)
+{
+	ID3D11VertexShader* VertexShader;
+
+	HRESULT hr = Device->CreateVertexShader(
+		VSBlob->GetBufferPointer(),
+		VSBlob->GetBufferSize(),
+		nullptr,
+		&VertexShader
+	);
+
+	if (!CheckResult(hr, "CreateVertexShader"))
+	{
+		SAFE_RELEASE(VSBlob);
+		return nullptr;
+	}
+	return VertexShader;
+}
+
+ID3D11InputLayout* URenderer::CreateInputLayout(
+	ID3D11Device* Device,
+	D3D11_INPUT_ELEMENT_DESC* InputElements,
+	int64 InputElementsSize,
+	ID3DBlob* VSBlob)
+{
+	ID3D11InputLayout* InputLayout;
+
+	HRESULT hr = Device->CreateInputLayout(
+		InputElements,
+		InputElementsSize,
+		VSBlob->GetBufferPointer(),
+		VSBlob->GetBufferSize(),
+		&InputLayout
+	);
+
+	SAFE_RELEASE(VSBlob);
+	if (!CheckResult(hr, "CreateInputLayout"))
+	{
+		return nullptr;
+	}
+	return InputLayout;
+}
+
+ID3D11PixelShader* URenderer::CreatePixelShader(ID3D11Device* Device, ID3DBlob* PSBlob)
+{
+	ID3D11PixelShader* PixelShader;
+
+	HRESULT hr = Device->CreatePixelShader(
+		PSBlob->GetBufferPointer(),
+		PSBlob->GetBufferSize(),
+		nullptr,
+		&PixelShader
+	);
+
+	if (!CheckResult(hr, "CreatePixelShader"))
+	{
+		SAFE_RELEASE(PSBlob);
+		return nullptr;
+	}
+	return PixelShader;
+}
+
+ID3D11Buffer* URenderer::CreateBuffer(
+	ID3D11Device* Device,
+	D3D11_BUFFER_DESC BufferDesc,
+	const void* data
+)
+{
+	if (!Device || !data)
+		return nullptr;
+
+	D3D11_SUBRESOURCE_DATA initData = {};
+	initData.pSysMem = data;
+
+	ID3D11Buffer* buffer = nullptr;
+	HRESULT hr = Device->CreateBuffer(&BufferDesc, &initData, &buffer);
+
+	if (FAILED(hr))
+	{
+		LogError("CreateVertexBuffer", hr);
+		return nullptr;
+	}
+
+	return buffer;
 }
