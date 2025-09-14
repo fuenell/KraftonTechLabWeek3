@@ -46,9 +46,7 @@ void UCamera::LookAt(const FVector& eye, const FVector& target, const FVector& u
 	mEye = eye;
 	FVector F = (target - eye).Normalized();
 	mRot = FQuaternion::LookRotation(F, up);
-	// pitch 추정
-	float fz = (F.Z < -1.f ? -1.f : (F.Z > 1.f ? 1.f : F.Z));
-	mPitch = asinf(fz);
+
 	// 뷰 갱신
 	RecalcAxesFromQuat();
 	UpdateView();

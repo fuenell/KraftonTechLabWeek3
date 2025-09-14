@@ -143,22 +143,23 @@ struct FQuaternion
 		return FromEulerXYZDeg(v.X, v.Y, v.Z);
 	}
 	// forward 방향으로 물체가 돌아갑니다.
-	static FQuaternion LookRotation(const FVector& forward, const FVector& up)
+	static FQuaternion LookRotation(const FVector& Forward, const FVector& Up)
 	{
-		FVector F = forward.Normalized();
+		FVector F = Forward.Normalized();
 		// up을 F에 직교하도록 정규화(Gram-Schmidt)
-		FVector Uref = up.Normalized();
+		FVector Uref = Up.Normalized();
 		if (fabs(F.Dot(Uref)) > 0.999f) // 거의 평행
 		{
-			Uref = FVector(0, 1, 0); // 임시 다른 up (예: Y축)
+			Uref = FVector(-1, 0, 0); // 임시 다른 up (예: -X축)
 		}
 		// R = F × U, U = R × F
-		FVector R = F.Cross(Uref).Normalized();
-		FVector U = R.Cross(F).Normalized(); // 재직교(수치안정)
+		FVector R = -F.Cross(Uref).Normalized();
+		FVector U = -R.Cross(F).Normalized(); // 재직교(수치안정)
+
 		FMatrix M = FMatrix::IdentityMatrix();
-		M.M[0][0] = R.X; M.M[0][1] = F.X; M.M[0][2] = U.X;
-		M.M[1][0] = R.Y; M.M[1][1] = F.Y; M.M[1][2] = U.Y;
-		M.M[2][0] = R.Z; M.M[2][1] = F.Z; M.M[2][2] = U.Z;
+		M.M[0][0] = F.X; M.M[0][1] = R.X; M.M[0][2] = U.X;
+		M.M[1][0] = F.Y; M.M[1][1] = R.Y; M.M[1][2] = U.Y;
+		M.M[2][0] = F.Z; M.M[2][1] = R.Z; M.M[2][2] = U.Z;
 		return FQuaternion::FromMatrixRow(M);
 	}
 
@@ -205,7 +206,8 @@ struct FQuaternion
 	}
 	*/
 	// 벡터 회전
-	FVector Rotate(const FVector& v) const {
+	FVector Rotate(const FVector& v) const
+	{
 		float n2 = X * X + Y * Y + Z * Z + W * W;
 		if (n2 <= 0.0f) return v;  // 안전가드
 
@@ -385,7 +387,7 @@ struct FQuaternion
 	// In-place 버전
 	void RotateLocalAxisAngle(const FVector& worldAxis, float radians)
 	{
-		*this = RotatedLocalAxisAngle(worldAxis, radians); 
+		*this = RotatedLocalAxisAngle(worldAxis, radians);
 	}
 	// 월드 오일러(X→Y→Z)로 누적: q' = (Rx * Ry * Rz) * q
 	FQuaternion RotatedWorldEulerXYZ(float rx, float ry, float rz) const
