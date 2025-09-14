@@ -33,6 +33,9 @@ public:
     // 그리드도 이제 IB 경로로 쌓음
     void AddGrid(float Spacing, int Count, uint32_t ColorMain, uint32_t ColorAxis); 
 
+    //스포트라이트를 위한 라인을 그리는 함수
+    void AddSpotLight(const FVector& InLightPosition, const FMatrix& InMatrix, float InAngle, float InScale);
+
     void Render(ID3D11DeviceContext* InDeviecContext, const FMatrix& View, const FMatrix& Proj);
 
 
@@ -97,6 +100,8 @@ public:
         Out.Max = cw + ew;
     }
 
+    
+
 
     // getter
     inline float GetGridSpace() const { return GridSpacing; }
@@ -108,14 +113,13 @@ public:
     void LoadSettings(const char* IniPath);
     void SaveSettings(const char* IniPath);
 
+    void Release();
+
     float GridSpacing = 1.0f;
 
 private:
     TArray<FLineVertex> CpuVertices;
     TArray<uint32_t>    CpuIndices;
-
-    // Indexed (스포트라이트, AABB)
-    TArray<FLineVertex> CpuVertsIB;
 
     ID3D11Buffer* VertexBuffer = nullptr;
     ID3D11Buffer* IndexBuffer = nullptr;

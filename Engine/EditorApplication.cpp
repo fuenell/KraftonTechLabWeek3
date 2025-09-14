@@ -172,13 +172,19 @@ void EditorApplication::Render()
 		if (PrimitiveType::Sphere == PickedPrimitive->GetType())
 		{
 			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
+			LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
+		}
+		else if (PrimitiveType::SpotLight == PickedPrimitive->GetType())
+		{
+			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), 15, 3);
 		}
 		else
 		{
 			ULineBatcherManager::LocalAABBtoWorldAABB(LocalBounds, WorldMatrix, WorldBounds);
+			LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
 		}
 		
-		LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
+		
 	}
 
 	// 2) 그리드 쌓기 (원하는 색/간격/개수)
@@ -189,14 +195,11 @@ void EditorApplication::Render()
 
 	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
 
+	//LineBatcherManager.AddSpotLight({0,0,0}, FMatrix::Identity, 15, 3);
 
-
-
-	
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	
 }
 
 void EditorApplication::RenderGUI()

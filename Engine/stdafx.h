@@ -81,5 +81,6 @@ enum class PrimitiveType
 	Sphere,
 	Cube,
 	Plane,
+	SpotLight,
 	End
 };

@@ -95,6 +95,7 @@ void ULineBatcherManager::AddLine(const FVector& InPointStart, const FVector& In
     if (CpuVertices.size() + 2 > MaxVertices)   return;
     if (CpuIndices.size() + 2 > MaxIndices)  return;
 
+    // 추가하기 전에 쌓여있는 정점의 사이즈
     uint32_t base = (uint32_t)CpuVertices.size();
 
     CpuVertices.push_back({ InPointStart.X, InPointStart.Y, InPointStart.Z, InColor });
@@ -165,6 +166,77 @@ void ULineBatcherManager::AddGrid(float InSpacing, int InCount, uint32_t InColor
 }
 
 
+void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMatrix& InMatrix, float InAngle, float InScale)
+{
+    // 여기서 라인 생성해서 FArray에 넣어줌
+    // 기저 벡터 구하기
+    //FVector Forward = InForward;
+    //Forward.Normalize();
+    //const FVector upGuess = (fabsf(Forward.Z) < 0.999f) ? FVector(0, 1, 0) : FVector(0, 0, 1);
+    //FVector Right = upGuess.Cross(Forward);  Right.Normalize();
+    //FVector Up = Forward.Cross(Right);    // 자동 직교
+    //
+    //
+    //// 3) 로컬→월드 변환 행렬(M) 구성 (row-vector 규약)
+    //// p_world = [px py pz 1] * M
+    //FMatrix M = FMatrix::IdentityMatrix();
+    //// 로컬 x/y/z 기저를 월드로: 각 "행"에 기저벡터를 둔다
+    //M.M[0][0] = Forward.X;  M.M[0][1] = Forward.Y;  M.M[0][2] = Forward.Z;
+    //M.M[1][0] = Right.X;     M.M[1][1] = Right.Y;     M.M[1][2] = Right.Z;
+    //M.M[2][0] = Up.X;      M.M[2][1] = Up.Y;      M.M[2][2] = Up.Z;
+    //// 평행이동 (row-vector에서는 마지막 행)
+    //M.M[3][0] = InLightPosition.X;    M.M[3][1] = InLightPosition.Y;    M.M[3][2] = InLightPosition.Z;
+
+
+
+    // 추가하기 전에 쌓여있는 정점의 사이즈
+    uint32_t base = (uint32_t)CpuVertices.size();
+
+    // 용량 체크
+    if (CpuVertices.size() + 2 > MaxVertices)   return;
+    if (CpuIndices.size() + 2 > MaxIndices)  return;
+
+
+
+    const uint32_t InColor = 0x40AAAAAA;
+
+
+    //우선 시작점 (location)을 버텍스에 넣음 
+    CpuVertices.push_back({ InLightPosition.X, InLightPosition.Y, InLightPosition.Z, InColor });
+    //CpuIndices.push_back(base);
+
+
+    // 여기서 계산식 토대로 라인들을 넣음
+    for (int32_t i = 0; i < 360; ++i)
+    {
+        const float theta = i * DegreeToRadian;
+        const float L = InScale;                              // 원뿔 길이(앞으로)
+        const float r = L * tanf(InAngle * DegreeToRadian); // 끝 원 반지름
+        FVector4 PLocal(L, r * cosf(theta), r * sinf(theta), 1.0f);
+
+        //FVector4 NewSpot = { Forward.X * InScale, Forward.X * InScale * sinf(i * DegreeToRadian), Forward.X * InScale * tanf(i * DegreeToRadian) * sinf(i * DegreeToRadian), 1.0f };
+
+        //여기에 변환식들어가야함
+        PLocal = FMatrix::MultiplyVectorRow(PLocal, InMatrix);
+
+        CpuVertices.push_back({ PLocal.X, PLocal.Y, PLocal.Z, InColor });
+
+        CpuIndices.push_back(base);
+        CpuIndices.push_back(base + i + 1);
+    }
+
+
+    // spot light의 끝부분 원을 표현하기 위함
+    for (int32_t i = 0; i < 359; ++i)
+    {
+        CpuIndices.push_back(base + i + 1);
+        CpuIndices.push_back(base + i + 2);
+    }
+    CpuIndices.push_back(base + 359);
+    CpuIndices.push_back(base + 1);
+
+}
+
 /*
 CPU에서 쌓인 CpuLines → GPU VertexBuffer에 Map/Unmap으로 복사.
 
@@ -220,6 +292,20 @@ void ULineBatcherManager::SaveSettings(const char* IniPath)
     char buf[64];
     sprintf_s(buf, "%f", GridSpacing);
     WritePrivateProfileStringA("Grid", "Spacing", buf, IniPath);
+}
+
+void ULineBatcherManager::Release()
+{
+    CpuVertices.clear();
+    CpuIndices.clear();
+
+    if (InputLayout) { InputLayout->Release();    InputLayout = nullptr; }
+    if (PixelShader) { PixelShader->Release();    PixelShader = nullptr; }
+    if (VertexShader) { VertexShader->Release();   VertexShader = nullptr; }
+    if (ConstantBuffer) { ConstantBuffer->Release(); ConstantBuffer = nullptr; }
+    if (IndexBuffer) { IndexBuffer->Release();    IndexBuffer = nullptr; }
+    if (VertexBuffer) { VertexBuffer->Release();   VertexBuffer = nullptr; }
+
 }
 
 
