@@ -23,8 +23,8 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 	return pressed;
 }
 
-UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, ULineBatcherManager* InLineBatcherManager)
-	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager), LineBatcherManager(InLineBatcherManager)
+UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, ULineBatcherManager* InLineBatcherManager, URenderer* InRenderer)
+	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager), LineBatcherManager(InLineBatcherManager), Renderer(InRenderer)
 {
 	for (const auto& Pair : UClass::GetClassPool())
 	{
@@ -60,6 +60,10 @@ void UControlPanel::RenderContent()
 	// 그리드 조절
 	ImGui::Separator();
 	GridManagementSection();
+
+	// View Mode
+	ImGui::Separator();
+	ViewModeSection();
 }
 
 void UControlPanel::PrimaryInformationSection()
@@ -314,6 +318,25 @@ void UControlPanel::GridManagementSection()
 		}
 
 		ImGui::EndTable();
+	}
+}
+
+void UControlPanel::ViewModeSection()
+{
+	ImGui::Text("View Mode");
+
+	int32_t Mode = static_cast<int>(Renderer->GetViewModeIndex());
+	bool bChanged = false;
+
+	bChanged |= ImGui::RadioButton("Lit", &Mode, static_cast<int32_t>(EViewModeIndex::VMI_Lit));
+	ImGui::SameLine();
+	bChanged |= ImGui::RadioButton("Unlit", &Mode, static_cast<int32_t>(EViewModeIndex::VMI_Unlit));
+	ImGui::SameLine();
+	bChanged |= ImGui::RadioButton("Wireframe", &Mode, static_cast<int32_t>(EViewModeIndex::VMI_Wireframe));
+
+	if (bChanged)
+	{
+		Renderer->SetRasterizerState(static_cast<EViewModeIndex>(Mode));
 	}
 }
 

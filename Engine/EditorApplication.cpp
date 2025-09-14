@@ -170,25 +170,26 @@ void EditorApplication::Render()
 
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
-			//ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
+			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
 			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 			//LineBatcherManager.AddBoundingBox(WorldBounds, 0x00FFFFFF);
 		}
 		else if (PickedPrimitive->GetClass() == USpotLightComponent::StaticClass())
 		{
-			//ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
-			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), 15, 3);
+			USpotLightComponent* SpotLightComponent = dynamic_cast<USpotLightComponent*>(PickedPrimitive);
+			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
+			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), SpotLightComponent->GetAngle(), SpotLightComponent->GetScale(), SpotLightComponent->GetColor());
 		}
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{
-			//ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
+			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
 		}
 		else
 		{
 			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
 			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		}
-		WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
+		//WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 	}
 
@@ -239,7 +240,7 @@ bool EditorApplication::OnInitialize()
 	Application::OnInitialize();
 	// 리사이즈/초기화
 
-	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetLineBatcherManager());
+	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetLineBatcherManager(), &renderer);
 	propertyWindow = new USceneComponentPropertyWindow();
 	SceneManagerWindow = new USceneManagerWindow(
 		&GetSceneManager(),

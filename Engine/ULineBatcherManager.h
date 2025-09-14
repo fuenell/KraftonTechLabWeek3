@@ -27,7 +27,7 @@ public:
     void AddGrid(float Spacing, int Count, uint32_t ColorMain, uint32_t ColorAxis); 
 
     //스포트라이트를 위한 라인을 그리는 함수
-    void AddSpotLight(const FVector& InLightPosition, const FMatrix& InMatrix, float InAngle, float InScale);
+    void AddSpotLight(const FVector& InLightPosition, const FMatrix& InMatrix, float InAngle, float InScale, const FVector4& InColor);
 
     void Render(ID3D11DeviceContext* InDeviecContext, const FMatrix& View, const FMatrix& Proj);
 

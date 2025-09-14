@@ -25,6 +25,7 @@ private:
 	ID3D11RenderTargetView* renderTargetView;
 	ID3D11DepthStencilView* depthStencilView;
 	ID3D11RasterizerState* rasterizerState;
+	ID3D11RasterizerState* RasterizerStateWire;
 
 	// Shader objects
 	ID3D11VertexShader* vertexShader;
@@ -52,7 +53,7 @@ private:
 	FMatrix mVP;                 // 프레임 캐시
 	CBTransform   mCBData;
 
-
+	EViewModeIndex ViewModeIndex = EViewModeIndex::VMI_Normal;
 
 public:
 	URenderer();
@@ -62,6 +63,7 @@ public:
 	bool Initialize(HWND windowHandle);
 	bool CreateShader();
 	bool CreateRasterizerState();
+	bool CreateRasterizerStateWire();
 	bool CreateBlendState();
 	bool CreateConstantBuffer();
 	void Release();
@@ -98,6 +100,7 @@ public:
 	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
 	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
 	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
+	void SetRasterizerState(EViewModeIndex InViewModeIndex);
 
 	// Constant buffer updates
 	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
@@ -105,15 +108,20 @@ public:
 	// Window resize handling
 	bool ResizeBuffers(int32 width, int32 height);
 
+	// Setter
+
+
 	// Getters
 	ID3D11Device* GetDevice() const { return device; }
 	ID3D11DeviceContext* GetDeviceContext() const { return deviceContext; }
 	IDXGISwapChain* GetSwapChain() const { return swapChain; }
+	EViewModeIndex GetViewModeIndex() const { return ViewModeIndex; }
 	bool IsInitialized() const { return bIsInitialized; }
 
 	// Utility functions
 	bool CheckDeviceState();
 	void GetBackBufferSize(int32& width, int32& height);
+	
 
 private:
 	// Internal helper functions

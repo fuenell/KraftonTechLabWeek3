@@ -165,7 +165,7 @@ void ULineBatcherManager::AddGrid(float InSpacing, int InCount, uint32_t InColor
 }
 
 
-void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMatrix& InMatrix, float InAngle, float InScale)
+void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMatrix& InMatrix, float InAngle, float InScale, const FVector4& InColor)
 {
     // 여기서 라인 생성해서 FArray에 넣어줌
     // 기저 벡터 구하기
@@ -197,11 +197,23 @@ void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMa
 
 
 
-    const uint32_t InColor = 0xFFFFFF80;
+    //const uint32_t InColor = 0xFFFFFF80;
+    // 0~1 -> 0~255 반올림(클램프 없음)
+    auto To8 = [](float v)->uint32_t { return static_cast<uint32_t>(v * 255.0f + 0.5f); };
+
+    // ABGR(0xAABBGGRR)로 패킹
+    const uint32_t R8 = To8(InColor.X);
+    const uint32_t G8 = To8(InColor.Y);
+    const uint32_t B8 = To8(InColor.Z);
+    const uint32_t A8 = 255; // 필요하면 인자로 받도록 변경
+
+    const uint32 PackedColor =
+        (uint32(A8) << 24) | (uint32(B8) << 16) | (uint32(G8) << 8) | uint32(R8);
+
 
 
     //우선 시작점 (location)을 버텍스에 넣음 
-    CpuVertices.push_back({ InLightPosition.X, InLightPosition.Y, InLightPosition.Z, InColor });
+    CpuVertices.push_back({ InLightPosition.X, InLightPosition.Y, InLightPosition.Z, PackedColor });
     //CpuIndices.push_back(base);
 
 
@@ -218,7 +230,7 @@ void ULineBatcherManager::AddSpotLight(const FVector& InLightPosition, const FMa
         //여기에 변환식들어가야함
         PLocal = FMatrix::MultiplyVectorRow(PLocal, InMatrix);
 
-        CpuVertices.push_back({ PLocal.X, PLocal.Y, PLocal.Z, InColor });
+        CpuVertices.push_back({ PLocal.X, PLocal.Y, PLocal.Z, PackedColor });
 
         CpuIndices.push_back(base);
         CpuIndices.push_back(base + i + 1);
