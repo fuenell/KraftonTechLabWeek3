@@ -6,7 +6,7 @@ bool UUIDRenderer::Initialize(ID3D11Device* Device)
 	return BBManager.Initialize(Device);
 }
 
-void UUIDRenderer::SetUUIDVertices(
+bool UUIDRenderer::SetUUIDVertices(
 	ID3D11Device* Device,
 	float AspectRatio,
 	uint32 UUID,
@@ -17,14 +17,16 @@ void UUIDRenderer::SetUUIDVertices(
 	FMatrix Projection
 )
 {
-	FMatrix MVP = Modeling * View * Projection;
-	FMatrix MV = Modeling * View;
-
 	FString UUIDString = FString("UID : ") + std::to_string(UUID);
 
 	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
 	
-	ObjectCenter = MVP.TransformVectorRow(ObjectCenter);
+	ObjectCenter = (Modeling * View).TransformVectorRow(ObjectCenter);
+	
+	if (ObjectCenter.Z < 0.0f)
+		return false;
+
+	ObjectCenter = Projection.TransformVectorRow(ObjectCenter);
 
 	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
 	
@@ -55,6 +57,7 @@ void UUIDRenderer::SetUUIDVertices(
 	}
 
 	BBManager.SetBuffer(Device, VertexArray, IndexArray);
+	return true;
 }
 
 void UUIDRenderer::Bind(ID3D11DeviceContext* DeviceContext)
