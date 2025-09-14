@@ -41,7 +41,10 @@
 #include "UClass.h"
 #include "RTTI.h"			// RTTI 시스템
 #include "UObject.h"		// 최상위 오브젝트
+
+// 수학 관련 헤더
 #include "Vector.h"
+#include "Random.h"
 
 // 라이브러리 링킹
 #pragma comment(lib, "user32.lib")
@@ -71,7 +74,8 @@ namespace Engine
 	// Common engine types and utilities can go here
 }
 
-struct FBounds {
+struct FBounds
+{
 	FVector Min;
 	FVector Max;
 };

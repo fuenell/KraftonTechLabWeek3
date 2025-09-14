@@ -191,6 +191,7 @@
     <ClCompile Include="UUIDRenderer.cpp" />
     <ClCompile Include="USpotLightComponent.cpp" />
     <ClCompile Include="ToggleWindow.cpp" />
+    <ClCompile Include="ShowFlag.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -372,6 +373,10 @@
     <ClInclude Include="UUIDRenderer.h" />
     <ClInclude Include="USpotLightComponent.h" />
     <ClInclude Include="ToggleWindow.h" />
+    <ClInclude Include="ShowFlag.h" />
+    <ClInclude Include="Random.h">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

@@ -254,7 +254,6 @@ void EditorApplication::RenderGUI()
 
 bool EditorApplication::OnInitialize()
 {
-	Application::OnInitialize();
 	// 리사이즈/초기화
 
 	controlPanel = new UControlPanel(&GetSceneManager(), &gizmoManager, &GetLineBatcherManager(), &renderer);

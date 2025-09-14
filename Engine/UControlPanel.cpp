@@ -23,8 +23,8 @@ static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVe
 	return pressed;
 }
 
-UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, ULineBatcherManager* InLineBatcherManager, URenderer* InRenderer)
-	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(sceneManager), GizmoManager(gizmoManager), LineBatcherManager(InLineBatcherManager), Renderer(InRenderer)
+UControlPanel::UControlPanel(USceneManager* InSceneManager, UGizmoManager* InGizmoManager, ULineBatcherManager* InLineBatcherManager, URenderer* InRenderer)
+	: ImGuiWindowWrapper("Control Panel", ImVec2(0, 0), ImVec2(275, 390)), SceneManager(InSceneManager), GizmoManager(InGizmoManager), LineBatcherManager(InLineBatcherManager), Renderer(InRenderer)
 {
 	for (const auto& Pair : UClass::GetClassPool())
 	{
@@ -36,13 +36,13 @@ UControlPanel::UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoMa
 		if (TypeName.empty())
 			continue;
 
-		registeredTypes.push_back(registeredType);
-		choiceStrList.push_back(registeredType->GetMeta("TypeName"));
+		RegisteredTypes.push_back(registeredType);
+		ChoiceStrList.push_back(registeredType->GetMeta("TypeName"));
 	}
 
-	for (const FString& str : choiceStrList)
+	for (const FString& str : ChoiceStrList)
 	{
-		choices.push_back(str.c_str());
+		Choices.push_back(str.c_str());
 	}
 }
 
@@ -55,7 +55,6 @@ void UControlPanel::RenderContent()
 	SceneManagementSection();
 	ImGui::Separator();
 	CameraManagementSection();
-
 
 	// 그리드 조절
 	ImGui::Separator();
@@ -74,7 +73,7 @@ void UControlPanel::PrimaryInformationSection()
 
 USceneComponent* UControlPanel::CreateSceneComponentFromChoice(int index)
 {
-	auto obj = registeredTypes[primitiveChoiceIndex]->CreateDefaultObject();
+	auto obj = RegisteredTypes[PrimitiveChoiceIndex]->CreateDefaultObject();
 	if (!obj) return nullptr;
 	return obj->Cast<USceneComponent>();
 }
@@ -82,38 +81,67 @@ USceneComponent* UControlPanel::CreateSceneComponentFromChoice(int index)
 void UControlPanel::SpawnPrimitiveSection()
 {
 	ImGui::SetNextItemWidth(150);
-	ImGui::Combo("Type", &primitiveChoiceIndex, choices.data(), static_cast<int32>(choices.size()));
+	ImGui::Combo("Type", &PrimitiveChoiceIndex, Choices.data(), static_cast<int32>(Choices.size()));
 
-	int32 objectCount = SceneManager->GetScene()->GetObjectCount();
+	int32 ObjectCount = SceneManager->GetScene()->GetObjectCount();
 	if (ImGui::Button("Spawn"))
 	{
-		USceneComponent* sceneComponent = CreateSceneComponentFromChoice(primitiveChoiceIndex);
-		sceneComponent->Name = registeredTypes[primitiveChoiceIndex]->GetUClassName();
-		if (sceneComponent != nullptr)
+		USceneComponent* SceneComponent = CreateSceneComponentFromChoice(PrimitiveChoiceIndex);
+
+		if (SceneComponent == nullptr)
 		{
-			sceneComponent->SetPosition(FVector(
-				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f,
-				-5.0f + static_cast<float>(rand()) / RAND_MAX * 10.0f
-			));
-			sceneComponent->SetScale(FVector(
-				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f,
-				0.1f + static_cast<float>(rand()) / RAND_MAX * 0.7f
-			));
-			sceneComponent->SetRotation(FVector(
-				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
-				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f,
-				-90.0f + static_cast<float>(rand()) / RAND_MAX * 180.0f
-			));
-			SceneManager->GetScene()->AddObject(sceneComponent);
+			return;
 		}
+
+		FName BaseName = RegisteredTypes[PrimitiveChoiceIndex]->GetUClassName().ToString(); // 이 부분은 엔진의 구현에 따라 std::string을 반환한다고 가정
+		FName NewName = BaseName;
+
+		for (UINT i = 1; i < UINT_MAX; i++)
+		{
+			if (SceneManager->GetScene()->IsNameDuplicated(NewName) == false)
+			{
+				break;
+			}
+
+			NewName = BaseName.ToString() + "_" + std::to_string(i);
+		}
+
+		SceneComponent->Name = NewName;
+
+		// 최초 생성
+		if (SceneComponent->Name == BaseName)
+		{
+			SceneComponent->SetPosition(FVector());
+			SceneComponent->SetScale(FVector(1, 1, 1));
+			SceneComponent->SetRotation(FVector());
+		}
+		else
+		{
+			SceneComponent->SetPosition(FVector(
+				Random::GetFloat(-2.5f, 2.5f),
+				Random::GetFloat(-2.5f, 2.5f),
+				Random::GetFloat(-2.5f, 2.5f)
+			));
+			SceneComponent->SetScale(FVector(
+				Random::GetFloat(0.1f, 2.0f),
+				Random::GetFloat(0.1f, 2.0f),
+				Random::GetFloat(0.1f, 2.0f)
+			));
+			SceneComponent->SetRotation(FVector(
+				Random::GetFloat(-360.0f, 360.0f),
+				Random::GetFloat(-360.0f, 360.0f),
+				Random::GetFloat(-360.0f, 360.0f)
+			));
+		}
+
+		SceneManager->GetScene()->AddObject(SceneComponent);
 	}
+
 	ImGui::SameLine();
 	ImGui::BeginDisabled();
 	ImGui::SetNextItemWidth(60);
 	ImGui::SameLine();
-	ImGui::InputInt("Spawned", &objectCount, 0);
+	ImGui::InputInt("Spawned", &ObjectCount, 0);
 	ImGui::EndDisabled();
 }
 
@@ -121,7 +149,7 @@ void UControlPanel::SceneManagementSection()
 {
 	ImGui::Text("Scene Name");                // Label on top
 	ImGui::SetNextItemWidth(200);             // Optional: set input width
-	ImGui::InputText("##SceneNameInput", sceneName, sizeof(sceneName)); // invisible label
+	ImGui::InputText("##SceneNameInput", SceneName, sizeof(SceneName)); // invisible label
 
 	if (ImGui::Button("New scene"))
 	{
@@ -130,16 +158,16 @@ void UControlPanel::SceneManagementSection()
 
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Save scene") && strcmp(sceneName, "") != 0)
+	if (ImGui::Button("Save scene") && strcmp(SceneName, "") != 0)
 	{
 		std::filesystem::path _path("./data/");
 		std::filesystem::create_directory(_path);
-		SceneManager->SaveScene(_path.string() + FString(sceneName) + ".Scene");
+		SceneManager->SaveScene(_path.string() + FString(SceneName) + ".Scene");
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Load scene") && strcmp(sceneName, "") != 0)
+	if (ImGui::Button("Load scene") && strcmp(SceneName, "") != 0)
 	{
-		SceneManager->LoadScene("./data/" + FString(sceneName) + ".Scene");
+		SceneManager->LoadScene("./data/" + FString(SceneName) + ".Scene");
 	}
 }
 
@@ -151,7 +179,7 @@ void UControlPanel::CameraManagementSection()
 	float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
 	FVector eulDeg = camera->GetEulerXYZDeg();
 	float eulerXYZ[3] = { eulDeg.X, eulDeg.Y, eulDeg.Z };
-	
+
 	float RotationSensitivity = camera->GetRotationSensitivity() * 200.0f;
 	float TranslationSensitivity = camera->GetTranslationSensitivity();
 
@@ -323,12 +351,12 @@ void UControlPanel::CameraManagementSection()
 	{
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
 	}
-	
+
 	if (RotSensCommitted)
 	{
 		camera->SetRotationSensitivity(RotationSensitivity / 200.0f);
 	}
-	
+
 	if (TransSensCommitted)
 	{
 		camera->SetTranslationSensitivity(TranslationSensitivity);

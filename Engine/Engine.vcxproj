@@ -245,6 +245,7 @@
     <ClInclude Include="FName.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="PlaneVertices.h" />
+    <ClInclude Include="Random.h" />
     <ClInclude Include="RTTI.h" />
     <ClInclude Include="ShowFlag.h" />
     <ClInclude Include="ToggleWindow.h" />

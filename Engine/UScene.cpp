@@ -11,41 +11,41 @@
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
 {
-	version = 1;
-	primitiveCount = 0;
+	Version = 1;
+	PrimitiveCount = 0;
 }
 
 UScene::~UScene()
 {
 	OnShutdown();
-	for (UObject* object : objects)
+	for (UObject* object : Objects)
 	{
 		delete object;
 	}
-	delete camera;
+	delete Camera;
 }
 
 bool UScene::Initialize(URenderer* r, UMeshManager* mm, UInputManager* im)
 {
-	renderer = r;
-	meshManager = mm;
-	inputManager = im;
+	Renderer = r;
+	MeshManager = mm;
+	InputManager = im;
 
-	backBufferWidth = 0.0f;
-	backBufferHeight = 0.0f;
+	BackBufferWidth = 0.0f;
+	BackBufferHeight = 0.0f;
 
 	// 모든 Primitive 컴포넌트 초기화
-	for (UObject* obj : objects)
+	for (UObject* obj : Objects)
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Init(meshManager);
+			primitive->Init(MeshManager);
 		}
 	}
 
-	camera = new UCamera();
-	camera->SetPerspectiveDegrees(60.0f, (backBufferHeight > 0) ? (float)backBufferWidth / (float)backBufferHeight : 1.0f, 0.1f, 1000.0f);
-	camera->LookAt({ -5,5,5 }, { 0,0,0 }, { 0,0,1 });
+	Camera = new UCamera();
+	Camera->SetPerspectiveDegrees(60.0f, (BackBufferHeight > 0) ? (float)BackBufferWidth / (float)BackBufferHeight : 1.0f, 0.1f, 1000.0f);
+	Camera->LookAt({ -5,5,5 }, { 0,0,0 }, { 0,0,1 });
 
 	return OnInitialize();
 }
@@ -60,22 +60,22 @@ UScene* UScene::Create(json::JSON data)
 void UScene::AddObject(USceneComponent* obj)
 {
 	// 런타임에서만 사용 - Scene이 Initialize된 후에 호출할 것
-	assert(meshManager != nullptr && "AddObject should only be called after Scene initialization");
+	assert(MeshManager != nullptr && "AddObject should only be called after Scene initialization");
 
-	if (!meshManager)
+	if (!MeshManager)
 	{
 		// 릴리즈 빌드에서 안전성 확보
 		return;
 	}
 
-	objects.push_back(obj);
+	Objects.push_back(obj);
 
 	// 일단 표준 RTTI 사용
 	if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 	{
-		primitive->Init(meshManager);
+		primitive->Init(MeshManager);
 		if (obj->CountOnInspector())
-			++primitiveCount;
+			++PrimitiveCount;
 	}
 }
 
@@ -83,10 +83,10 @@ json::JSON UScene::Serialize() const
 {
 	json::JSON result;
 	// UScene 특성에 맞는 JSON 구성
-	result["Version"] = version;
+	result["Version"] = Version;
 	result["NextUUID"] = std::to_string(UEngineStatics::GetNextUUID());
 	int32 validCount = 0;
-	for (UObject* object : objects)
+	for (UObject* object : Objects)
 	{
 		if (object == nullptr) continue;
 		json::JSON _json = object->Serialize();
@@ -102,10 +102,10 @@ json::JSON UScene::Serialize() const
 
 bool UScene::Deserialize(const json::JSON& data)
 {
-	version = data.at("Version").ToInt();
+	Version = data.at("Version").ToInt();
 	// nextUUID = data.at("NextUUID").ToInt();
 
-	objects.clear();
+	Objects.clear();
 	json::JSON primitivesJson = data.at("Primitives");
 
 	UEngineStatics::SetUUIDGeneration(false);
@@ -122,9 +122,9 @@ bool UScene::Deserialize(const json::JSON& data)
 		component->Deserialize(_data);
 		component->SetUUID(uuid);
 
-		objects.push_back(component);
+		Objects.push_back(component);
 		if (component->CountOnInspector())
-			++primitiveCount;
+			++PrimitiveCount;
 	}
 
 	USceneComponent* gizmoGrid = new UGizmoGridComp(
@@ -132,7 +132,7 @@ bool UScene::Deserialize(const json::JSON& data)
 		{ 0.0f, 0.0f, 0.0f },
 		{ 0.2f, 0.2f, 0.2f }
 	);
-	objects.push_back(gizmoGrid);
+	Objects.push_back(gizmoGrid);
 
 	FString uuidStr = data.at("NextUUID").ToString();
 
@@ -142,75 +142,88 @@ bool UScene::Deserialize(const json::JSON& data)
 	return true;
 }
 
+bool UScene::IsNameDuplicated(FName Name)
+{
+	for (UObject* obj : Objects)
+	{
+		if (obj->Name == Name)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void UScene::Render()
 {
 	// 카메라가 바뀌면 원하는 타이밍(매 프레임도 OK)에 알려주면 됨
-	renderer->SetTargetAspect(camera->GetAspect());
+	Renderer->SetTargetAspect(Camera->GetAspect());
 
-	renderer->SetViewProj(camera->GetView(), camera->GetProj());
+	Renderer->SetViewProj(Camera->GetView(), Camera->GetProj());
 
-	for (UObject* obj : objects)
+	for (UObject* obj : Objects)
 	{
 		if (UPrimitiveComponent* primitive = obj->Cast<UPrimitiveComponent>())
 		{
-			primitive->Draw(*renderer);
+			primitive->Draw(*Renderer);
 		}
 	}
 }
 
 void UScene::Update(float deltaTime)
 {
-	renderer->GetBackBufferSize(backBufferWidth, backBufferHeight);
+	Renderer->GetBackBufferSize(BackBufferWidth, BackBufferHeight);
 
-	if (backBufferHeight > 0)
+	if (BackBufferHeight > 0)
 	{
-		camera->SetAspect((float)backBufferWidth / (float)backBufferHeight);
+		Camera->SetAspect((float)BackBufferWidth / (float)BackBufferHeight);
 	}
 
 	float dx = 0, dy = 0, dz = 0;
-	bool boost = inputManager->IsKeyDown(VK_SHIFT); // Shift로 가속
+	bool boost = InputManager->IsKeyDown(VK_SHIFT); // Shift로 가속
 
 	// --- 마우스룩: RMB 누른 동안 회전 ---
-	if (inputManager->IsMouseLooking())
+	if (InputManager->IsMouseLooking())
 	{
 		// 마우스룩 모드는 WndProc에서 Begin/End로 관리
 		float mdx = 0.f, mdy = 0.f;
-		inputManager->ConsumeMouseDelta(mdx, mdy);
+		InputManager->ConsumeMouseDelta(mdx, mdy);
 
-		float RotationSensitivity = camera->GetRotationSensitivity(); // 일단 크게 해서 동작 확인
-		camera->AddYawPitch(mdx * RotationSensitivity, mdy * RotationSensitivity);
+		float RotationSensitivity = Camera->GetRotationSensitivity(); // 일단 크게 해서 동작 확인
+		Camera->AddYawPitch(mdx * RotationSensitivity, mdy * RotationSensitivity);
 	}
 
-	float TranslationSensitivity = camera->GetTranslationSensitivity();
+	float TranslationSensitivity = Camera->GetTranslationSensitivity();
 
-	if (inputManager->IsKeyDown('W'))
+	if (InputManager->IsKeyDown('W'))
 	{
 		dy += TranslationSensitivity; // 전진
 	}
-	if (inputManager->IsKeyDown('A'))
+	if (InputManager->IsKeyDown('A'))
 	{
 		dx -= TranslationSensitivity; // 좌
 	}
-	if (inputManager->IsKeyDown('S'))
+	if (InputManager->IsKeyDown('S'))
 	{
 		dy -= TranslationSensitivity; // 후진
 	}
-	if (inputManager->IsKeyDown('D'))
+	if (InputManager->IsKeyDown('D'))
 	{
 		dx += TranslationSensitivity; // 우
 	}
-	if (inputManager->IsKeyDown('E'))
+	if (InputManager->IsKeyDown('E'))
 	{
 		dz += TranslationSensitivity; // 상
 	}
-	if (inputManager->IsKeyDown('Q'))
+	if (InputManager->IsKeyDown('Q'))
 	{
 		dz -= TranslationSensitivity; // 하
 	}
 
 	static float t = 0.0f; t += deltaTime;
 	// 대각선 이동 속도 보정(선택): 벡터 정규화
-	camera->MoveLocal(dx, dy, dz, deltaTime, boost);
+	Camera->MoveLocal(dx, dy, dz, deltaTime, boost);
 }
 
 bool UScene::OnInitialize()

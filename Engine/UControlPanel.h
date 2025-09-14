@@ -8,26 +8,8 @@
 
 class UControlPanel : public ImGuiWindowWrapper
 {
-private:
-	USceneManager* SceneManager;
-	UGizmoManager* GizmoManager;
-	ULineBatcherManager* LineBatcherManager;
-	URenderer* Renderer;
-
-	// Spawn Primitive Section
-	TArray<UClass*> registeredTypes;
-	TArray<FString> choiceStrList;
-	TArray<const char*> choices;
-	int32 primitiveChoiceIndex = 0;
-
-	// Scene Management Section
-	char sceneName[256] = "Default";
-
-	// Camera Management Section
-
-
 public:
-	UControlPanel(USceneManager* sceneManager, UGizmoManager* gizmoManager, ULineBatcherManager* LineBatcherManager, URenderer* Renderer);
+	UControlPanel(USceneManager* InSceneManager, UGizmoManager* InGizmoManager, ULineBatcherManager* InLineBatcherManager, URenderer* InRenderer);
 	void RenderContent() override;
 	void PrimaryInformationSection();
 	void SpawnPrimitiveSection();
@@ -35,6 +17,21 @@ public:
 	void CameraManagementSection();
 	void GridManagementSection();
 	void ViewModeSection();
-	USceneComponent* CreateSceneComponentFromChoice(int index);
+	USceneComponent* CreateSceneComponentFromChoice(int Index);
+
+private:
+	USceneManager* SceneManager;
+	UGizmoManager* GizmoManager;
+	ULineBatcherManager* LineBatcherManager;
+	URenderer* Renderer;
+
+	// Spawn Primitive Section
+	TArray<UClass*> RegisteredTypes;
+	TArray<FString> ChoiceStrList;
+	TArray<const char*> Choices;
+	int32 PrimitiveChoiceIndex = 0;
+
+	// Scene Management Section
+	char SceneName[256] = "Default";
 };
 

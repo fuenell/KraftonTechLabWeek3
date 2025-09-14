@@ -43,6 +43,9 @@ bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int
 	windowWidth = width;
 	windowHeight = height;
 
+	// 현재 시간을 이용해 난수 시드를 초기화합니다.
+	srand(static_cast<unsigned int>(time(NULL)));
+
 	// Create main window
 	if (!CreateMainWindow(hInstance))
 	{
@@ -107,8 +110,6 @@ bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int
 		return false;
 	}
 
-	
-
 
 	// Allow derived classes to initialize
 	if (!OnInitialize())
@@ -131,7 +132,7 @@ void Application::Run()
 	{
 		timeManager.BeginFrame();
 
-		
+
 
 
 		// 대강 이런식으로 추가 구현 예정
@@ -255,7 +256,7 @@ void Application::InternalRender()
 	Render();
 
 
-	
+
 
 	// Render GUI
 	gui.BeginFrame();
@@ -333,12 +334,6 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 
 
 	return 0;
-}
-
-bool Application::OnInitialize()
-{
-	return true;
-
 }
 
 UScene* Application::CreateDefaultScene()

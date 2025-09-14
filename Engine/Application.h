@@ -86,7 +86,7 @@ protected:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	// Override point32s for derived classes
-	virtual bool OnInitialize();
+	virtual bool OnInitialize() = 0;
 	virtual void RenderGUI() {}
 	virtual void OnShutdown() {}
 	// Called on window resize
