@@ -64,7 +64,6 @@ public:
 	void ReleaseConstantBuffer();
 
 	// Buffer creation
-	ID3D11Buffer* CreateIndexBuffer(const void* data, size_t sizeInBytes);
 	bool ReleaseVertexBuffer(ID3D11Buffer* buffer);
 	bool ReleaseIndexBuffer(ID3D11Buffer* buffer);
 
@@ -156,9 +155,9 @@ public:
 
 	static ID3D11PixelShader* CreatePixelShader(ID3D11Device* Device, ID3DBlob* PSBlob);
 
-	static ID3D11Buffer* CreateVertexBuffer(
+	static ID3D11Buffer* CreateBuffer(
 		ID3D11Device* Device,
-		D3D11_BUFFER_DESC bufferDesc,
+		D3D11_BUFFER_DESC BufferDesc,
 		const void* data
 	);
 };

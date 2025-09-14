@@ -188,6 +188,7 @@
       <Filter>Engine\UI</Filter>
     </ClCompile>
     <ClCompile Include="BillBoardManager.cpp" />
+    <ClCompile Include="UUIDRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -366,6 +367,7 @@
       <Filter>Engine\UI</Filter>
     </ClInclude>
     <ClInclude Include="BillBoardManager.h" />
+    <ClInclude Include="UUIDRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

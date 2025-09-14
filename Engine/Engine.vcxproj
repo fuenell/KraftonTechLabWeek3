@@ -232,6 +232,7 @@
     <ClCompile Include="UInputManager.cpp" />
     <ClCompile Include="URenderer.cpp" />
     <ClCompile Include="UPlaneComp.cpp" />
+    <ClCompile Include="UUIDRenderer.cpp" />
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
@@ -293,6 +294,7 @@
     <ClInclude Include="UPrimitiveComponent.h" />
     <ClInclude Include="URenderer.h" />
     <ClInclude Include="UPlaneComp.h" />
+    <ClInclude Include="UUIDRenderer.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>

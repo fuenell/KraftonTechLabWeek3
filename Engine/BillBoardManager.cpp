@@ -5,7 +5,11 @@ BillBoardManager::BillBoardManager() :
 	VertexShader(nullptr),
 	PixelShader(nullptr),
 	InputLayout(nullptr),
-	VertexBuffer(nullptr)
+	VertexBuffer(nullptr),
+	VertexBufferSize(0),
+	IndexBufferSize(0),
+	VertexStride(0),
+	IndexStride(0)
 {
 }
 
@@ -45,29 +49,37 @@ bool BillBoardManager::Initialize(ID3D11Device* Device)
 	if (!PixelShader)
 		return false;
 
-	TArray<FVertexPosColor4> VA = {
-		{0.3f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
-		{0.0f, 0.3f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
-		{0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f},
-	};
-
-	SetBuffer(Device, VA);
-
 	return true;
 }
 
-void BillBoardManager::SetBuffer(ID3D11Device* Device, TArray<FVertexPosColor4> VertexArray)
+void BillBoardManager::SetBuffer(
+	ID3D11Device* Device,
+	TArray<FVertexPosColor4> VertexArray,
+	TArray<uint32> IndexArray)
 {
+	VertexStride = sizeof(FVertexPosColor4);
+	VertexBufferSize = VertexStride * VertexArray.size();
+
+	IndexStride = sizeof(uint32);
+	IndexBufferSize = IndexStride * IndexArray.size();
+
 	D3D11_BUFFER_DESC Desc = {};
 	Desc.Usage = D3D11_USAGE_IMMUTABLE;
-	Desc.ByteWidth = sizeof(FVertexPosColor4) * VertexArray.size();
+	Desc.ByteWidth = VertexBufferSize;
 	Desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	Desc.CPUAccessFlags = 0;
 	Desc.MiscFlags = 0;
 	Desc.StructureByteStride = 0;
 
-	VertexBuffer = URenderer::CreateVertexBuffer(Device, Desc, (const void *)VertexArray.data());
+	VertexBuffer = URenderer::CreateBuffer(Device, Desc, (const void *)VertexArray.data());
 	if (!VertexBuffer)
+		;
+
+	Desc.ByteWidth = IndexBufferSize;
+	Desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	
+	IndexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)IndexArray.data());
+	if (!IndexBuffer)
 		;
 }
 
@@ -79,9 +91,9 @@ void BillBoardManager::Bind(ID3D11DeviceContext* DeviceContext)
 
 	// Set input layout
 	DeviceContext->IASetInputLayout(InputLayout);
-	UINT Stride = sizeof(FVertexPosColor4);
 	UINT Offset = 0;
-	DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &Stride, &Offset);
+	DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &VertexStride, &Offset);
+	DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, Offset);
 
 	// Set primitive topology (default to triangle list)
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -89,7 +101,18 @@ void BillBoardManager::Bind(ID3D11DeviceContext* DeviceContext)
 
 void BillBoardManager::Render(ID3D11DeviceContext* DeviceContext)
 {
-	DeviceContext->Draw(3, 0);
+	DeviceContext->DrawIndexed(IndexBufferSize, 0, 0);
+	if (VertexBuffer)
+	{
+		VertexBuffer->Release();
+		VertexBuffer = nullptr;
+	}
+
+	if (IndexBuffer)
+	{
+		IndexBuffer->Release();
+		IndexBuffer = nullptr;
+	}
 }
 
 void BillBoardManager::Release()
@@ -116,5 +139,11 @@ void BillBoardManager::Release()
 	{
 		VertexBuffer->Release();
 		VertexBuffer = nullptr;
+	}
+
+	if (IndexBuffer)
+	{
+		IndexBuffer->Release();
+		IndexBuffer = nullptr;
 	}
 }

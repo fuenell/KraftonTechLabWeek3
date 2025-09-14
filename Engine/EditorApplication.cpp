@@ -140,6 +140,9 @@ void EditorApplication::ProcessMouseInteraction()
 
 void EditorApplication::Render()
 {
+	ID3D11Device* Device = renderer.GetDevice();
+	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
+
 	GetSceneManager().GetScene()->Render();
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +176,18 @@ void EditorApplication::Render()
 		}
 		
 		LineBatcherManager.AddBoundingBox(WorldBounds, 0x80FFFFFF);
+
+		UUIDRenderer.SetUUIDVertices(
+			Device,
+			(float)windowWidth / (float)windowHeight,
+			PickedPrimitive->UUID,
+			0.05f,
+			PickedPrimitive->GetScale().Z,
+			WorldMatrix,
+			View,
+			Proj);
+		UUIDRenderer.Bind(DeviceContext);
+		UUIDRenderer.Render(DeviceContext);
 	}
 
 	// 2) 그리드 쌓기 (원하는 색/간격/개수)
@@ -181,13 +196,8 @@ void EditorApplication::Render()
 	const uint32_t ColAxis = 0x80FFFFFF;
 	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
 
-	ID3D11DeviceContext* DeviceContext = renderer.GetDeviceContext();
-	
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
-
-	BillBoardManager.Bind(DeviceContext);
-	BillBoardManager.Render(DeviceContext);
 }
 
 void EditorApplication::RenderGUI()

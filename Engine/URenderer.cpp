@@ -213,31 +213,6 @@ bool URenderer::ReleaseIndexBuffer(ID3D11Buffer* buffer)
 	return false;
 }
 
-ID3D11Buffer* URenderer::CreateIndexBuffer(const void* data, size_t sizeInBytes)
-{
-	if (!device || !data || sizeInBytes == 0)
-		return nullptr;
-
-	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.ByteWidth = static_cast<UINT>(sizeInBytes);
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-	D3D11_SUBRESOURCE_DATA initData = {};
-	initData.pSysMem = data;
-
-	ID3D11Buffer* buffer = nullptr;
-	HRESULT hr = device->CreateBuffer(&bufferDesc, &initData, &buffer);
-
-	if (FAILED(hr))
-	{
-		LogError("CreateIndexBuffer", hr);
-		return nullptr;
-	}
-
-	return buffer;
-}
-
 ID3D11Texture2D* URenderer::CreateTexture2D(int32 width, int32 height, DXGI_FORMAT format, const void* data)
 {
 	if (!device || width <= 0 || height <= 0)
@@ -812,9 +787,9 @@ ID3D11PixelShader* URenderer::CreatePixelShader(ID3D11Device* Device, ID3DBlob* 
 	return PixelShader;
 }
 
-ID3D11Buffer* URenderer::CreateVertexBuffer(
+ID3D11Buffer* URenderer::CreateBuffer(
 	ID3D11Device* Device,
-	D3D11_BUFFER_DESC bufferDesc,
+	D3D11_BUFFER_DESC BufferDesc,
 	const void* data
 )
 {
@@ -825,7 +800,7 @@ ID3D11Buffer* URenderer::CreateVertexBuffer(
 	initData.pSysMem = data;
 
 	ID3D11Buffer* buffer = nullptr;
-	HRESULT hr = Device->CreateBuffer(&bufferDesc, &initData, &buffer);
+	HRESULT hr = Device->CreateBuffer(&BufferDesc, &initData, &buffer);
 
 	if (FAILED(hr))
 	{

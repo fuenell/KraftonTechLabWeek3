@@ -94,7 +94,7 @@ bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int
 	{
 		return false;
 	}
-	if (!BillBoardManager.Initialize(renderer.GetDevice()))
+	if (!UUIDRenderer.Initialize(renderer.GetDevice()))
 	{
 		return false;
 	}
