@@ -148,11 +148,11 @@ void EditorApplication::Render()
 	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
 
 	if (ShowPrimitives == EEngineShowFlags::SF_Primitives)
+	{
 		GetSceneManager().GetScene()->Render();
-
-	// 기즈모 그리기
-	gizmoManager.Draw(GetRenderer());
-
+		// 기즈모 그리기
+		gizmoManager.Draw(GetRenderer());
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Batch Rendering
