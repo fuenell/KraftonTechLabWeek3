@@ -18,9 +18,9 @@ UScene::UScene()
 UScene::~UScene()
 {
 	OnShutdown();
-	for (UObject* object : Objects)
+	for (UObject* Object : Objects)
 	{
-		delete object;
+		delete Object;
 	}
 	delete Camera;
 }

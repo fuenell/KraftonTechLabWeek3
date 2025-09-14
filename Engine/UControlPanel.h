@@ -33,5 +33,6 @@ private:
 
 	// Scene Management Section
 	char SceneName[256] = "Default";
+	FString SavePath = "./data/";
 };
 

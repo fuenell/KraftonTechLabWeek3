@@ -2,24 +2,20 @@
 #include "UDefaultScene.h"
 #include "URaycastManager.h"
 
-void UDefaultScene::Update(float deltaTime)
+void UDefaultScene::Update(float DeltaTime)
 {
-    UScene::Update(deltaTime);
-    static float t = 0.0f;
-    t += deltaTime;
+	UScene::Update(DeltaTime);
+	static float T = 0.0f;
+	T += DeltaTime;
 }
 
 bool UDefaultScene::OnInitialize()
 {
-    UScene::OnInitialize();
-    if (IsFirstTime)
-    {
-        // 컴포넌트 생성
-        USphereComp* sphere = new USphereComp({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f });
-
-        AddObject(sphere);
-        IsFirstTime = false;
-    }
+	UScene::OnInitialize();
+	if (IsFirstTime)
+	{
+		IsFirstTime = false;
+	}
 
 	return true;
 }

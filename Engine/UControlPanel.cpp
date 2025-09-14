@@ -160,14 +160,14 @@ void UControlPanel::SceneManagementSection()
 	ImGui::SameLine();
 	if (ImGui::Button("Save scene") && strcmp(SceneName, "") != 0)
 	{
-		std::filesystem::path _path("./data/");
+		std::filesystem::path _path(SavePath);
 		std::filesystem::create_directory(_path);
 		SceneManager->SaveScene(_path.string() + FString(SceneName) + ".Scene");
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Load scene") && strcmp(SceneName, "") != 0)
 	{
-		SceneManager->LoadScene("./data/" + FString(SceneName) + ".Scene");
+		SceneManager->LoadScene(SavePath + FString(SceneName) + ".Scene");
 	}
 }
 

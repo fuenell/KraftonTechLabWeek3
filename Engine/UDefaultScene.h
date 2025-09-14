@@ -8,7 +8,7 @@ class UDefaultScene :
 private:
     static inline bool IsFirstTime = true;
 public:
-    void Update(float deltaTime) override;
+    void Update(float DeltaTime) override;
     bool OnInitialize() override;
 };
 
