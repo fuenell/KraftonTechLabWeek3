@@ -68,6 +68,12 @@ bool URenderer::Initialize(HWND windowHandle)
 		LogError("CreateRasterizerState", E_FAIL);
 		return false;
 	}
+	
+	if (!CreateRasterizerStateWire())
+	{
+		LogError("CreateRasterizerState", E_FAIL);
+		return false;
+	}
 
 	if (!CreateBlendState())
 	{
@@ -154,6 +160,17 @@ bool URenderer::CreateRasterizerState()
 	return CheckResult(hr, "CreateRasterizerState");
 }
 
+bool URenderer::CreateRasterizerStateWire()
+{
+	D3D11_RASTERIZER_DESC rasterizerDesc = {};
+	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;           // 뒷면 제거
+	rasterizerDesc.FrontCounterClockwise = TRUE;
+
+	HRESULT hr = device->CreateRasterizerState(&rasterizerDesc, &RasterizerStateWire);
+	return CheckResult(hr, "CreateRasterizerStateWire");
+}
+
 bool URenderer::CreateConstantBuffer()
 {
 	D3D11_BUFFER_DESC bufferDesc = {};
@@ -196,6 +213,7 @@ void URenderer::Release()
 	ReleaseShader();
 	ReleaseConstantBuffer();
 
+	SAFE_RELEASE(RasterizerStateWire);
 	SAFE_RELEASE(rasterizerState);
 	SAFE_RELEASE(depthStencilView);
 	SAFE_RELEASE(renderTargetView);
@@ -354,10 +372,22 @@ void URenderer::PrepareShader()
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Set rasterizer state (와인딩 순서 적용)
-	if (rasterizerState)
+	switch (ViewModeIndex)
 	{
+	case EViewModeIndex::VMI_Normal:
 		deviceContext->RSSetState(rasterizerState);
+
+		break;
+
+	case EViewModeIndex::VMI_Wireframe:
+		deviceContext->RSSetState(RasterizerStateWire);
+		break;
+
+	default:
+		deviceContext->RSSetState(rasterizerState);
+		break;
 	}
+
 
 	// Set constant buffer
 	if (constantBuffer)
@@ -492,6 +522,11 @@ void URenderer::SetTexture(ID3D11ShaderResourceView* srv, UINT slot)
 	{
 		deviceContext->PSSetShaderResources(slot, 1, &srv);
 	}
+}
+
+void URenderer::SetRasterizerState(EViewModeIndex InViewModeIndex)
+{
+	ViewModeIndex = InViewModeIndex;
 }
 
 bool URenderer::ResizeBuffers(int32 width, int32 height)

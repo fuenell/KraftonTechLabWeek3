@@ -84,3 +84,11 @@ enum class PrimitiveType
 	SpotLight,
 	End
 };
+
+enum class EViewModeIndex : uint32
+{
+	VMI_Normal,
+	VMI_Lit,
+	VMI_Unlit,
+	VMI_Wireframe,
+};

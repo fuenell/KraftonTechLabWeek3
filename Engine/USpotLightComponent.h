@@ -13,6 +13,13 @@ public:
 	}
 	~USpotLightComponent();
 
+	// getter
+	inline float GetAngle()const { return Angle; }
+	inline float GetScale()const { return Scale; }
+
+	// setter
+	inline void  SetAngle(float InAngle) { Angle = InAngle; }
+	inline void  SetScale(float InScale) { Scale = InScale; }
 
 private:
 	bool IsManageable() override { return true; }
