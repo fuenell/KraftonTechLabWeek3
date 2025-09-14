@@ -2,19 +2,12 @@
 #include "UEngineSubsystem.h"
 #include "Vector.h"
 #include "Matrix.h"
+#include "UMesh.h"
 
 struct FLineVertex {
     float X, Y, Z;       // POSITION
     uint32_t Abgr;     // COLOR packed ABGR (0xAABBGGRR 아님: 본 코드는 ABGR)
 };
-
-// AABB 구조체
-struct FBoundingBox
-{
-    float MinX, MinY, MinZ;
-    float MaxX, MaxY, MaxZ;
-};
-
 
 
 class ULineBatcherManager : UEngineSubsystem
@@ -41,27 +34,6 @@ public:
 
     static void LocalAABBtoWorldAABB(const FBounds& L, const FMatrix& InMatrix, FBounds& Out)
     {
-        //// 1) center / extents
-        //const FVector c = (L.Min + L.Max) * 0.5f;
-        //const FVector e = (L.Max - L.Min) * 0.5f;
-        //
-        //// 2) center transform (row-vector 규약)
-        //const FVector cw = M.TransformPointRow(c);
-        //
-        //// 3) extents: 열(column) 절댓값 합 (row-vector 규약 핵심)
-        //const float m00 = M.M[0][0], m10 = M.M[1][0], m20 = M.M[2][0]; // col 0
-        //const float m01 = M.M[0][1], m11 = M.M[1][1], m21 = M.M[2][1]; // col 1
-        //const float m02 = M.M[0][2], m12 = M.M[1][2], m22 = M.M[2][2]; // col 2
-        //
-        //FVector ew;
-        //ew.X = fabsf(m00) * e.X + fabsf(m10) * e.Y + fabsf(m20) * e.Z; // ← col0
-        //ew.Y = fabsf(m01) * e.X + fabsf(m11) * e.Y + fabsf(m21) * e.Z; // ← col1
-        //ew.Z = fabsf(m02) * e.X + fabsf(m12) * e.Y + fabsf(m22) * e.Z; // ← col2
-        //
-        //// 4) world AABB
-        //Out.Min = cw - ew;
-        //Out.Max = cw + ew;
-
         const FVector c = (L.Min + L.Max) * 0.5f;
         const FVector e = (L.Max - L.Min) * 0.5f;
 

@@ -84,6 +84,7 @@ void UControlPanel::SpawnPrimitiveSection()
 	if (ImGui::Button("Spawn"))
 	{
 		USceneComponent* sceneComponent = CreateSceneComponentFromChoice(primitiveChoiceIndex);
+		sceneComponent->Name = registeredTypes[primitiveChoiceIndex]->GetUClassName();
 		if (sceneComponent != nullptr)
 		{
 			sceneComponent->SetPosition(FVector(
@@ -193,7 +194,8 @@ void UControlPanel::CameraManagementSection()
 	ImGui::SameLine();
 	if (ImGui::Button("Reset")) { fovDeg = 60.0f; changed = true; }
 
-	if (changed) {
+	if (changed)
+	{
 		fovDeg = std::clamp(fovDeg, minFov, maxFov);
 		camera->SetFOV(fovDeg); // 내부에서 proj 재빌드
 	}

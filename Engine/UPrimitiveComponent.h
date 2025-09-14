@@ -14,8 +14,6 @@ protected:
 	UMesh* mesh;
 	FVector4 Color = { 1, 1, 1, 1 };
 
-	PrimitiveType Type;
-
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
 		: USceneComponent(loc, rot, scl), mesh(nullptr)
@@ -32,8 +30,6 @@ public:
 	virtual bool Init(UMeshManager* meshManager);
 
 	bool CountOnInspector() override { return true; }
-
-	PrimitiveType GetType()const { return Type; }
 
 	UMesh* GetMesh() { return mesh; }
 

@@ -62,6 +62,12 @@ struct FMatrix
 		return R;
 	}
 
+	// 행우선
+	static FVector4 MultiplyVectorRow(const FVector V, const FMatrix M)
+	{
+		return MultiplyVectorRow({ V.X, V.Y, V.Z, 1 }, M);
+	}
+
 	FMatrix operator*(const FMatrix& B) const { return Multiply(*this, B); }
 	static FMatrix Transpose(const FMatrix& A)
 	{

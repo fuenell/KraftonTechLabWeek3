@@ -8,20 +8,6 @@
 
 class UClass
 {
-private:
-	static inline TMap<FName, TUniquePtr<UClass>> classList;
-	//static inline TMap<FString, uint32> nameToId;
-	// DisplayName은 typeName을 나타내는 사용자 정의 메타데이터다.
-	static inline TMap<FName, FName> TypeNameToId;
-	static inline uint32 registeredCount = 0;
-
-	TMap<FName, FName> metadata;
-	uint32 typeId;
-	FDynamicBitset typeBitset;
-	FName className, superClassTypeName;
-	UClass* superClass;
-	TFunction<UObject* ()> createFunction;
-	bool processed = false;
 public:
 	static UClass* RegisterToFactory(const FName& typeName,
 		const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName);
@@ -100,6 +86,18 @@ public:
 		return createFunction ? createFunction() : nullptr;
 	}
 
+private:
+	static inline TMap<FName, TUniquePtr<UClass>> classList;
+	//static inline TMap<FString, uint32> nameToId;
+	// DisplayName은 typeName을 나타내는 사용자 정의 메타데이터다.
+	static inline TMap<FName, FName> TypeNameToId;
+	static inline uint32 registeredCount = 0;
+
+	TMap<FName, FName> metadata;
+	uint32 typeId;
+	FDynamicBitset typeBitset;
+	FName className, superClassTypeName;
+	UClass* superClass;
+	TFunction<UObject* ()> createFunction;
+	bool processed = false;
 };
-
-
