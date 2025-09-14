@@ -151,10 +151,15 @@ void UControlPanel::CameraManagementSection()
 	float cameraLocation[3] = { pos.X, pos.Y, pos.Z };
 	FVector eulDeg = camera->GetEulerXYZDeg();
 	float eulerXYZ[3] = { eulDeg.X, eulDeg.Y, eulDeg.Z };
+	
+	float RotationSensitivity = camera->GetRotationSensitivity() * 200.0f;
+	float TranslationSensitivity = camera->GetTranslationSensitivity();
 
 	// --- 테이블 UI ---
 	bool locCommitted = false;
 	bool rotCommitted = false;
+	bool RotSensCommitted = false;
+	bool TransSensCommitted = false;
 
 	bool isOrthogonal = camera->IsOrtho();
 	ImGui::Checkbox("Orthogonal", &isOrthogonal);
@@ -254,6 +259,31 @@ void UControlPanel::CameraManagementSection()
 
 		ImGui::EndTable();
 	}
+
+	// 카메라 회전 감도 조작
+	ImGui::Text("Rotation Sensitivity");
+
+	const float RotationSensitivityMin = 0.1f;
+	const float RotationSensitivityMax = 2.0f;
+	// DragFloat로 교체
+	if (ImGui::DragFloat("##RotationSensitivity",
+		&RotationSensitivity, 0.1f, RotationSensitivityMin, RotationSensitivityMax, "%.3f"))
+	{
+		RotSensCommitted = true; // 값이 바뀐 순간 바로 commit
+	}
+
+	// 카메라 이동 감도 조작
+	ImGui::Text("Translation Sensitivity");
+
+	const float TranslationSensitivityMin = 0.1f;
+	const float TranslationSensitivityMax = 10.0f;
+	// DragFloat로 교체
+	if (ImGui::DragFloat("##TranslationSensitivity",
+		&TranslationSensitivity, 0.1f, TranslationSensitivityMin, TranslationSensitivityMax, "%.3f"))
+	{
+		TransSensCommitted = true; // 값이 바뀐 순간 바로 commit
+	}
+
 	// World / Local 선택 (체크박스 대신, 버튼처럼 보이는 상호배타 토글)
 
 	if (ModeButton("World", GizmoManager->GetIsWorldSpace()))
@@ -292,6 +322,16 @@ void UControlPanel::CameraManagementSection()
 	if (rotCommitted)
 	{
 		camera->SetEulerXYZDeg(eulerXYZ[0], eulerXYZ[1], eulerXYZ[2]);
+	}
+	
+	if (RotSensCommitted)
+	{
+		camera->SetRotationSensitivity(RotationSensitivity / 200.0f);
+	}
+	
+	if (TransSensCommitted)
+	{
+		camera->SetTranslationSensitivity(TranslationSensitivity);
 	}
 }
 

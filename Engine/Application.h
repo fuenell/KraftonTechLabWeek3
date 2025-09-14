@@ -9,6 +9,7 @@
 #include "USceneManager.h"
 #include "UGizmoManager.h"
 #include "ULineBatcherManager.h"
+#include "UUIDRenderer.h"
 
 class Application
 {
@@ -23,6 +24,7 @@ protected:
 	USceneManager sceneManager;
 	URaycastManager raycastManager;
 	ULineBatcherManager LineBatcherManager;
+	UUIDRenderer UUIDRenderer;
 
 	// Application state
 	bool bIsRunning;

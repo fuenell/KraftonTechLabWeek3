@@ -71,8 +71,6 @@ public:
 	void ReleaseConstantBuffer();
 
 	// Buffer creation
-	ID3D11Buffer* CreateVertexBuffer(const void* data, size_t sizeInBytes);
-	ID3D11Buffer* CreateIndexBuffer(const void* data, size_t sizeInBytes);
 	bool ReleaseVertexBuffer(ID3D11Buffer* buffer);
 	bool ReleaseIndexBuffer(ID3D11Buffer* buffer);
 
@@ -130,10 +128,6 @@ private:
 	bool CreateDepthStencilView(int32 width, int32 height);
 	bool SetupViewport(int32 width, int32 height);
 
-	// Error handling
-	void LogError(const char* function, HRESULT hr);
-	bool CheckResult(HRESULT hr, const char* function);
-
 	// 행렬 복사 핼퍼
 	static inline void CopyRowMajor(float dst[16], const FMatrix& src)
 	{
@@ -158,4 +152,25 @@ public:
 		currentViewport = viewport;
 	}
 
+	// Error handling
+	static void LogError(const char* function, HRESULT hr);
+	static bool CheckResult(HRESULT hr, const char* function);
+
+	static ID3DBlob* CompileShader(LPCWSTR pFileName, LPCSTR pEntrypoint, LPCSTR pTarget);
+
+	static ID3D11VertexShader* CreateVertexShader(ID3D11Device* Device, ID3DBlob* VSBlob);
+
+	static ID3D11InputLayout* CreateInputLayout(
+		ID3D11Device* Device,
+		D3D11_INPUT_ELEMENT_DESC* InputElements,
+		int64 InputElementsSize,
+		ID3DBlob* VSBlob);
+
+	static ID3D11PixelShader* CreatePixelShader(ID3D11Device* Device, ID3DBlob* PSBlob);
+
+	static ID3D11Buffer* CreateBuffer(
+		ID3D11Device* Device,
+		D3D11_BUFFER_DESC BufferDesc,
+		const void* data
+	);
 };
