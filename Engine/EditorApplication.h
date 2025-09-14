@@ -17,39 +17,35 @@ public:
 	EditorApplication() = default;
 	~EditorApplication()
 	{
-		delete controlPanel;
-		delete propertyWindow;
+		delete ControlPanel;
+		delete PropertyWindow;
 		delete SceneManagerWindow;
 		delete ToggleWindow;
-		controlPanel = nullptr;
-		propertyWindow = nullptr;
+		ControlPanel = nullptr;
+		PropertyWindow = nullptr;
 		SceneManagerWindow = nullptr;
 		ToggleWindow = nullptr;
 	}
-	UScene* CreateDefaultScene() override;
 
 	void OnSceneChange() override;
 	void SetTarget(UPrimitiveComponent* Target);
 
 protected:
-	void Update(float deltaTime) override;
+	void Update(float DeltaTime) override;
 	void Render() override;
 	void RenderGUI() override;
 	bool OnInitialize() override;
-	void OnResize(int32 width, int32 height) override;
+	void OnResize(int32 Width, int32 Height) override;
 
 private:
 	void ProcessKeyboardInput();
 	void ProcessMouseInteraction();
 
 private:
-	UGizmoManager gizmoManager;
-	TArray<USceneComponent*> sceneComponents;
+	UGizmoManager GizmoManager;
 
-	USceneComponent* selectedSceneComponent;
-
-	UControlPanel* controlPanel;
-	USceneComponentPropertyWindow* propertyWindow;
+	UControlPanel* ControlPanel;
+	USceneComponentPropertyWindow* PropertyWindow;
 	USceneManagerWindow* SceneManagerWindow;
 	UToggleWindow* ToggleWindow;
 };

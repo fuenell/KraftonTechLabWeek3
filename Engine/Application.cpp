@@ -13,12 +13,12 @@ Application* g_pApplication = nullptr;
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 Application::Application()
-	: hWnd(nullptr)
+	: HWnd(nullptr)
 	, bIsRunning(false)
 	, bIsInitialized(false)
-	, windowTitle(DefaultTitle)
-	, windowWidth(1024)
-	, windowHeight(768)
+	, WindowTitle(DefaultTitle)
+	, WindowWidth(1024)
+	, WindowHeight(768)
 {
 	g_pApplication = this;
 }
@@ -32,81 +32,81 @@ Application::~Application()
 	g_pApplication = nullptr;
 }
 
-bool Application::Initialize(HINSTANCE hInstance, const std::wstring& title, int32 width, int32 height)
+bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int32 Width, int32 Height)
 {
 	if (bIsInitialized)
 		return false;
 
 	UClass::ResolveTypeBitsets();
 
-	windowTitle = title;
-	windowWidth = width;
-	windowHeight = height;
+	WindowTitle = Title;
+	WindowWidth = Width;
+	WindowHeight = Height;
 
 	// 현재 시간을 이용해 난수 시드를 초기화합니다.
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	// Create main window
-	if (!CreateMainWindow(hInstance))
+	if (!CreateMainWindow(HInstance))
 	{
 		return false;
 	}
 
 	// Initialize core systems
-	if (!timeManager.Initialize(60))
+	if (!TimeManager.Initialize(60))
 	{
-		MessageBox(hWnd, L"Failed to initialize TimeManager", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to initialize TimeManager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!renderer.Initialize(hWnd))
+	if (!Renderer.Initialize(HWnd))
 	{
-		MessageBox(hWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!renderer.CreateShader())
+	if (!Renderer.CreateShader())
 	{
-		MessageBox(hWnd, L"Failed to create shaders", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to create shaders", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!renderer.CreateConstantBuffer())
+	if (!Renderer.CreateConstantBuffer())
 	{
-		MessageBox(hWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!meshManager.Initialize(&renderer))
+	if (!MeshManager.Initialize(&Renderer))
 	{
-		MessageBox(hWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
-	if (!sceneManager.Initialize(g_pApplication))
+	if (!SceneManager.Initialize(g_pApplication))
 	{
-		MessageBox(hWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
-	if (!raycastManager.Initialize(&renderer, &inputManager))
+	if (!RaycastManager.Initialize(&Renderer, &InputManager))
 	{
-		MessageBox(hWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
-	if (!gui.Initialize(hWnd, renderer.GetDevice(), renderer.GetDeviceContext()))
+	if (!Gui.Initialize(HWnd, Renderer.GetDevice(), Renderer.GetDeviceContext()))
 	{
 		return false;
 	}
-	if (!UUIDRenderer.Initialize(renderer.GetDevice()))
+	if (!UUIDRenderer.Initialize(Renderer.GetDevice()))
 	{
 		return false;
 	}
 
 	// 여기서 일단은 그리드 렌더링에 필요한 vb, ib ,cb, vs, ps, ia 설정
 	// 추후 수정예정 why? => 아직은 그리드만 구현했기 때문 
-	if (!LineBatcherManager.Initialize(renderer.GetDevice(), 1024))
+	if (!LineBatcherManager.Initialize(Renderer.GetDevice(), 1024))
 	{
-		MessageBox(hWnd, L"Failed to initialize LineBatcherManager", L"Engine Error", MB_OK | MB_ICONERROR);
+		MessageBox(HWnd, L"Failed to initialize LineBatcherManager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
 
@@ -130,7 +130,7 @@ void Application::Run()
 
 	while (bIsRunning)
 	{
-		timeManager.BeginFrame();
+		TimeManager.BeginFrame();
 
 
 
@@ -144,7 +144,7 @@ void Application::Run()
 		*/
 
 
-		inputManager.Update();
+		InputManager.Update();
 		ProcessMessages();
 
 		if (!bIsRunning)
@@ -153,8 +153,8 @@ void Application::Run()
 		InternalUpdate();
 		InternalRender();
 
-		timeManager.EndFrame();
-		timeManager.WaitForTargetFrameTime();
+		TimeManager.EndFrame();
+		TimeManager.WaitForTargetFrameTime();
 	}
 }
 
@@ -169,67 +169,67 @@ void Application::Shutdown()
 	OnShutdown();
 
 	// Shutdown core systems
-	gui.Shutdown();
-	renderer.ReleaseConstantBuffer();
-	renderer.ReleaseShader();
-	renderer.Release();
+	Gui.Shutdown();
+	Renderer.ReleaseConstantBuffer();
+	Renderer.ReleaseShader();
+	Renderer.Release();
 
 	bIsInitialized = false;
 }
 
-bool Application::CreateMainWindow(HINSTANCE hInstance)
+bool Application::CreateMainWindow(HINSTANCE HInstance)
 {
 	// Register window class
-	WNDCLASSW wndclass = {};
-	wndclass.lpfnWndProc = WndProc;
-	wndclass.hInstance = hInstance;
-	wndclass.lpszClassName = WindowClass;
-	wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	WNDCLASSW Wndclass = {};
+	Wndclass.lpfnWndProc = WndProc;
+	Wndclass.hInstance = HInstance;
+	Wndclass.lpszClassName = WindowClass;
+	Wndclass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	Wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 
-	if (!RegisterClassW(&wndclass))
+	if (!RegisterClassW(&Wndclass))
 	{
 		return false;
 	}
 
 	// Calculate window size including borders
-	RECT windowRect = { 0, 0, windowWidth, windowHeight };
-	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+	RECT WindowRect = { 0, 0, WindowWidth, WindowHeight };
+	AdjustWindowRect(&WindowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	int32 adjustedWidth = windowRect.right - windowRect.left;
-	int32 adjustedHeight = windowRect.bottom - windowRect.top;
+	int32 AdjustedWidth = WindowRect.right - WindowRect.left;
+	int32 AdjustedHeight = WindowRect.bottom - WindowRect.top;
 
 	// Create window
-	hWnd = CreateWindowExW(
+	HWnd = CreateWindowExW(
 		0,
 		WindowClass,
-		windowTitle.c_str(),
+		WindowTitle.c_str(),
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		CW_USEDEFAULT, CW_USEDEFAULT,
-		adjustedWidth, adjustedHeight,
-		nullptr, nullptr, hInstance, nullptr
+		AdjustedWidth, AdjustedHeight,
+		nullptr, nullptr, HInstance, nullptr
 	);
 
-	if (!hWnd)
+	if (!HWnd)
 	{
 		return false;
 	}
 
-	ShowWindow(hWnd, SW_SHOW);
-	UpdateWindow(hWnd);
+	ShowWindow(HWnd, SW_SHOW);
+	UpdateWindow(HWnd);
 
 	return true;
 }
 
 void Application::ProcessMessages()
 {
-	MSG msg;
-	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	MSG Msg;
+	while (PeekMessage(&Msg, nullptr, 0, 0, PM_REMOVE))
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		TranslateMessage(&Msg);
+		DispatchMessage(&Msg);
 
-		if (msg.message == WM_QUIT)
+		if (Msg.message == WM_QUIT)
 		{
 			bIsRunning = false;
 			return;
@@ -239,33 +239,30 @@ void Application::ProcessMessages()
 
 void Application::InternalUpdate()
 {
-	float deltaTime = static_cast<float>(timeManager.GetDeltaTime());
+	float DeltaTime = static_cast<float>(TimeManager.GetDeltaTime());
 
 
 	// Call derived class update
-	Update(deltaTime);
+	Update(DeltaTime);
 }
 
 void Application::InternalRender()
 {
 	// Prepare rendering
-	renderer.Prepare();
-	renderer.PrepareShader();
+	Renderer.Prepare();
+	Renderer.PrepareShader();
 
 	// Call derived class render
 	Render();
 
-
-
-
 	// Render GUI
-	gui.BeginFrame();
-	gui.Render();
+	Gui.BeginFrame();
+	Gui.Render();
 	RenderGUI();
-	gui.EndFrame();
+	Gui.EndFrame();
 
 	// Present the frame
-	renderer.SwapBuffer();
+	Renderer.SwapBuffer();
 }
 
 LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -279,7 +276,7 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 	if (g_pApplication)
 	{
 		// Let input manager process input messages
-		g_pApplication->inputManager.ProcessMessage(hWnd, message, wParam, lParam);
+		g_pApplication->InputManager.ProcessMessage(hWnd, message, wParam, lParam);
 	}
 
 	switch (message)
@@ -289,7 +286,7 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 		break;
 
 	case WM_ENTERSIZEMOVE:
-		if (g_pApplication) g_pApplication->isSizing = true;
+		if (g_pApplication) g_pApplication->bIsSizing = true;
 		break;
 	case WM_SIZE:
 		if (g_pApplication && wParam != SIZE_MINIMIZED)
@@ -297,11 +294,11 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 			int32 width = LOWORD(lParam);
 			int32 height = HIWORD(lParam);
 
-			if (g_pApplication->isSizing)
+			if (g_pApplication->bIsSizing)
 			{
 				// 드래그 중: 스왑체인 리사이즈 X, 레터/필러박스 뷰포트만 적용
-				g_pApplication->windowWidth = width;
-				g_pApplication->windowHeight = height;
+				g_pApplication->WindowWidth = width;
+				g_pApplication->WindowHeight = height;
 				g_pApplication->GetRenderer().UseAspectFitViewport(width, height);
 			}
 			else
@@ -316,9 +313,9 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 	case WM_EXITSIZEMOVE:
 		if (g_pApplication)
 		{
-			g_pApplication->isSizing = false;
-			int32 width = g_pApplication->windowWidth;
-			int32 height = g_pApplication->windowHeight;
+			g_pApplication->bIsSizing = false;
+			int32 width = g_pApplication->WindowWidth;
+			int32 height = g_pApplication->WindowHeight;
 			if (width > 0 && height > 0)
 			{
 				g_pApplication->GetRenderer().ResizeBuffers(width, height);
@@ -334,9 +331,4 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 
 
 	return 0;
-}
-
-UScene* Application::CreateDefaultScene()
-{
-	return new UScene();
 }

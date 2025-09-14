@@ -7,94 +7,112 @@
 IMPLEMENT_UCLASS(USceneManager, UEngineSubsystem)
 USceneManager::~USceneManager()
 {
-	if (currentScene)
-		delete currentScene;
-}
-
-bool USceneManager::Initialize(Application* _application)
-{
-	application = _application;
-	currentScene = _application->CreateDefaultScene();
-	currentScene->Initialize(
-		&application->GetRenderer(),
-		&application->GetMeshManager(),
-		&application->GetInputManager());
-	return true;
-}
-
-UScene* USceneManager::GetScene()
-{
-	return currentScene;
-}
-
-void USceneManager::SetScene(UScene* scene)
-{
-	if (currentScene != nullptr)
+	if (CurrentScene)
 	{
-		delete currentScene;
+		delete CurrentScene;
 	}
+}
 
-	currentScene = scene;
-
-	currentScene->Initialize(
-		&application->GetRenderer(),
-		&application->GetMeshManager(),
-		&application->GetInputManager());
-
-	application->OnSceneChange();
+bool USceneManager::Initialize(Application* InApplication)
+{
+	App = InApplication;
+	CurrentScene = CreateDefaultScene();
+	CurrentScene->Initialize(
+		&App->GetRenderer(),
+		&App->GetMeshManager(),
+		&App->GetInputManager());
+	return true;
 }
 
 void USceneManager::RequestExit()
 {
-	if (application) {
-		application->RequestExit();
-	}
-}
-
-
-void USceneManager::LoadScene(const FString& path)
-{
-	std::ifstream file(path);
-	if (!file)
+	if (App)
 	{
-		// Log error: failed to open file
-		return;
-
+		App->RequestExit();
 	}
-	std::stringstream buffer;
-	buffer << file.rdbuf();
-
-	json::JSON sceneData = json::JSON::Load(buffer.str());
-	SetScene(UScene::Create(sceneData));
 }
 
-void USceneManager::SaveScene(const FString& path)
+UScene* USceneManager::GetScene()
 {
-	std::filesystem::path fsPath(path);
+	return CurrentScene;
+}
+
+void USceneManager::SetScene(UScene* Scene)
+{
+	if (Scene == nullptr)
+	{
+		return;
+	}
+
+	if (CurrentScene != nullptr)
+	{
+		delete CurrentScene;
+	}
+
+	CurrentScene = Scene;
+
+	CurrentScene->Initialize(
+		&App->GetRenderer(),
+		&App->GetMeshManager(),
+		&App->GetInputManager());
+
+	App->OnSceneChange();
+}
+
+UScene* USceneManager::CreateDefaultScene()
+{
+	UScene* NewScene = LoadScene(SavePath + FString(SceneName) + SceneExtension);
+	if (NewScene == nullptr)
+	{
+		NewScene = new UScene();
+	}
+	return NewScene;
+}
+
+UScene* USceneManager::LoadScene(const FString& Path)
+{
+	std::ifstream File(Path);
+	if (!File)
+	{
+		UE_LOG("The scene does not exist.");
+		return nullptr;
+	}
+
+	std::stringstream Buffer;
+	Buffer << File.rdbuf();
+
+	json::JSON SceneData = json::JSON::Load(Buffer.str());
+	UScene* NewScene = UScene::Create(SceneData);
+	return NewScene;
+}
+
+void USceneManager::SaveScene(const FString& Path)
+{
+	std::filesystem::path fsPath(Path);
 
 	if (std::filesystem::exists(fsPath))
 	{
-		std::ifstream file(path);
-		if (file)
+		std::ifstream File(Path);
+		if (File)
 		{
-			std::stringstream buffer;
-			buffer << file.rdbuf();
-			json::JSON sceneData = json::JSON::Load(buffer.str());
+			std::stringstream Buffer;
+			Buffer << File.rdbuf();
+			json::JSON SceneData = json::JSON::Load(Buffer.str());
 
-			currentScene->SetVersion(sceneData["Version"].ToInt() + 1);
+			CurrentScene->SetVersion(SceneData["Version"].ToInt() + 1);
 		}
 	}
 
-	json::JSON sceneData = currentScene->Serialize();
+	json::JSON SceneData = CurrentScene->Serialize();
 
-	std::ofstream file(path);
+	std::ofstream File(Path);
 
-	if (!file)
+	if (!File)
 	{
 		// Log error: failed to open file
 		return;
 	}
 
-	file << sceneData.dump();
+	File << SceneData.dump();
 }
 
