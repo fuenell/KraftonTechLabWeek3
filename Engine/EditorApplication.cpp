@@ -200,7 +200,7 @@ void EditorApplication::Render()
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
-			UUIDRenderer.SetUUIDVertices(
+			if (UUIDRenderer.SetUUIDVertices(
 				Device,
 				(float)windowWidth / (float)windowHeight,
 				PickedPrimitive->UUID,
@@ -208,9 +208,12 @@ void EditorApplication::Render()
 				PickedPrimitive->GetScale().Z,
 				WorldMatrix,
 				View,
-				Proj);
-			UUIDRenderer.Bind(DeviceContext);
-			UUIDRenderer.Render(DeviceContext);
+				Proj)
+				)
+			{
+				UUIDRenderer.Bind(DeviceContext);
+				UUIDRenderer.Render(DeviceContext);
+			}
 		}
 	}
 
