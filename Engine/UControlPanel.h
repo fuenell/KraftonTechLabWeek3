@@ -30,8 +30,5 @@ private:
 	TArray<FString> ChoiceStrList;
 	TArray<const char*> Choices;
 	int32 PrimitiveChoiceIndex = 0;
-
-	// Scene Management Section
-	char SceneName[256] = "Default";
 };
 

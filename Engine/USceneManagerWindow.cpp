@@ -27,7 +27,7 @@ void USceneManagerWindow::RenderContent()
 
 		// 이제 ImGui::Selectable은 내부적으로 [UUID + 이름] 조합의 고유 ID를 갖게 됩니다.
 		// 따라서 이름이 같더라도 ID 충돌이 발생하지 않습니다.
-		// FName::ToString()은 FString을 반환하므로, TCHAR_TO_UTF8로 변환해주는 것이 안전합니다.
+
 		if (ImGui::Selectable(SceneObject->Name.ToString().c_str(), SceneObject == Target))
 		{
 			UPrimitiveComponent* TargetSceneObject = SceneObject->Cast<UPrimitiveComponent>();

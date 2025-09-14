@@ -18,9 +18,9 @@ UScene::UScene()
 UScene::~UScene()
 {
 	OnShutdown();
-	for (UObject* object : Objects)
+	for (UObject* Object : Objects)
 	{
-		delete object;
+		delete Object;
 	}
 	delete Camera;
 }
@@ -126,13 +126,6 @@ bool UScene::Deserialize(const json::JSON& data)
 		if (component->CountOnInspector())
 			++PrimitiveCount;
 	}
-
-	USceneComponent* gizmoGrid = new UGizmoGridComp(
-		{ 0.3f, 0.3f, 0.3f },
-		{ 0.0f, 0.0f, 0.0f },
-		{ 0.2f, 0.2f, 0.2f }
-	);
-	Objects.push_back(gizmoGrid);
 
 	FString uuidStr = data.at("NextUUID").ToString();
 

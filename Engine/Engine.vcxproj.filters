@@ -43,6 +43,9 @@
     <Filter Include="Engine\UI">
       <UniqueIdentifier>{3a65dfd5-299b-4436-96c7-b669986cfa16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Core\Scene">
+      <UniqueIdentifier>{26b449b4-b8be-4123-b127-6cecca43b1f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp">
@@ -105,12 +108,6 @@
     <ClCompile Include="URaycastManager.cpp">
       <Filter>Engine\Subsystem</Filter>
     </ClCompile>
-    <ClCompile Include="EditorApplication.cpp">
-      <Filter>Runtime</Filter>
-    </ClCompile>
-    <ClCompile Include="UDefaultScene.cpp">
-      <Filter>Runtime</Filter>
-    </ClCompile>
     <ClCompile Include="UObject.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
@@ -122,9 +119,6 @@
     </ClCompile>
     <ClCompile Include="UPrimitiveComponent.cpp">
       <Filter>Engine\Core\Component</Filter>
-    </ClCompile>
-    <ClCompile Include="UScene.cpp">
-      <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Application.cpp">
       <Filter>Engine\Application</Filter>
@@ -192,6 +186,15 @@
     <ClCompile Include="USpotLightComponent.cpp" />
     <ClCompile Include="ToggleWindow.cpp" />
     <ClCompile Include="ShowFlag.cpp" />
+    <ClCompile Include="EditorApplication.cpp">
+      <Filter>Engine\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="UScene.cpp">
+      <Filter>Engine\Core\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="UDefaultScene.cpp">
+      <Filter>Engine\Core\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -220,12 +223,6 @@
     </ClInclude>
     <ClInclude Include="ImGui\imstb_truetype.h">
       <Filter>IMGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="EditorApplication.h">
-      <Filter>Runtime</Filter>
-    </ClInclude>
-    <ClInclude Include="UDefaultScene.h">
-      <Filter>Runtime</Filter>
     </ClInclude>
     <ClInclude Include="FVertexPosColor.h">
       <Filter>Engine\Core\Mesh</Filter>
@@ -295,9 +292,6 @@
     </ClInclude>
     <ClInclude Include="USceneComponent.h">
       <Filter>Engine\Core\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="UScene.h">
-      <Filter>Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="UObject.h">
       <Filter>Engine\Core</Filter>
@@ -376,6 +370,15 @@
     <ClInclude Include="ShowFlag.h" />
     <ClInclude Include="Random.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorApplication.h">
+      <Filter>Engine\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="UScene.h">
+      <Filter>Engine\Core\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="UDefaultScene.h">
+      <Filter>Engine\Core\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

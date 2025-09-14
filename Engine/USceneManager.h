@@ -6,19 +6,27 @@ class Application;
 
 class USceneManager : UEngineSubsystem
 {
-    DECLARE_UCLASS(USceneManager, UEngineSubsystem)
-private:
-    Application* application;
-    UScene* currentScene = nullptr;
+	DECLARE_UCLASS(USceneManager, UEngineSubsystem)
+
 public:
-    ~USceneManager() override;
-    bool Initialize(Application* _application);
+	~USceneManager() override;
+	bool Initialize(Application* InApplication);
 
-    UScene* GetScene();
-    void SetScene(UScene* scene);
+	UScene* GetScene();
+	void SetScene(UScene* Scene);
 
-    void RequestExit();
-    void LoadScene(const FString& path = "");
-    void SaveScene(const FString& path = "");
+	UScene* CreateDefaultScene();
+
+	void RequestExit();
+	UScene* LoadScene(const FString& Path = "");
+	void SaveScene(const FString& Path = "");
+
+public:
+	char SceneName[256] = "Default";
+	const FString SavePath = "./data/";
+	const FString SceneExtension = ".Scene";
+
+private:
+	Application* App;
+	UScene* CurrentScene = nullptr;
 };
-

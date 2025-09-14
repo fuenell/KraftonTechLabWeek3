@@ -6,7 +6,6 @@
 #include "UScene.h"
 #include "UDefaultScene.h"
 
-
 // 활성화(선택) 상태면 버튼색을 Active 계열로 바꿔서 '눌린 버튼'처럼 보이게 하는 헬퍼
 static bool ModeButton(const char* label, bool active, const ImVec2& size = ImVec2(0, 0))
 {
@@ -149,7 +148,7 @@ void UControlPanel::SceneManagementSection()
 {
 	ImGui::Text("Scene Name");                // Label on top
 	ImGui::SetNextItemWidth(200);             // Optional: set input width
-	ImGui::InputText("##SceneNameInput", SceneName, sizeof(SceneName)); // invisible label
+	ImGui::InputText("##SceneNameInput", SceneManager->SceneName, sizeof(SceneManager->SceneName)); // invisible label
 
 	if (ImGui::Button("New scene"))
 	{
@@ -158,16 +157,17 @@ void UControlPanel::SceneManagementSection()
 
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Save scene") && strcmp(SceneName, "") != 0)
+	if (ImGui::Button("Save scene") && strcmp(SceneManager->SceneName, "") != 0)
 	{
-		std::filesystem::path _path("./data/");
+		std::filesystem::path _path(SceneManager->SavePath);
 		std::filesystem::create_directory(_path);
-		SceneManager->SaveScene(_path.string() + FString(SceneName) + ".Scene");
+		SceneManager->SaveScene(_path.string() + FString(SceneManager->SceneName) + SceneManager->SceneExtension);
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Load scene") && strcmp(SceneName, "") != 0)
+	if (ImGui::Button("Load scene") && strcmp(SceneManager->SceneName, "") != 0)
 	{
-		SceneManager->LoadScene("./data/" + FString(SceneName) + ".Scene");
+		UScene* NewScene = SceneManager->LoadScene(SceneManager->SavePath + FString(SceneManager->SceneName) + SceneManager->SceneExtension);
+		SceneManager->SetScene(NewScene);
 	}
 }
 
