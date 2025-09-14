@@ -22,7 +22,8 @@ public:
         , mOrthoHeight(10.0f)
         , bLockRoll(false)
         , mPitch(0.0f)
-        , Sensitivity(0.005f)
+        , RotationSensitivity(0.005f)
+        , TranslationSensitivity(1.0f)
     {
         RecalcAxesFromQuat();
         UpdateView();
@@ -99,8 +100,11 @@ public:
     void SetEulerXYZRad(float rx, float ry, float rz);
     void SetEulerXYZDeg(float rxDeg, float ryDeg, float rzDeg);
 
-    float GetSensitivity() const;
-    void SetSensitivity(float Sensitivity);
+    float GetRotationSensitivity() const;
+    void SetRotationSensitivity(float Sensitivity);
+
+    float GetTranslationSensitivity() const;
+    void SetTranslationSensitivity(float Sensitivity);
     // ---- 내부 상태 ----
     FVector mEye;      // 월드 위치
     FQuaternion mRot;  // 자세(orientation)
@@ -126,8 +130,9 @@ public:
 	// 롤 잠금
     bool  bLockRoll;
 
-    // 마우스 조작 감도
-    float Sensitivity;
+    // 조작 감도
+    float RotationSensitivity;
+    float TranslationSensitivity;
 
     // 카메라 정보 갱신
 
