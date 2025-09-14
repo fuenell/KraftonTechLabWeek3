@@ -148,11 +148,11 @@ void EditorApplication::Render()
 	const FMatrix Proj = sceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
 
 	if (ShowPrimitives == EEngineShowFlags::SF_Primitives)
+	{
 		GetSceneManager().GetScene()->Render();
-
-	// 기즈모 그리기
-	gizmoManager.Draw(GetRenderer());
-
+		// 기즈모 그리기
+		gizmoManager.Draw(GetRenderer());
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Batch Rendering
@@ -200,7 +200,7 @@ void EditorApplication::Render()
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
-			UUIDRenderer.SetUUIDVertices(
+			if (UUIDRenderer.SetUUIDVertices(
 				Device,
 				(float)windowWidth / (float)windowHeight,
 				PickedPrimitive->UUID,
@@ -208,9 +208,12 @@ void EditorApplication::Render()
 				PickedPrimitive->GetScale().Z,
 				WorldMatrix,
 				View,
-				Proj);
-			UUIDRenderer.Bind(DeviceContext);
-			UUIDRenderer.Render(DeviceContext);
+				Proj)
+				)
+			{
+				UUIDRenderer.Bind(DeviceContext);
+				UUIDRenderer.Render(DeviceContext);
+			}
 		}
 	}
 
