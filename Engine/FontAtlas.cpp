@@ -3,10 +3,18 @@
 
 FontAtlas::FontAtlas()
 {
+    Initialize();
 }
 
 FontAtlas::~FontAtlas()
 {
+}
+
+bool FontAtlas::Initialize()
+{
+    InitCharInfoMap();
+
+    return true;
 }
 
 void FontAtlas::InitCharInfoMap()
@@ -41,7 +49,7 @@ CharacterInfo FontAtlas::GetCharInfo(char c)
         return charInfo;
     }
 
-    return CharacterInfo(0.0, 0.0, 0.0, 0.0);
+    return CharacterInfo(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 bool IsValidCharInfo(CharacterInfo& charInfo)

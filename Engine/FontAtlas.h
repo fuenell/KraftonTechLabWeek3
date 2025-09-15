@@ -9,6 +9,10 @@ struct CharacterInfo
     float width;
     float height;
 
+    CharacterInfo()
+    {
+
+    }
     CharacterInfo(float U, float V, float Width, float Height)
     {
         u = U;
@@ -24,6 +28,7 @@ public:
     FontAtlas();
     virtual ~FontAtlas();
 
+    bool Initialize();
     void InitCharInfoMap();
     CharacterInfo GetCharInfo(char c);
     static bool IsValidCharInfo(CharacterInfo& charInfo);
