@@ -10,6 +10,7 @@
 #include "UGizmoManager.h"
 #include "ULineBatcherManager.h"
 #include "UUIDRenderer.h"
+#include "UTextureManager.h"
 
 class Application
 {
@@ -36,6 +37,7 @@ public:
 	UTimeManager& GetTimeManager() { return TimeManager; }
 	URaycastManager& GetRaycastManager() { return RaycastManager; }
 	ULineBatcherManager& GetLineBatcherManager() { return LineBatcherManager; }
+	UTextureManager& GetTextManager() { return TextureManager; }
 
 	// Window management
 	HWND GetWindowHandle() const { return HWnd; }
@@ -74,6 +76,7 @@ protected:
 	URaycastManager RaycastManager;
 	ULineBatcherManager LineBatcherManager;
 	UUIDRenderer UUIDRenderer;
+	UTextureManager TextureManager;
 
 	// Application state
 	bool bIsRunning;
