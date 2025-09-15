@@ -40,8 +40,9 @@ float4 PSMain(VSOutput input) : SV_Target
     
     //if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
     //    discard;
+    
     //return float4(input.texCoord, 0, 1);
     // 알파 채널이 글자 모양 (mask)
-    float4 newTexColor = float4(texColor.xyz, 1.0f);
-    return newTexColor;
+    
+    return texColor;
 }
