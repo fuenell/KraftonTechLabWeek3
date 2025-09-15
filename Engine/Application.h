@@ -10,6 +10,7 @@
 #include "UGizmoManager.h"
 #include "ULineBatcherManager.h"
 #include "UUIDRenderer.h"
+#include "ConfigManager.h"
 
 class Application
 {

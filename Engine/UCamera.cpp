@@ -1,6 +1,27 @@
 ﻿#include "stdafx.h"
 #include "UCamera.h"
 
+// ===== 카메라 민감도 변경 전역 함수 =====
+float UCamera::GetRotationSensitivity()
+{
+	return RotationSensitivity;
+}
+
+void UCamera::SetRotationSensitivity(float Sensitivity)
+{
+	RotationSensitivity = Sensitivity;
+}
+
+float UCamera::GetTranslationSensitivity()
+{
+	return TranslationSensitivity;
+}
+
+void UCamera::SetTranslationSensitivity(float Sensitivity)
+{
+	TranslationSensitivity = Sensitivity;
+}
+
 // ==== 투영 관련 ====
 
 void UCamera::SetPerspective(float fovY, float aspect, float zn, float zf)
@@ -148,26 +169,6 @@ void UCamera::SetEulerXYZRad(float rx, float ry, float rz)
 void UCamera::SetEulerXYZDeg(float rxDeg, float ryDeg, float rzDeg)
 {
 	SetEulerXYZRad(rxDeg * DegreeToRadian, ryDeg * DegreeToRadian, rzDeg * DegreeToRadian);
-}
-
-float UCamera::GetRotationSensitivity() const
-{
-	return RotationSensitivity;
-}
-
-void UCamera::SetRotationSensitivity(float Sensitivity)
-{
-	this->RotationSensitivity = Sensitivity;
-}
-
-float UCamera::GetTranslationSensitivity() const
-{
-	return TranslationSensitivity;
-}
-
-void UCamera::SetTranslationSensitivity(float Sensitivity)
-{
-	this->TranslationSensitivity = Sensitivity;
 }
 
 // ==== 내부 구현(private 함수들) ====

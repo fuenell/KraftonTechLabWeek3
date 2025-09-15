@@ -180,8 +180,8 @@ void UControlPanel::CameraManagementSection()
 	FVector eulDeg = camera->GetEulerXYZDeg();
 	float eulerXYZ[3] = { eulDeg.X, eulDeg.Y, eulDeg.Z };
 
-	float RotationSensitivity = camera->GetRotationSensitivity() * 200.0f;
-	float TranslationSensitivity = camera->GetTranslationSensitivity();
+	float RotationSensitivity = UCamera::GetRotationSensitivity() * 200.0f;
+	float TranslationSensitivity = UCamera::GetTranslationSensitivity();
 
 	// --- 테이블 UI ---
 	bool locCommitted = false;
@@ -354,12 +354,12 @@ void UControlPanel::CameraManagementSection()
 
 	if (RotSensCommitted)
 	{
-		camera->SetRotationSensitivity(RotationSensitivity / 200.0f);
+		UCamera::SetRotationSensitivity(RotationSensitivity / 200.0f);
 	}
 
 	if (TransSensCommitted)
 	{
-		camera->SetTranslationSensitivity(TranslationSensitivity);
+		UCamera::SetTranslationSensitivity(TranslationSensitivity);
 	}
 }
 

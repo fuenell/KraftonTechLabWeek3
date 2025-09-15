@@ -110,6 +110,13 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 		return false;
 	}
 
+	/*
+	ConfigManager은 반드시 Camera와 LineBatcherManager 및 변수를 받아오는 객체들이
+	초기화된 이후에 초기화해야 한다.
+	*/
+	ConfigManager& ConfigManager = ConfigManager::Instance();
+	ConfigManager.RegisterConfigTargets(&LineBatcherManager);
+	ConfigManager.LoadConfig();
 
 	// Allow derived classes to initialize
 	if (!OnInitialize())
@@ -164,6 +171,8 @@ void Application::Shutdown()
 		return;
 
 	bIsRunning = false;
+
+	ConfigManager::Instance().SaveConfig();
 
 	// Allow derived classes to cleanup
 	OnShutdown();

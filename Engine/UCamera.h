@@ -22,13 +22,19 @@ public:
         , mOrthoHeight(10.0f)
         , bLockRoll(false)
         , mPitch(0.0f)
-        , RotationSensitivity(0.005f)
-        , TranslationSensitivity(1.0f)
     {
         RecalcAxesFromQuat();
         UpdateView();
         UpdateProj();
     }
+
+    // ===== 카메라 민감도 변경 함수 =====
+    static float GetRotationSensitivity();
+    static void SetRotationSensitivity(float Sensitivity);
+
+    static float GetTranslationSensitivity();
+    static void SetTranslationSensitivity(float Sensitivity);
+
     // ===== 행렬 Get =====
 
     const FMatrix& GetView() const { return mView; }
@@ -100,11 +106,13 @@ public:
     void SetEulerXYZRad(float rx, float ry, float rz);
     void SetEulerXYZDeg(float rxDeg, float ryDeg, float rzDeg);
 
-    float GetRotationSensitivity() const;
-    void SetRotationSensitivity(float Sensitivity);
+private:
+    // ===== 전역으로 관리하는 카메라 민감도 설정 =====
+    // 조작 감도
+    static inline float RotationSensitivity = 0.005f;
+    static inline float TranslationSensitivity = 1.0f;
 
-    float GetTranslationSensitivity() const;
-    void SetTranslationSensitivity(float Sensitivity);
+public:
     // ---- 내부 상태 ----
     FVector mEye;      // 월드 위치
     FQuaternion mRot;  // 자세(orientation)
@@ -129,10 +137,6 @@ public:
     FMatrix mProj;
 	// 롤 잠금
     bool  bLockRoll;
-
-    // 조작 감도
-    float RotationSensitivity;
-    float TranslationSensitivity;
 
     // 카메라 정보 갱신
 
