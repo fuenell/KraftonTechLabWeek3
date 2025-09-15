@@ -185,10 +185,12 @@ void EditorApplication::Render()
 			USpotLightComponent* SpotLightComponent = dynamic_cast<USpotLightComponent*>(PickedPrimitive);
 			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
 			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), SpotLightComponent->GetAngle(), SpotLightComponent->GetScale(), SpotLightComponent->GetColor());
+			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 		}
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{
 			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
+			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 		}
 		else
 		{
@@ -196,7 +198,7 @@ void EditorApplication::Render()
 			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		}
 		//WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
-		LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+		//LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
