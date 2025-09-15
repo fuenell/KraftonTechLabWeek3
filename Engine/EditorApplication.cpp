@@ -227,6 +227,9 @@ void EditorApplication::Render()
 	//LineBatcherManager.AddSpotLight({0,0,0}, FMatrix::Identity, 15, 3);
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	SpriteManager.Render(DeviceContext);
+
 }
 
 void EditorApplication::RenderGUI()

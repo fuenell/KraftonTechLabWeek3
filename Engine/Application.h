@@ -12,6 +12,9 @@
 #include "UUIDRenderer.h"
 #include "UTextureManager.h"
 #include "ConfigManager.h"
+#include "TestUUIDRenderer.h"
+#include "USpriteManager.h"
+#include "SpriteRenderer.h"
 
 class Application
 {
@@ -78,6 +81,9 @@ protected:
 	ULineBatcherManager LineBatcherManager;
 	UUIDRenderer UUIDRenderer;
 	UTextureManager TextureManager;
+	USpriteManager SpriteManager;
+
+	USpriteRenderer SpriteRenderer;
 
 	// Application state
 	bool bIsRunning;
