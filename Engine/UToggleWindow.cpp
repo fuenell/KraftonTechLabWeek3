@@ -1,7 +1,7 @@
 ﻿
 // UToggleWindow.cpp
 #include "stdafx.h"
-#include "ToggleWindow.h"
+#include "UToggleWindow.h"
 
 /* private functions */
 UToggleWindow::UToggleWindow()

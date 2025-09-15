@@ -2,11 +2,11 @@
 
 #include "URenderer.h"
 
-class BillBoardManager
+class SpriteManager
 {
 private:
 public:
-	BillBoardManager();
+	SpriteManager();
 
 	// BillBoard를 그리기 위해 필요한 자원들을 생성
 	bool Initialize(ID3D11Device* Device);

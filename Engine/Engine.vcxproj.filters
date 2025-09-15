@@ -181,10 +181,9 @@
     <ClCompile Include="USceneManagerWindow.cpp">
       <Filter>Engine\UI</Filter>
     </ClCompile>
-    <ClCompile Include="BillBoardManager.cpp" />
     <ClCompile Include="UUIDRenderer.cpp" />
     <ClCompile Include="USpotLightComponent.cpp" />
-    <ClCompile Include="ToggleWindow.cpp" />
+    <ClCompile Include="UToggleWindow.cpp" />
     <ClCompile Include="ShowFlag.cpp" />
     <ClCompile Include="EditorApplication.cpp">
       <Filter>Engine\Application</Filter>
@@ -194,6 +193,13 @@
     </ClCompile>
     <ClCompile Include="UDefaultScene.cpp">
       <Filter>Engine\Core\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="USubUVComponent.cpp" />
+    <ClCompile Include="SpriteRenderer.h" />
+    <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="SubUVVertices.h">
+      <Filter>Engine\Core\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -363,10 +369,10 @@
     <ClInclude Include="USceneManagerWindow.h">
       <Filter>Engine\UI</Filter>
     </ClInclude>
-    <ClInclude Include="BillBoardManager.h" />
+    <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="UUIDRenderer.h" />
     <ClInclude Include="USpotLightComponent.h" />
-    <ClInclude Include="ToggleWindow.h" />
+    <ClInclude Include="UToggleWindow.h" />
     <ClInclude Include="ShowFlag.h" />
     <ClInclude Include="Random.h">
       <Filter>Math</Filter>
@@ -380,6 +386,7 @@
     <ClInclude Include="UDefaultScene.h">
       <Filter>Engine\Core\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="USubUVComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
