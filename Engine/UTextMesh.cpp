@@ -6,7 +6,7 @@ void UTextMesh::Init(ID3D11Device * device)
 {
 	D3D11_BUFFER_DESC vbd = {};
 	vbd.Usage = D3D11_USAGE_DYNAMIC;
-	vbd.ByteWidth = sizeof(FVertexPosUV4) * 3; // 실제로는 문자열이 없지만, Draw 시에 아무것도 그리지 않을 예정
+	vbd.ByteWidth = sizeof(FVertexPosUV) * 3; // 실제로는 문자열이 없지만, Draw 시에 아무것도 그리지 않을 예정
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.CPUAccessFlags = 0;
 	vbd.MiscFlags = 0;

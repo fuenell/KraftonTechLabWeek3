@@ -97,7 +97,7 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 	{
 		return false;
 	}
-	if (!UUIDRenderer.Initialize(Renderer.GetDevice()))
+	if (!UUIDRenderer.Initialize(Renderer.GetDevice(), &TextureManager))
 	{
 		return false;
 	}
@@ -113,6 +113,11 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 		MessageBox(HWnd, L"Failed to initialize TextureManager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
+	//if (!SpriteRenderer.Initialize(Renderer.GetDevice() , &TextureManager))
+	//{
+	//	MessageBox(HWnd, L"Failed to initialize LineBatcherManager", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
 
 	/*
 	ConfigManager은 반드시 Camera와 LineBatcherManager 및 변수를 받아오는 객체들이

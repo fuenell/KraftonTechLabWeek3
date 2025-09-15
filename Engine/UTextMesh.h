@@ -11,13 +11,13 @@ private:
 	bool isInitialized = false;
 public:
 	ID3D11Buffer* VertexBuffer = nullptr;
-	TArray<FVertexPosUV4> Vertices;
+	TArray<FVertexPosUV> Vertices;
 	int32 NumVertices = 0;
 	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
 	UINT Stride = 0;
 
 	UTextMesh();
-	UTextMesh(const TArray<FVertexPosUV4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	UTextMesh(const TArray<FVertexPosUV>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	~UTextMesh()
 	{

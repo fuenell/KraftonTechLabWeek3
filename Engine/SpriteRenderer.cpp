@@ -1,22 +1,22 @@
 ﻿#include "stdafx.h"
 #include "SpriteRenderer.h"
 
-bool SpriteRenderer::Initialize(ID3D11Device* Device)
+bool USpriteRenderer::Initialize(ID3D11Device* Device, UTextureManager* InTextureManager)
 {
-	return SpriteManager.Initialize(Device);
+	return SpriteManager.Initialize(Device, InTextureManager);
 }
 
-void SpriteRenderer::Bind(ID3D11DeviceContext* DeviceContext)
+void USpriteRenderer::Bind(ID3D11DeviceContext* DeviceContext)
 {
 	SpriteManager.Bind(DeviceContext);
 }
 
-void SpriteRenderer::Render(ID3D11DeviceContext* DeviceContext)
+void USpriteRenderer::Render(ID3D11DeviceContext* DeviceContext)
 {
 	SpriteManager.Render(DeviceContext);
 }
 
-void SpriteRenderer::Release()
+void USpriteRenderer::Release()
 {
 	SpriteManager.Release();
 }

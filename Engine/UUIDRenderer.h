@@ -2,10 +2,10 @@
 
 #include "stdafx.h"
 #include "SpriteRenderer.h"
+#include "FontAtlas.h"
 
-class UUIDRenderer : public SpriteRenderer
+class UUIDRenderer : public USpriteRenderer
 {
-private:
 public:
 	// 버퍼 생성
 	// BillBoard가 카메라 뒤에 있으면 false 반환
@@ -19,4 +19,7 @@ public:
 		FMatrix View,
 		FMatrix Projection
 	);
+
+private:
+	FontAtlas Atlas;
 };

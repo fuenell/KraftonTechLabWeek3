@@ -205,7 +205,7 @@ void EditorApplication::Render()
 				Device,
 				(float)WindowWidth / (float)WindowHeight,
 				PickedPrimitive->UUID,
-				0.05f,
+				0.5f,
 				PickedPrimitive->GetScale().Z,
 				WorldMatrix,
 				View,
@@ -227,6 +227,9 @@ void EditorApplication::Render()
 	//LineBatcherManager.AddSpotLight({0,0,0}, FMatrix::Identity, 15, 3);
 	LineBatcherManager.Render(DeviceContext, View, Proj);
 	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	SpriteManager.Render(DeviceContext);
+
 }
 
 void EditorApplication::RenderGUI()
