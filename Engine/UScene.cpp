@@ -163,6 +163,7 @@ void UScene::Render()
 		{
 			primitive->Draw(*Renderer);
 		}
+
 	}
 }
 

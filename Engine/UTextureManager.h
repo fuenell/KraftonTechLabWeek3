@@ -9,7 +9,9 @@ public:
 	UTextureManager();
 	~UTextureManager();
 
-	void RegisterDDSToSRV();
+	bool Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext);
+	bool RegisterSRVWithDDS(const std::string nameKey, const wchar_t* filePath, HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext);
+	void Release();
 
 private:
 	TMap<std::string, ID3D11ShaderResourceView*> SRVMap;
