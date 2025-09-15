@@ -152,7 +152,7 @@ void USceneComponentPropertyWindow::RenderContent()
 				UE_LOG("Alpha value : %d ", A);
 
 				const FVector4 NewColor(R, G, B, A);
-				SpotLightComponent->SetColor(NewColor);
+				SpotLightComponent->SetLightColor(NewColor);
 			}
 			if (bAngleChanged)
 			{

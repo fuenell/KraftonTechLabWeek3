@@ -277,7 +277,7 @@ void ULineBatcherManager::Render(ID3D11DeviceContext* InDeviceContext, const FMa
     Cb.View = View; // HLSL row_major 일 때 맞춰주기
     Cb.Proj = Proj;
     InDeviceContext->UpdateSubresource(ConstantBuffer, 0, nullptr, &Cb, 0, 0);
-
+    
     // === 3. 파이프라인 바인딩 ===
     UINT Stride = sizeof(FLineVertex);
     UINT Offset = 0;
