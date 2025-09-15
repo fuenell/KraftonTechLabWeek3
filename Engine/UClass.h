@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "UEngineStatics.h"
-#include "FDynamicBitset.h"
 #include "json.hpp"
 #include "UObject.h"
 #include "FName.h"
@@ -12,8 +11,7 @@ public:
 	static UClass* RegisterToFactory(const FName& TypeName,
 		const TFunction<UObject* ()>& CreateFunction, const FName& SuperClassTypeName);
 
-	static void ResolveTypeBitsets();
-	void ResolveTypeBitset(UClass* ClassPtr);
+	static void Init();
 
 	static UClass* FindClass(const FName& Name)
 	{
@@ -87,13 +85,10 @@ public:
 
 private:
 	static inline TMap<FName, TUniquePtr<UClass>> ClassList{};
-	static inline uint32 RegisteredCount = 0;
 
 	TMap<FName, FName> Metadata{};
-	uint32 TypeId{};
-	FDynamicBitset TypeBitset{};
-	FName ClassName{}, SuperClassTypeName{};
+	FName ClassName{};
+	FName SuperClassTypeName{};
 	UClass* SuperClass{};
 	TFunction<UObject* ()> CreateFunction{};
-	bool bIsProcessed = false;
 };

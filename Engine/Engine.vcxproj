@@ -255,7 +255,6 @@
     <ClInclude Include="SphereVertices.h" />
     <ClInclude Include="USpriteManager.h" />
     <ClInclude Include="CubeVertices.h" />
-    <ClInclude Include="FDynamicBitset.h" />
     <ClInclude Include="FName.h" />
     <ClInclude Include="ImGuiWindowWrapper.h" />
     <ClInclude Include="PlaneVertices.h" />

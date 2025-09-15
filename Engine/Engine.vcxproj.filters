@@ -196,7 +196,6 @@
     </ClCompile>
     <ClCompile Include="USubUVComponent.cpp" />
     <ClCompile Include="SpriteRenderer.h" />
-    <ClCompile Include="SpriteManager.cpp" />
     <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="SubUVVertices.h">
       <Filter>Engine\Core\Mesh</Filter>
@@ -204,6 +203,12 @@
     <ClCompile Include="UTextureManager.cpp">
       <Filter>Engine\Subsystem</Filter>
     </ClCompile>
+    <ClCompile Include="FontAtlas.cpp" />
+    <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="USpriteManager.cpp" />
+    <ClCompile Include="TestUUIDRenderer.cpp" />
+    <ClCompile Include="UTextComponent.cpp" />
+    <ClCompile Include="UTextMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -338,9 +343,6 @@
     <ClInclude Include="UGizmoScaleHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
-    <ClInclude Include="FDynamicBitset.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="UGizmoRotationHandleComp.h">
       <Filter>Engine\Core\Component</Filter>
     </ClInclude>
@@ -369,7 +371,6 @@
     <ClInclude Include="USceneManagerWindow.h">
       <Filter>Engine\UI</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="UUIDRenderer.h" />
     <ClInclude Include="USpotLightComponent.h" />
     <ClInclude Include="UToggleWindow.h" />
@@ -396,6 +397,12 @@
     <ClInclude Include="CapsuleVertices.h">
       <Filter>Engine\Core\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="FontAtlas.h" />
+    <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="USpriteManager.h" />
+    <ClInclude Include="TestUUIDRenderer.h" />
+    <ClInclude Include="UTextComponent.h" />
+    <ClInclude Include="UTextMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">
@@ -415,6 +422,6 @@
     <FxCompile Include="BillBoard.vs">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="ShaderFonthlsl.hlsl" />
+    <FxCompile Include="ShaderFont.hlsl" />
   </ItemGroup>
 </Project>
