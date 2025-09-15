@@ -54,18 +54,3 @@ bool UUIDRenderer::SetUUIDVertices(
 	SpriteManager.SetBuffer(Device, VertexArray, IndexArray);
 	return true;
 }
-
-void UUIDRenderer::Bind(ID3D11DeviceContext* DeviceContext)
-{
-	SpriteManager.Bind(DeviceContext);
-}
-
-void UUIDRenderer::Render(ID3D11DeviceContext* DeviceContext)
-{
-	SpriteManager.Render(DeviceContext);
-}
-
-void UUIDRenderer::Release()
-{
-	SpriteManager.Release();
-}

@@ -79,7 +79,9 @@ void UScene::AddObject(USceneComponent* obj)
 	}
 }
 
-json::JSON UScene::Serialize() const
+json::JSON UScene::Serialize() 
+
+const
 {
 	json::JSON result;
 	// UScene 특성에 맞는 JSON 구성
