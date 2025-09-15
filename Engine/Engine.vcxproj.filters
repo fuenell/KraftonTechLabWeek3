@@ -201,6 +201,9 @@
     <ClCompile Include="SubUVVertices.h">
       <Filter>Engine\Core\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="UTextureManager.cpp">
+      <Filter>Engine\Subsystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -387,6 +390,9 @@
       <Filter>Engine\Core\Scene</Filter>
     </ClInclude>
     <ClInclude Include="USubUVComponent.h" />
+    <ClInclude Include="UTextureManager.h">
+      <Filter>Engine\Subsystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.ps">

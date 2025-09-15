@@ -205,6 +205,7 @@
     </ClCompile>
     <ClCompile Include="SubUVVertices.h" />
     <ClCompile Include="USubUVComponent.cpp" />
+    <ClCompile Include="UTextureManager.cpp" />
     <ClCompile Include="UToggleWindow.cpp" />
     <ClCompile Include="UCamera.cpp" />
     <ClCompile Include="UClass.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="RTTI.h" />
     <ClInclude Include="ShowFlag.h" />
     <ClInclude Include="USubUVComponent.h" />
+    <ClInclude Include="UTextureManager.h" />
     <ClInclude Include="UToggleWindow.h" />
     <ClInclude Include="UCamera.h" />
     <ClInclude Include="FVertexPosColor.h" />
