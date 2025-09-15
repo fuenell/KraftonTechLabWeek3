@@ -11,6 +11,7 @@
 #include "ULineBatcherManager.h"
 #include "UUIDRenderer.h"
 #include "UTextureManager.h"
+#include "ConfigManager.h"
 
 class Application
 {
