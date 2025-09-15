@@ -19,10 +19,22 @@ class UMesh : public UObject
 public:
 	UMesh() {}
 
+	// 비인덱싱 메시를 위한 생성자 오버로딩
 	UMesh(const TArray<FVertexPosColor4>& InVertices, D3D_PRIMITIVE_TOPOLOGY InPrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
 		: Vertices(InVertices), PrimitiveType(InPrimitiveType)
 	{
 		NumVertices = Vertices.size();
+		NumIndices = 0; // 인덱스가 없으므로 0
+		Stride = sizeof(FVertexPosColor4);
+		LocalBounds = ComputeLocalBounds(Vertices);
+	}
+
+	// 인덱싱 메시를 위한 생성자
+	UMesh(const TArray<FVertexPosColor4>& InVertices, const TArray<uint32>& InIndices, D3D_PRIMITIVE_TOPOLOGY InPrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+		: Vertices(InVertices), Indices(InIndices), PrimitiveType(InPrimitiveType)
+	{
+		NumVertices = Vertices.size();
+		NumIndices = Indices.size();
 		Stride = sizeof(FVertexPosColor4);
 		LocalBounds = ComputeLocalBounds(Vertices);
 	}
@@ -30,6 +42,7 @@ public:
 	~UMesh()
 	{
 		if (VertexBuffer) VertexBuffer->Release();
+		if (IndexBuffer) IndexBuffer->Release();
 	}
 
 	void Init(ID3D11Device* device);
@@ -90,6 +103,11 @@ public:
 	TArray<FVertexPosColor4> Vertices;
 	int32 NumVertices = 0;
 	UINT Stride = 0;
+
+	// Index Buffer 관련 데이터
+	ID3D11Buffer* IndexBuffer = nullptr;
+	TArray<uint32> Indices;
+	int32 NumIndices = 0;
 
 private:
 	bool bIsInitialized = false;

@@ -68,7 +68,7 @@ bool URenderer::Initialize(HWND windowHandle)
 		LogError("CreateRasterizerState", E_FAIL);
 		return false;
 	}
-	
+
 	if (!CreateRasterizerStateWire())
 	{
 		LogError("CreateRasterizerState", E_FAIL);
@@ -82,7 +82,7 @@ bool URenderer::Initialize(HWND windowHandle)
 	}
 
 
-	
+
 
 	bIsInitialized = true;
 	return true;
@@ -438,17 +438,25 @@ void URenderer::Draw(UINT vertexCount, UINT startVertexLocation)
 	}
 }
 
-void URenderer::DrawMesh(UMesh* mesh)
+void URenderer::DrawMesh(UMesh* Mesh)
 {
-	if (!mesh || !mesh->IsInitialized())
-		return;
+	if (!IsInitialized()) return;
 
 	UINT offset = 0;
+	deviceContext->IASetVertexBuffers(0, 1, &Mesh->VertexBuffer, &Mesh->Stride, &offset);
+	deviceContext->IASetPrimitiveTopology(Mesh->PrimitiveType);
 
-	deviceContext->IASetVertexBuffers(0, 1, &mesh->VertexBuffer, &mesh->Stride, &offset);
-	deviceContext->IASetPrimitiveTopology(mesh->PrimitiveType);
-
-	deviceContext->Draw(mesh->NumVertices, 0);
+	if (Mesh->IndexBuffer && Mesh->NumIndices > 0)
+	{
+		// 인덱스 버퍼가 있으면 DrawIndexed 호출
+		deviceContext->IASetIndexBuffer(Mesh->IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		deviceContext->DrawIndexed(Mesh->NumIndices, 0, 0);
+	}
+	else
+	{
+		// 인덱스 버퍼가 없으면 기존 방식대로 Draw 호출
+		deviceContext->Draw(Mesh->NumVertices, 0);
+	}
 }
 
 void URenderer::DrawTextMesh(UTextMesh* tmesh)

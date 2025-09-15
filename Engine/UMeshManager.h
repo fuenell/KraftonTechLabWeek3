@@ -15,6 +15,7 @@ public:
 
 private:
 	UMesh* CreateMeshInternal(const TArray<FVertexPosColor>& Vertices, D3D_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	UMesh* CreateIndexMeshInternal(const TArray<FVertexPosColor>& Vertices, const TArray<uint32>& InIndices, D3D_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 private:
 	TMap<FString, UMesh*> Meshes;

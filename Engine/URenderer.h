@@ -18,44 +18,6 @@ struct CBTransform
 class URenderer : UEngineSubsystem
 {
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)
-private:
-	// Core D3D11 objects
-	ID3D11Device* device;
-	ID3D11DeviceContext* deviceContext;
-	IDXGISwapChain* swapChain;
-	ID3D11RenderTargetView* renderTargetView;
-	ID3D11DepthStencilView* depthStencilView;
-	ID3D11RasterizerState* rasterizerState;
-	ID3D11RasterizerState* RasterizerStateWire;
-
-	// Shader objects
-	ID3D11VertexShader* vertexShader;
-	ID3D11PixelShader* pixelShader;
-	ID3D11InputLayout* inputLayout;
-	ID3D11SamplerState* SamplerState;
-
-	// Constant buffer
-	ID3D11Buffer* constantBuffer;
-
-
-	// blendstate buffer
-	ID3D11BlendState* BlendState;
-
-	// Viewport
-	D3D11_VIEWPORT viewport;
-	D3D11_VIEWPORT currentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
-	float targetAspect = 16.0f / 9.0f;
-
-	// Window handle
-	HWND hWnd;
-
-	// Render state
-	bool bIsInitialized;
-
-	FMatrix mVP;                 // 프레임 캐시
-	CBTransform   mCBData;
-
-	EViewModeIndex ViewModeIndex = EViewModeIndex::VMI_Normal;
 
 public:
 	URenderer();
@@ -111,7 +73,6 @@ public:
 
 	// Setter
 
-
 	// Getters
 	ID3D11Device* GetDevice() const { return device; }
 	ID3D11DeviceContext* GetDeviceContext() const { return deviceContext; }
@@ -122,23 +83,7 @@ public:
 	// Utility functions
 	bool CheckDeviceState();
 	void GetBackBufferSize(int32& width, int32& height);
-	
 
-private:
-	// Internal helper functions
-	bool CreateDeviceAndSwapChain(HWND windowHandle);
-	bool CreateRenderTargetView();
-	bool CreateDepthStencilView(int32 width, int32 height);
-	bool SetupViewport(int32 width, int32 height);
-
-	// 행렬 복사 핼퍼
-	static inline void CopyRowMajor(float dst[16], const FMatrix& src)
-	{
-		for (int32 r = 0; r < 4; ++r)
-			for (int32 c = 0; c < 4; ++c)
-				dst[r * 4 + c] = src.M[r][c];
-	}
-public:
 	void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
 	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
 	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
@@ -176,4 +121,59 @@ public:
 		D3D11_BUFFER_DESC BufferDesc,
 		const void* data
 	);
+
+
+private:
+	// Internal helper functions
+	bool CreateDeviceAndSwapChain(HWND windowHandle);
+	bool CreateRenderTargetView();
+	bool CreateDepthStencilView(int32 width, int32 height);
+	bool SetupViewport(int32 width, int32 height);
+
+	// 행렬 복사 핼퍼
+	static inline void CopyRowMajor(float dst[16], const FMatrix& src)
+	{
+		for (int32 r = 0; r < 4; ++r)
+			for (int32 c = 0; c < 4; ++c)
+				dst[r * 4 + c] = src.M[r][c];
+	}
+
+private:
+	// Core D3D11 objects
+	ID3D11Device* device;
+	ID3D11DeviceContext* deviceContext;
+	IDXGISwapChain* swapChain;
+	ID3D11RenderTargetView* renderTargetView;
+	ID3D11DepthStencilView* depthStencilView;
+	ID3D11RasterizerState* rasterizerState;
+	ID3D11RasterizerState* RasterizerStateWire;
+
+	// Shader objects
+	ID3D11VertexShader* vertexShader;
+	ID3D11PixelShader* pixelShader;
+	ID3D11InputLayout* inputLayout;
+	ID3D11SamplerState* SamplerState;
+
+	// Constant buffer
+	ID3D11Buffer* constantBuffer;
+
+
+	// blendstate buffer
+	ID3D11BlendState* BlendState;
+
+	// Viewport
+	D3D11_VIEWPORT viewport;
+	D3D11_VIEWPORT currentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
+	float targetAspect = 16.0f / 9.0f;
+
+	// Window handle
+	HWND hWnd;
+
+	// Render state
+	bool bIsInitialized;
+
+	FMatrix mVP;                 // 프레임 캐시
+	CBTransform   mCBData;
+
+	EViewModeIndex ViewModeIndex = EViewModeIndex::VMI_Normal;
 };

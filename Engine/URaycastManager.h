@@ -21,26 +21,26 @@ class URaycastManager : UEngineSubsystem
 	DECLARE_UCLASS(URaycastManager, UEngineSubsystem)
 public:
 	URaycastManager();
-	URaycastManager(URenderer* renderer, UCamera* camera, UInputManager* inputManager);
+	URaycastManager(URenderer* InRenderer, UInputManager* InInputManager);
 	~URaycastManager();
 
-	bool Initialize(URenderer* renderer, UInputManager* inputManager)
+	bool Initialize(URenderer* InRenderer, UInputManager* InInputManager)
 	{
-		if (!renderer || !inputManager) return false;
-		Renderer = renderer;
-		InputManager = inputManager;
+		if (!InRenderer || !InInputManager) return false;
+		Renderer = InRenderer;
+		InputManager = InInputManager;
 		return true;
 	}
 
-	void SetRenderer(URenderer* renderer) { Renderer = renderer; }
-	void SetInputManager(UInputManager* inputManager) { InputManager = inputManager; }
+	void SetRenderer(URenderer* InRenderer) { Renderer = InRenderer; }
+	void SetInputManager(UInputManager* InInputManager) { InputManager = InInputManager; }
 
 	template <typename T>
-	bool RayIntersectsMeshes(UCamera* camera, TArray<T*>& components, T*& hitComponent, FVector& outImpactPoint);
+	bool RayIntersectsMeshes(UCamera* Camera, TArray<T*>& Components, T*& HitComponent, FVector& OutImpactPoint);
 
-	TOptional<FVector> RayIntersectsTriangle(FVector triangleVertices[3]);
+	TOptional<FVector> RayIntersectsTriangle(FVector TriangleVertices[3]);
 
-	FRay CreateRayFromScreenPosition(UCamera* camera);
+	FRay CreateRayFromScreenPosition(UCamera* Camera);
 
 private:
 	URenderer* Renderer;
@@ -49,8 +49,8 @@ private:
 	float MouseX, MouseY;
 	FVector RayOrigin, RayDirection;
 
-	FVector GetRaycastOrigin(UCamera* camera);
-	FVector GetRaycastDirection(UCamera* camera);
+	FVector GetRaycastOrigin(UCamera* Camera);
+	FVector GetRaycastDirection(UCamera* Camera);
 
-	FVector TransformVertexToWorld(const FVertexPosColor4& vertex, const FMatrix& world);
+	FVector TransformVertexToWorld(const FVertexPosColor4& Vertex, const FMatrix& WorldMatrix);
 };
