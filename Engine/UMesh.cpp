@@ -4,36 +4,29 @@
 
 IMPLEMENT_UCLASS(UMesh, UObject)
 
-UMesh::UMesh()
+void UMesh::Init(ID3D11Device* Device)
 {
-}
+	if (bIsInitialized || !Device) return;
 
-UMesh::UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
-	: Vertices(vertices), PrimitiveType(primitiveType), NumVertices(vertices.size()), Stride(sizeof(FVertexPosColor4))
-{
-
-}
-
-void UMesh::Init(ID3D11Device* device)
-{
-	D3D11_BUFFER_DESC vbd = {};
-	vbd.Usage = D3D11_USAGE_IMMUTABLE;
-	vbd.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.CPUAccessFlags = 0;
-	vbd.MiscFlags = 0;
-	vbd.StructureByteStride = 0;
-
-	D3D11_SUBRESOURCE_DATA vertexData = {};
-	vertexData.pSysMem = Vertices.data();
-
-	HRESULT hr = device->CreateBuffer(&vbd, &vertexData, &VertexBuffer);
-	if (FAILED(hr))
+	// 1. Vertex Buffer 생성
+	if (NumVertices > 0)
 	{
-		throw std::runtime_error("Failed to create vertex buffer for mesh");
+		D3D11_BUFFER_DESC Vbd = {};
+		Vbd.Usage = D3D11_USAGE_IMMUTABLE;
+		Vbd.ByteWidth = sizeof(FVertexPosColor4) * NumVertices;
+		Vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		Vbd.CPUAccessFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA Vsd = {};
+		Vsd.pSysMem = Vertices.data();
+
+		HRESULT Hr = Device->CreateBuffer(&Vbd, &Vsd, &VertexBuffer);
+		if (FAILED(Hr))
+		{
+			// HR_CHECK 매크로나 별도 예외 처리를 사용하는 것이 좋습니다.
+			throw std::runtime_error("Failed to create vertex buffer for mesh");
+		}
 	}
 
-	// 미리 계산된 최소점, 최대점 셋
-	LocalBounds = ComputeLocalBounds(Vertices);
-	isInitialized = true;
+	bIsInitialized = true;
 }

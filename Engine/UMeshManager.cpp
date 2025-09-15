@@ -1,51 +1,53 @@
 ﻿#include "stdafx.h"
 #include "UMeshManager.h"
 #include "GizmoVertices.h"
-#include "Sphere.h"
+#include "SphereVertices.h"
 #include "PlaneVertices.h"
 #include "CubeVertices.h"
+#include "CapsuleVertices.h"
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
-UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType)
+UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& Vertices, D3D_PRIMITIVE_TOPOLOGY PrimitiveType)
 {
 	// vector의 데이터 포인터와 크기를 ConvertVertexData에 전달
-	auto convertedVertices = FVertexPosColor4::ConvertVertexData(vertices.data(), vertices.size());
-	UMesh* mesh = new UMesh(convertedVertices, primitiveType);
+	auto convertedVertices = FVertexPosColor4::ConvertVertexData(Vertices.data(), Vertices.size());
+	UMesh* mesh = new UMesh(convertedVertices, PrimitiveType);
 	return mesh;
 }
 
 // 생성자
 UMeshManager::UMeshManager()
 {
-	meshes["Sphere"] = CreateMeshInternal(sphere_vertices);
-	meshes["Plane"] = CreateMeshInternal(plane_vertices);
-	meshes["Cube"] = CreateMeshInternal(cube_vertices);
-	meshes["SpotLight"] = CreateMeshInternal(plane_vertices);
+	Meshes["Capsule"] = CreateMeshInternal(CapsuleVertices);
+	Meshes["Sphere"] = CreateMeshInternal(SphereVertices);
+	Meshes["Plane"] = CreateMeshInternal(PlaneVertices);
+	Meshes["Cube"] = CreateMeshInternal(CubeVertices);
+	Meshes["SpotLight"] = CreateMeshInternal(PlaneVertices);
 	//meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	meshes["GizmoArrow"] = CreateMeshInternal(gizmo_arrow_vertices);
-	meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
-	meshes["GizmoScaleHandle"] = CreateMeshInternal(gizmo_scale_handle_vertices);
+	Meshes["GizmoArrow"] = CreateMeshInternal(GizmoArrowVertices);
+	Meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
+	Meshes["GizmoScaleHandle"] = CreateMeshInternal(GizmoScaleHandleVertices);
 }
 
 // 소멸자 (메모리 해제)
 UMeshManager::~UMeshManager()
 {
-	for (auto& pair : meshes)
+	for (auto& pair : Meshes)
 	{
 		delete pair.second;
 	}
-	meshes.clear();
+	Meshes.clear();
 }
 
-bool UMeshManager::Initialize(URenderer* renderer)
+bool UMeshManager::Initialize(URenderer* Renderer)
 {
-	if (!renderer) return false;
+	if (!Renderer) return false;
 
 	try
 	{
-		for (const auto& var : meshes)
+		for (const auto& var : Meshes)
 		{
-			var.second->Init(renderer->GetDevice());
+			var.second->Init(Renderer->GetDevice());
 		}
 	}
 	catch (const std::exception& e)
@@ -62,9 +64,9 @@ bool UMeshManager::Initialize(URenderer* renderer)
 	return true;
 }
 
-UMesh* UMeshManager::RetrieveMesh(FString meshName)
+UMesh* UMeshManager::RetrieveMesh(FString MeshName)
 {
-	auto itr = meshes.find(meshName);
-	if (itr == meshes.end()) return nullptr;
+	auto itr = Meshes.find(MeshName);
+	if (itr == Meshes.end()) return nullptr;
 	return itr->second;
 }

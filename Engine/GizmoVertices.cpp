@@ -8,7 +8,7 @@ const float cylHeight = 0.8;        // 원기둥 높이
 const float coneHeight = 0.25;       // 원뿔 높이
 const float coneRadius = 0.125;		// 원뿔 반지름
 
-const TArray<FVertexPosColor> gizmo_arrow_vertices =
+const TArray<FVertexPosColor> GizmoArrowVertices =
 {
 	// 원기둥 바닥 (총 8개 삼각형, 정점 순서 뒤집힘)
 	{ cylRadius * 0.7071f, 0.0f, cylRadius * 0.7071f, 0.8f, 0.8f, 0.8f, 1 }, { cylRadius, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f, 1 }, { 0.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f, 1 },
@@ -125,7 +125,7 @@ const float boxHeight = 0.8f; // 사각기둥의 높이 (Y 방향)
 const float cubeSize = 0.2f;  // 정육면체의 한 변 길이
 const float cubeOffset = boxHeight + (cubeSize / 2.0f); // 정육면체 중심의 Y 오프셋 (사각기둥 끝에 붙이도록)
 
-const TArray<FVertexPosColor> gizmo_scale_handle_vertices =
+const TArray<FVertexPosColor> GizmoScaleHandleVertices =
 {
 	// ===================================================================================
 	// 사각기둥 (Box/Prism) - 12개 삼각형 (정점 순서 반전)

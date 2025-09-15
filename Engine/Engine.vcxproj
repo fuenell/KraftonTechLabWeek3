@@ -248,8 +248,10 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CapsuleVertices.h" />
     <ClInclude Include="FontAtlas.h" />
     <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="SphereVertices.h" />
     <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="FDynamicBitset.h" />
@@ -298,7 +300,6 @@
     <ClInclude Include="USceneManager.h" />
     <ClInclude Include="URaycastManager.h" />
     <ClInclude Include="EditorApplication.h" />
-    <ClInclude Include="Sphere.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="UEngineStatics.h" />

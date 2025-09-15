@@ -2,7 +2,7 @@
 #include "FVertexPosColor.h"
 #include "TArray.h"
 
-inline TArray<FVertexPosColor> cube_vertices = {
+inline TArray<FVertexPosColor> CubeVertices = {
     // 앞면 (Front face) - Z = +0.5 - Red 계열
     { -0.5f,  0.5f,  0.5f, 1.0f, 0.0f, 0.0f, 1.0f}, // 좌상
     {  0.5f,  0.5f,  0.5f, 1.0f, 0.2f, 0.2f, 1.0f}, // 우상

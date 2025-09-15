@@ -3,7 +3,7 @@
 #include "TArray.h"
 
 // CW(시계방향) 기준 XY 평면 정사각형
-inline TArray<FVertexPosColor> plane_vertices = {
+inline TArray<FVertexPosColor> PlaneVertices = {
 	// 첫 번째 삼각형 (CW: 좌상 -> 우상 -> 좌하)
 	{ -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f}, // 좌상 - Red
 	{  0.5f,  0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f}, // 우상 - Green

@@ -16,20 +16,16 @@ struct FVertexPosColor4; // 전방 선언
 class UMesh : public UObject
 {
 	DECLARE_UCLASS(UMesh, UObject)
-private:
-	bool isInitialized = false;
 public:
-	ID3D11Buffer* VertexBuffer = nullptr;
-	TArray<FVertexPosColor4> Vertices;
-	int32 NumVertices = 0;
-	D3D_PRIMITIVE_TOPOLOGY PrimitiveType;
-	UINT Stride = 0;
-	FBounds LocalBounds;
-	FBounds RealBounds;
+	UMesh() {}
 
-	UMesh();
-	// 생성자에서 초기화 리스트와 버텍스 버퍼를 생성
-	UMesh(const TArray<FVertexPosColor4>& vertices, D3D_PRIMITIVE_TOPOLOGY primitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	UMesh(const TArray<FVertexPosColor4>& InVertices, D3D_PRIMITIVE_TOPOLOGY InPrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST)
+		: Vertices(InVertices), PrimitiveType(InPrimitiveType)
+	{
+		NumVertices = Vertices.size();
+		Stride = sizeof(FVertexPosColor4);
+		LocalBounds = ComputeLocalBounds(Vertices);
+	}
 
 	~UMesh()
 	{
@@ -38,13 +34,10 @@ public:
 
 	void Init(ID3D11Device* device);
 
-	bool IsInitialized() const { return isInitialized; }
+	bool IsInitialized() const { return bIsInitialized; }
 
 	const FBounds& GetLocalBounds() const { return LocalBounds; }
-	const FBounds& GetRealBounds() const
-	{
-		return RealBounds;
-	}
+	const FBounds& GetRealBounds() const { return RealBounds; }	// 지금 안씀
 
 	// 여기서 최소값과 최대값이 결정된 두개의 점 구조체가 완성됨
 	static FBounds ComputeLocalBounds(const TArray<FVertexPosColor4>& verts)
@@ -65,7 +58,6 @@ public:
 		}
 		return b;
 	}
-
 
 	// 실제 딱 맞는 Bounds를 계산하는 함수
 	static FBounds CalculateAccurateWorldBounds(const UMesh* InMesh, const FMatrix& WorldTransform)
@@ -88,4 +80,20 @@ public:
 
 		return AccurateWorldBounds;
 	}
+
+public:
+	// 공용 멤버 변수
+	D3D_PRIMITIVE_TOPOLOGY PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	// Vertex Buffer 관련 데이터
+	ID3D11Buffer* VertexBuffer = nullptr;
+	TArray<FVertexPosColor4> Vertices;
+	int32 NumVertices = 0;
+	UINT Stride = 0;
+
+private:
+	bool bIsInitialized = false;
+
+	FBounds LocalBounds{};
+	FBounds RealBounds{};	// 지금 안씀
 };

@@ -2,9 +2,9 @@
 #include "FVertexPosColor.h"
 #include "TArray.h"
 
-extern const TArray<FVertexPosColor> gizmo_arrow_vertices;
+extern const TArray<FVertexPosColor> GizmoArrowVertices;
 
-extern const TArray<FVertexPosColor> gizmo_scale_handle_vertices;
+extern const TArray<FVertexPosColor> GizmoScaleHandleVertices;
 
 class GridGenerator
 {
