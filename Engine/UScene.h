@@ -60,19 +60,19 @@ protected:
 	virtual void RenderGUI() {}
 	virtual void OnShutdown() {}
 
-	int32 BackBufferWidth, BackBufferHeight;
-	int32 Version;
-	int32 PrimitiveCount;
-	bool bIsInitialized;
-	TArray<USceneComponent*> Objects;
+	int32 BackBufferWidth{}, BackBufferHeight{};
+	int32 Version{};
+	int32 PrimitiveCount{};
+	bool bIsInitialized{};
+	TArray<USceneComponent*> Objects{};
 
 	// Reference from outside
-	URenderer* Renderer;
-	UMeshManager* MeshManager;
-	UInputManager* InputManager;
-	//URaycastManager* RaycastManager;
-	//UGizmoManager* GizmoManager;
+	URenderer* Renderer{};
+	UMeshManager* MeshManager{};
+	UInputManager* InputManager{};
+	//URaycastManager* RaycastManager{};
+	//UGizmoManager* GizmoManager{};
 
 	//UScene owns camera
-	UCamera* Camera;
+	UCamera* Camera{};
 };

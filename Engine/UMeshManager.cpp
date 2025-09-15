@@ -5,6 +5,13 @@
 #include "PlaneVertices.h"
 #include "CubeVertices.h"
 #include "CapsuleVertices.h"
+#include "USphereComp.h"
+#include "UPlaneComp.h"
+#include "UCubeComp.h"
+#include "USpotLightComponent.h"
+#include "UGizmoArrowComp.h"
+#include "UGizmoRotationHandleComp.h"
+#include "UGizmoScaleHandleComp.h"
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
 UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& Vertices, D3D_PRIMITIVE_TOPOLOGY PrimitiveType)
@@ -19,14 +26,14 @@ UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& Vertices,
 UMeshManager::UMeshManager()
 {
 	Meshes["Capsule"] = CreateMeshInternal(CapsuleVertices);
-	Meshes["Sphere"] = CreateMeshInternal(SphereVertices);
-	Meshes["Plane"] = CreateMeshInternal(PlaneVertices);
-	Meshes["Cube"] = CreateMeshInternal(CubeVertices);
-	Meshes["SpotLight"] = CreateMeshInternal(PlaneVertices);
-	//meshes["GizmoGrid"] = CreateMeshInternal(GridGenerator::CreateGridVertices(1, 100), D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-	Meshes["GizmoArrow"] = CreateMeshInternal(GizmoArrowVertices);
-	Meshes["GizmoRotationHandle"] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
-	Meshes["GizmoScaleHandle"] = CreateMeshInternal(GizmoScaleHandleVertices);
+	Meshes[USphereComp::StaticClass()->GetUClassName()] = CreateMeshInternal(SphereVertices);
+	Meshes[UPlaneComp::StaticClass()->GetUClassName()] = CreateMeshInternal(PlaneVertices);
+	Meshes[UCubeComp::StaticClass()->GetUClassName()] = CreateMeshInternal(CubeVertices);
+	Meshes[USpotLightComponent::StaticClass()->GetUClassName()] = CreateMeshInternal(PlaneVertices);
+
+	Meshes[UGizmoArrowComp::StaticClass()->GetUClassName()] = CreateMeshInternal(GizmoArrowVertices);
+	Meshes[UGizmoRotationHandleComp::StaticClass()->GetUClassName()] = CreateMeshInternal(GridGenerator::CreateRotationHandleVertices());
+	Meshes[UGizmoScaleHandleComp::StaticClass()->GetUClassName()] = CreateMeshInternal(GizmoScaleHandleVertices);
 }
 
 // 소멸자 (메모리 해제)

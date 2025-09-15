@@ -13,11 +13,9 @@ class UGizmoGridComp : public UGizmoComponent
 	DECLARE_UCLASS(UGizmoGridComp, UGizmoComponent)
 public:
 	using UGizmoComponent::UGizmoComponent;
-	
+
 	json::JSON Serialize() const override
 	{
 		return json::JSON();
 	}
-
-	UGizmoGridComp();
 };

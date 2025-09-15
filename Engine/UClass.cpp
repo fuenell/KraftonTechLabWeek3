@@ -1,68 +1,62 @@
 ﻿#include "stdafx.h"
 
-UClass::UClass() : className(""), superClassTypeName("") {}
-
-UClass* UClass::RegisterToFactory(const FName& typeName, const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName)
+UClass* UClass::RegisterToFactory(const FName& TypeName, const TFunction<UObject* ()>& CreateFunction, const FName& SuperClassTypeName)
 {
-	TUniquePtr<UClass> classType = MakeUnique<UClass>();
+	TUniquePtr<UClass> ClassType = MakeUnique<UClass>();
 
-	//classType->typeId = registeredCount++;
-	classType->className = typeName;
-	classType->superClassTypeName = superClassTypeName;
-	classType->createFunction = createFunction;
+	ClassType->ClassName = TypeName;
+	ClassType->SuperClassTypeName = SuperClassTypeName;
+	ClassType->CreateFunction = CreateFunction;
 
-
-	//nameToId[typeName] = classType->typeId;
-
-	UClass* rawPtr = classType.get();
-	classList[classType->className] = std::move(classType);
-	return rawPtr;
+	UClass* RawPtr = ClassType.get();
+	ClassList[ClassType->ClassName] = std::move(ClassType);
+	return RawPtr;
 }
 
 void UClass::ResolveTypeBitsets()
 {
-	for (std::pair<const FName, TUniquePtr<UClass>>& _class : classList)
+	for (std::pair<const FName, TUniquePtr<UClass>>& ClassEntry : ClassList)
 	{
-		const FName& Name = _class.first;
-		UClass* Object = _class.second.get();
+		const FName& Name = ClassEntry.first;
+		UClass* Object = ClassEntry.second.get();
 
-		if (Object->superClassTypeName != FName(""))
+		if (Object->SuperClassTypeName != FName(""))
 		{
-			Object->superClass = FindClass(Object->superClassTypeName);
+			Object->SuperClass = FindClass(Object->SuperClassTypeName);
 		}
 	}
-	for (std::pair<const FName, TUniquePtr<UClass>>& _class : classList)
+	for (std::pair<const FName, TUniquePtr<UClass>>& _class : ClassList)
 	{
 		UClass* Object = _class.second.get();
 
-		if (Object->processed) continue;
+		if (Object->bIsProcessed) continue;
 
 		Object->ResolveTypeBitset(Object);
 	}
 }
 
-void UClass::ResolveTypeBitset(UClass* classPtr)
+void UClass::ResolveTypeBitset(UClass* ClassPtr)
 {
-	TArray<UClass*> stack;
-	stack.push_back(classPtr);
+	TArray<UClass*> Stack;
+	Stack.push_back(ClassPtr);
 
-	while (!stack.empty())
+	while (!Stack.empty())
 	{
-		UClass* cur = stack.back();
+		UClass* Cur = Stack.back();
 
 		// 부모가 아직 처리되지 않았다면 먼저 스택에 push
-		while (cur->superClass && !cur->superClass->processed)
+		while (Cur->SuperClass && !Cur->SuperClass->bIsProcessed)
 		{
-			stack.push_back(cur->superClass);
-			cur = stack.back();
+			Stack.push_back(Cur->SuperClass);
+			Cur = Stack.back();
 		}
 
 		// 현재 노드 처리
-		cur->typeBitset.Clear();
-		if (cur->superClass) cur->typeBitset |= cur->superClass->typeBitset;
-		cur->typeBitset.Set(cur->typeId);  // 자신의 비트 추가
-		cur->processed = true;
+		Cur->TypeBitset.Clear();
+		if (Cur->SuperClass) Cur->TypeBitset |= Cur->SuperClass->TypeBitset;
+		Cur->TypeBitset.Set(Cur->TypeId);  // 자신의 비트 추가
+		Cur->bIsProcessed = true;
 
-		stack.pop_back();
+		Stack.pop_back();
 	}
 }

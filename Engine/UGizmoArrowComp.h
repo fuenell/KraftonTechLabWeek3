@@ -9,6 +9,4 @@ public:
 	using UGizmoComponent::UGizmoComponent;
 
 	EAxis Axis = EAxis::None;
-
-	UGizmoArrowComp();
 };

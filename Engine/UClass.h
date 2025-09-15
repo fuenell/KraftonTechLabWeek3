@@ -9,71 +9,70 @@
 class UClass
 {
 public:
-	static UClass* RegisterToFactory(const FName& typeName,
-		const TFunction<UObject* ()>& createFunction, const FName& superClassTypeName);
+	static UClass* RegisterToFactory(const FName& TypeName,
+		const TFunction<UObject* ()>& CreateFunction, const FName& SuperClassTypeName);
 
 	static void ResolveTypeBitsets();
-	void ResolveTypeBitset(UClass* classPtr);
+	void ResolveTypeBitset(UClass* ClassPtr);
 
 	static UClass* FindClass(const FName& Name)
 	{
 		FName key(Name);
 
-		if (classList.count(Name))
-			return classList[Name].get();
+		if (ClassList.count(Name))
+			return ClassList[Name].get();
 		else
 			return nullptr;
 	}
 
-	static UClass* FindClassWithTypeName(const FString& Name)
-	{
-		if (!TypeNameToId.count(Name))
-			return nullptr;
-
-		const FName& Key = TypeNameToId[Name];
-		return FindClass(Key);
-	}
-
-
 	static const TMap<FName, TUniquePtr<UClass>>& GetClassPool()
 	{
-		return classList;
+		return ClassList;
 	}
 
-	UClass();
+	UClass() {}
 
-	bool IsChildOrSelfOf(UClass* baseClass) const
+	// 현재 클래스가 BaseClass를 상속받았는지 확인한다 (같은 경우 false 반환)
+	bool IsChildOf(UClass* BaseClass) const
 	{
-		return baseClass && typeBitset.Test(baseClass->typeId);
-	}
+		const UClass* CurrentClass = SuperClass; // 자기 자신은 제외하고 부모부터 탐색
 
-	FName GetUClassName() const { return className; }
-
-	FName GetTypeName() const
-	{
-		FString Name = GetMeta("TypeName");
-		if (Name == "")
-			return GetUClassName();
-
-		return Name;
-	}
-
-	void SetMeta(const FString& key, const FString& value)
-	{
-		metadata[key] = value;
-
-		if (key == "TypeName")
+		while (CurrentClass != nullptr)
 		{
-			TypeNameToId[value] = className;  // typeId는 인스턴스 멤버
+			if (CurrentClass->ClassName == BaseClass->ClassName)
+			{
+				return true;
+			}
+
+			CurrentClass = CurrentClass->SuperClass;
 		}
+
+		return false;
 	}
 
+	// 현재 클래스가 BaseClass이거나, BaseClass를 상속받았는지 확인한다
+	bool IsChildOrSelfOf(UClass* BaseClass) const
+	{
+		if (ClassName == BaseClass->ClassName)
+		{
+			return true;
+		}
 
-	FName GetMeta(const FString& key) const
+		return IsChildOf(BaseClass);
+	}
+
+	FName GetUClassName() const { return ClassName; }
+
+	void SetMeta(const FString& Key, const FString& Value)
+	{
+		Metadata[Key] = Value;
+	}
+
+	FName GetMeta(const FString& Key) const
 	{
 		try
 		{
-			return metadata.at(FName(key));
+			return Metadata.at(FName(Key));
 		}
 		catch (const std::out_of_range&)
 		{
@@ -83,21 +82,18 @@ public:
 
 	UObject* CreateDefaultObject() const
 	{
-		return createFunction ? createFunction() : nullptr;
+		return CreateFunction ? CreateFunction() : nullptr;
 	}
 
 private:
-	static inline TMap<FName, TUniquePtr<UClass>> classList;
-	//static inline TMap<FString, uint32> nameToId;
-	// DisplayName은 typeName을 나타내는 사용자 정의 메타데이터다.
-	static inline TMap<FName, FName> TypeNameToId;
-	static inline uint32 registeredCount = 0;
+	static inline TMap<FName, TUniquePtr<UClass>> ClassList{};
+	static inline uint32 RegisteredCount = 0;
 
-	TMap<FName, FName> metadata;
-	uint32 typeId;
-	FDynamicBitset typeBitset;
-	FName className, superClassTypeName;
-	UClass* superClass;
-	TFunction<UObject* ()> createFunction;
-	bool processed = false;
+	TMap<FName, FName> Metadata{};
+	uint32 TypeId{};
+	FDynamicBitset TypeBitset{};
+	FName ClassName{}, SuperClassTypeName{};
+	UClass* SuperClass{};
+	TFunction<UObject* ()> CreateFunction{};
+	bool bIsProcessed = false;
 };

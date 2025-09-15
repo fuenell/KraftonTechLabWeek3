@@ -28,15 +28,15 @@ UControlPanel::UControlPanel(USceneManager* InSceneManager, UGizmoManager* InGiz
 	for (const auto& Pair : UClass::GetClassPool())
 	{
 		UClass* registeredType = Pair.second.get();
-		if (!registeredType->IsChildOrSelfOf(USceneComponent::StaticClass()))
+		if (!registeredType->IsChildOf(UPrimitiveComponent::StaticClass()))
 			continue;
 
-		FString TypeName = registeredType->GetMeta("TypeName");
+		FString TypeName = registeredType->GetUClassName();
 		if (TypeName.empty())
 			continue;
 
 		RegisteredTypes.push_back(registeredType);
-		ChoiceStrList.push_back(registeredType->GetMeta("TypeName"));
+		ChoiceStrList.push_back(registeredType->GetUClassName());
 	}
 
 	for (const FString& str : ChoiceStrList)
@@ -66,8 +66,8 @@ void UControlPanel::RenderContent()
 
 void UControlPanel::PrimaryInformationSection()
 {
-	float frameRate = ImGui::GetIO().Framerate;
-	ImGui::Text("FPS %.0f (%.0f ms)", frameRate, 1000.0f / frameRate);
+	float FrameRate = ImGui::GetIO().Framerate;
+	ImGui::Text("FPS %.0f (%.0f ms)", FrameRate, 1000.0f / FrameRate);
 }
 
 USceneComponent* UControlPanel::CreateSceneComponentFromChoice(int index)

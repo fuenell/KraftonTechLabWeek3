@@ -10,30 +10,33 @@ class UMeshManager; // 전방 선언
 class UPrimitiveComponent : public USceneComponent
 {
 	DECLARE_UCLASS(UPrimitiveComponent, USceneComponent)
-protected:
-	UMesh* mesh;
-	FVector4 Color = { 1, 1, 1, 1 };
 
 public:
 	UPrimitiveComponent(FVector loc = { 0,0,0 }, FVector rot = { 0,0,0 }, FVector scl = { 1,1,1 })
-		: USceneComponent(loc, rot, scl), mesh(nullptr)
+		: USceneComponent(loc, rot, scl), Mesh(nullptr)
 	{
 	}
 
-	bool bIsSelected = false;
-
-	virtual void Draw(URenderer& renderer);
-	virtual void UpdateConstantBuffer(URenderer& renderer);
+	virtual void Draw(URenderer& Renderer);
+	virtual void UpdateConstantBuffer(URenderer& Renderer);
 	virtual ~UPrimitiveComponent() {}
 
 	// 별도의 초기화 메서드
-	virtual bool Init(UMeshManager* meshManager);
+	virtual bool Init(UMeshManager* MeshManager);
 
 	bool CountOnInspector() override { return true; }
 
-	UMesh* GetMesh() { return mesh; }
+	UMesh* GetMesh() { return Mesh; }
 
-	void SetColor(const FVector4& newColor) { Color = newColor; }
+	void SetColor(const FVector4& NewColor) { Color = NewColor; }
 	FVector4 GetColor() const { return Color; }
 
+	bool IsManageable() override { return true; }
+
+public:
+	bool bIsSelected = false;
+
+protected:
+	UMesh* Mesh;
+	FVector4 Color = { 1, 1, 1, 1 };
 };

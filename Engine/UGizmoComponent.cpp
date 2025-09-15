@@ -9,7 +9,7 @@ bool UGizmoComponent::Init(UMeshManager* meshManager)
 {
 	if (meshManager)
 	{
-		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
+		mesh = meshManager->RetrieveMesh(GetClass()->GetUClassName());
 		return mesh != nullptr;
 	}
 	return false;

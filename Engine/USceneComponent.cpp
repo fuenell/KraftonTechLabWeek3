@@ -14,7 +14,7 @@ json::JSON USceneComponent::Serialize() const
 {
 	FVector TmpRot = RelativeQuaternion.GetEulerXYZ();
 	json::JSON Result;
-	Result["Type"] = GetClass()->GetTypeName();
+	Result["Type"] = GetClass()->GetUClassName();
 	Result["FName"] = Name;
 	Result["Location"] = json::Array(RelativeLocation.X, RelativeLocation.Y, RelativeLocation.Z);
 	Result["Rotation"] = json::Array(TmpRot.X, TmpRot.Y, TmpRot.Z);

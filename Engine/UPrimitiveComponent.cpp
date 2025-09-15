@@ -8,8 +8,8 @@ bool UPrimitiveComponent::Init(UMeshManager* meshManager)
 {
 	if (meshManager)
 	{
-		mesh = meshManager->RetrieveMesh(GetClass()->GetMeta("MeshName"));
-		return mesh != nullptr;
+		Mesh = meshManager->RetrieveMesh(GetClass()->GetUClassName());
+		return Mesh != nullptr;
 	}
 	return false;
 }
@@ -22,11 +22,11 @@ void UPrimitiveComponent::UpdateConstantBuffer(URenderer& renderer)
 
 void UPrimitiveComponent::Draw(URenderer& renderer)
 {
-	if (!mesh || !mesh->VertexBuffer)
+	if (!Mesh || !Mesh->VertexBuffer)
 	{
 		return;
 	}
 
 	UpdateConstantBuffer(renderer);
-	renderer.DrawMesh(mesh);
+	renderer.DrawMesh(Mesh);
 }
