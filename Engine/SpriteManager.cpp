@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
-#include "BillBoardManager.h"
+#include "SpriteManager.h"
 
-BillBoardManager::BillBoardManager() :
+SpriteManager::SpriteManager() :
 	VertexShader(nullptr),
 	PixelShader(nullptr),
 	InputLayout(nullptr),
@@ -13,7 +13,7 @@ BillBoardManager::BillBoardManager() :
 {
 }
 
-bool BillBoardManager::Initialize(ID3D11Device* Device)
+bool SpriteManager::Initialize(ID3D11Device* Device)
 {
 
 	// Load vertex shader from file
@@ -52,7 +52,7 @@ bool BillBoardManager::Initialize(ID3D11Device* Device)
 	return true;
 }
 
-void BillBoardManager::SetBuffer(
+void SpriteManager::SetBuffer(
 	ID3D11Device* Device,
 	TArray<FVertexPosColor4> VertexArray,
 	TArray<uint32> IndexArray)
@@ -83,7 +83,7 @@ void BillBoardManager::SetBuffer(
 		;
 }
 
-void BillBoardManager::Bind(ID3D11DeviceContext* DeviceContext)
+void SpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
 {
 	// Set shaders
 	DeviceContext->VSSetShader(VertexShader, nullptr, 0);
@@ -99,7 +99,7 @@ void BillBoardManager::Bind(ID3D11DeviceContext* DeviceContext)
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void BillBoardManager::Render(ID3D11DeviceContext* DeviceContext)
+void SpriteManager::Render(ID3D11DeviceContext* DeviceContext)
 {
 	DeviceContext->DrawIndexed(IndexBufferSize, 0, 0);
 	if (VertexBuffer)
@@ -115,7 +115,7 @@ void BillBoardManager::Render(ID3D11DeviceContext* DeviceContext)
 	}
 }
 
-void BillBoardManager::Release()
+void SpriteManager::Release()
 {
 	if (VertexShader)
 	{

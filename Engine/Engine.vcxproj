@@ -139,7 +139,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BillBoardManager.cpp" />
     <ClCompile Include="FName.cpp" />
     <ClCompile Include="GizmoVertices.cpp" />
     <ClCompile Include="ImGuiWindowWrapper.cpp" />
@@ -195,13 +194,17 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="ShowFlag.cpp" />
+    <ClCompile Include="SpriteManager.cpp" />
+    <ClCompile Include="SpriteRenderer.cpp" />
+    <ClCompile Include="SpriteRenderer.h" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ToggleWindow.cpp" />
+    <ClCompile Include="MouseClickEffectManager.cpp" />
+    <ClCompile Include="UToggleWindow.cpp" />
     <ClCompile Include="UCamera.cpp" />
     <ClCompile Include="UClass.cpp" />
     <ClCompile Include="UControlPanel.cpp" />
@@ -239,7 +242,7 @@
     <ClCompile Include="Vector4.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BillBoardManager.h" />
+    <ClInclude Include="SpriteManager.h" />
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="FDynamicBitset.h" />
     <ClInclude Include="FName.h" />
@@ -248,7 +251,8 @@
     <ClInclude Include="Random.h" />
     <ClInclude Include="RTTI.h" />
     <ClInclude Include="ShowFlag.h" />
-    <ClInclude Include="ToggleWindow.h" />
+    <ClInclude Include="MouseClickEffectManager.h" />
+    <ClInclude Include="UToggleWindow.h" />
     <ClInclude Include="UCamera.h" />
     <ClInclude Include="FVertexPosColor.h" />
     <ClInclude Include="GizmoVertices.h" />

@@ -6,7 +6,7 @@
 #include "UControlPanel.h"
 #include "USceneComponentPropertyWindow.h"
 #include "USceneManagerWindow.h"
-#include "ToggleWindow.h"
+#include "UToggleWindow.h"
 
 class USceneManagerWindow;
 
