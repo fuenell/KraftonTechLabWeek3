@@ -1,11 +1,6 @@
 ﻿#include "stdafx.h"
 #include "UUIDRenderer.h"
 
-bool UUIDRenderer::Initialize(ID3D11Device* Device)
-{
-	return BBManager.Initialize(Device);
-}
-
 bool UUIDRenderer::SetUUIDVertices(
 	ID3D11Device* Device,
 	float AspectRatio,
@@ -56,21 +51,6 @@ bool UUIDRenderer::SetUUIDVertices(
 		IndexArray.push_back(3 + 4 * i);
 	}
 
-	BBManager.SetBuffer(Device, VertexArray, IndexArray);
+	SpriteManager.SetBuffer(Device, VertexArray, IndexArray);
 	return true;
-}
-
-void UUIDRenderer::Bind(ID3D11DeviceContext* DeviceContext)
-{
-	BBManager.Bind(DeviceContext);
-}
-
-void UUIDRenderer::Render(ID3D11DeviceContext* DeviceContext)
-{
-	BBManager.Render(DeviceContext);
-}
-
-void UUIDRenderer::Release()
-{
-	BBManager.Release();
 }

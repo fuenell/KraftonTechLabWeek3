@@ -451,6 +451,19 @@ void URenderer::DrawMesh(UMesh* mesh)
 	deviceContext->Draw(mesh->NumVertices, 0);
 }
 
+void URenderer::DrawTextMesh(UTextMesh* tmesh)
+{
+	if (!tmesh || !tmesh->IsInitialized())
+		return;
+
+	UINT offset = 0;
+
+	deviceContext->IASetVertexBuffers(0, 1, &tmesh->VertexBuffer, &tmesh->Stride, &offset);
+	deviceContext->IASetPrimitiveTopology(tmesh->PrimitiveType);
+
+	deviceContext->Draw(tmesh->NumVertices, 0);
+}
+
 void URenderer::DrawMeshOnTop(UMesh* mesh)
 {
 	if (!mesh || !mesh->IsInitialized())

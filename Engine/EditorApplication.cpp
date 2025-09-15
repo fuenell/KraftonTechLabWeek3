@@ -184,8 +184,7 @@ void EditorApplication::Render()
 		{
 			USpotLightComponent* SpotLightComponent = dynamic_cast<USpotLightComponent*>(PickedPrimitive);
 			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
-			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), SpotLightComponent->GetAngle(), SpotLightComponent->GetScale(), SpotLightComponent->GetColor());
-			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), SpotLightComponent->GetAngle(), SpotLightComponent->GetScale(), SpotLightComponent->GetLightColor());
 		}
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{

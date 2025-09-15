@@ -90,7 +90,7 @@ void USceneComponentPropertyWindow::RenderContent()
 		ImGui::SeparatorText("SpotLight");
 
 		// 현재 컬러/각도 가져오기 (FColor(0~255) 기준 가정)
-		FVector4 Cur = SpotLightComponent->GetColor();                 // A,R,G,B (엔진 구조에 맞춰 변경)
+		FVector4 Cur = SpotLightComponent->GetLightColor();                 // A,R,G,B (엔진 구조에 맞춰 변경)
 		float  Col[4] = {
 			Cur.X / 255.0f, Cur.Y / 255.0f, Cur.Z / 255.0f, Cur.W / 255.0f
 		};
@@ -152,7 +152,7 @@ void USceneComponentPropertyWindow::RenderContent()
 				UE_LOG("Alpha value : %d ", A);
 
 				const FVector4 NewColor(R, G, B, A);
-				SpotLightComponent->SetColor(NewColor);
+				SpotLightComponent->SetLightColor(NewColor);
 			}
 			if (bAngleChanged)
 			{

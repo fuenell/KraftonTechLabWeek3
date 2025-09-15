@@ -35,6 +35,12 @@ TUniquePtr<T> MakeUnique(Args&&... args)
 template<typename T, typename U>
 using TMap = std::unordered_map<T, U>;
 
+template<typename T, typename U>
+using TPair = std::pair<T, U>;
+
+template<typename T>
+using TQueue = std::queue<T>;
+
 template<typename T>
 using TFunction = std::function<T>;
 

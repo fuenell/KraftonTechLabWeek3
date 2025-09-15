@@ -23,6 +23,7 @@
 #include <climits>
 #include <bitset>
 #include <stack>
+#include <queue>
 
 // DirectX 관련
 #include <d3d11.h>

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "stdafx.h"
 #include "UMesh.h"
+#include "UTextMesh.h"
 #include "Matrix.h"
 #include "UEngineSubsystem.h"
 
@@ -91,6 +92,7 @@ public:
 	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
 	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
 	void DrawMesh(UMesh* mesh);
+	void DrawTextMesh(UTextMesh* tmesh);
 	void DrawMeshOnTop(UMesh* mesh);
 
 	// Resource binding
