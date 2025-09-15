@@ -2,7 +2,7 @@
 #include "UTextureManager.h"
 #include "Inc/DDSTextureLoader.h"
 
-#pragma comment(lib, "DirectXTK.lib")
+#pragma comment(lib, "Lib/DirectXTK.lib")
 
 UTextureManager::UTextureManager()
 {
@@ -15,7 +15,7 @@ UTextureManager::~UTextureManager()
 bool UTextureManager::Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 {
 	bool bSuccess = true;
-	bSuccess |= RegisterSRVWithDDS("DejaVu San Mono", L"DejaVu Sans Mono.dds", hWnd, device, deviceContext);
+	bSuccess |= RegisterSRVWithDDS("DejaVu San Mono", L"DDS/DejaVu Sans Mono.dds", hWnd, device, deviceContext);
 
 	return bSuccess;
 }
