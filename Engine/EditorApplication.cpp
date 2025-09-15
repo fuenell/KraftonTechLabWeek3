@@ -189,6 +189,7 @@ void EditorApplication::Render()
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{
 			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
+			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 		}
 		else
 		{
@@ -196,7 +197,7 @@ void EditorApplication::Render()
 			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		}
 		//WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
-		LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+		//LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
