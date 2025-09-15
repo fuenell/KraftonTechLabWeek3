@@ -79,14 +79,12 @@ void UScene::AddObject(USceneComponent* obj)
 	}
 }
 
-json::JSON UScene::Serialize() 
-
-const
+json::JSON UScene::Serialize() const
 {
-	json::JSON result;
+	json::JSON Result;
 	// UScene 특성에 맞는 JSON 구성
-	result["Version"] = Version;
-	result["NextUUID"] = std::to_string(UEngineStatics::GetNextUUID());
+	Result["Version"] = Version;
+	Result["NextUUID"] = std::to_string(UEngineStatics::GetNextUUID());
 	int32 validCount = 0;
 	for (UObject* object : Objects)
 	{
@@ -95,43 +93,69 @@ const
 		if (!_json.IsNull())
 		{
 			//result["Primitives"][std::to_string(validCount)] = _json;
-			result["Primitives"][std::to_string(object->UUID)] = _json;
+			Result["Primitives"][std::to_string(object->UUID)] = _json;
 			++validCount;
 		}
 	}
-	return result;
+	return Result;
 }
 
-bool UScene::Deserialize(const json::JSON& data)
+bool UScene::Deserialize(const json::JSON& DataObject)
 {
-	Version = data.at("Version").ToInt();
-	// nextUUID = data.at("NextUUID").ToInt();
+	if (!ValidateField(DataObject, "Version", json::JSON::Class::Integral) ||
+		!ValidateField(DataObject, "Primitives", json::JSON::Class::Object) ||
+		!ValidateField(DataObject, "NextUUID", json::JSON::Class::String))
+	{
+		return false;
+	}
+
+	Version = DataObject.at("Version").ToInt();
 
 	Objects.clear();
-	json::JSON primitivesJson = data.at("Primitives");
+	json::JSON primitivesJson = DataObject.at("Primitives");
 
 	UEngineStatics::SetUUIDGeneration(false);
 	UObject::ClearFreeIndices();
+
 	for (auto& primitiveJson : primitivesJson.ObjectRange())
 	{
 		uint32 uuid = stoi(primitiveJson.first);
-		json::JSON _data = primitiveJson.second;
+		json::JSON Data = primitiveJson.second;
 
-		UClass* _class = UClass::FindClassWithTypeName(_data.at("Type").ToString());
-		USceneComponent* component = nullptr;
-		if (_class != nullptr) component = _class->CreateDefaultObject()->Cast<USceneComponent>();
+		UClass* ClassType = nullptr;
+		if (ValidateField(Data, "Type", json::JSON::Class::String))
+		{
+			ClassType = UClass::FindClassWithTypeName(Data.at("Type").ToString());
 
-		component->Deserialize(_data);
-		component->SetUUID(uuid);
+			if (ClassType == nullptr || !ClassType->IsChildOrSelfOf(USceneComponent::StaticClass()))
+			{
+				continue;
+			}
+		}
+		else
+		{
+			continue;
+		}
 
-		Objects.push_back(component);
-		if (component->CountOnInspector())
+		USceneComponent* Component = nullptr;
+		Component = ClassType->CreateDefaultObject()->Cast<USceneComponent>();
+
+		if (Component->Deserialize(Data) == false)
+		{
+			delete Component;
+			continue;
+		}
+
+		Component->SetUUID(uuid);
+
+		Objects.push_back(Component);
+		if (Component->CountOnInspector())
 			++PrimitiveCount;
 	}
 
-	FString uuidStr = data.at("NextUUID").ToString();
+	FString UuidStr = DataObject.at("NextUUID").ToString();
 
-	UEngineStatics::SetNextUUID((uint32)stoi(uuidStr));
+	UEngineStatics::SetNextUUID((uint32)stoi(UuidStr));
 	UEngineStatics::SetUUIDGeneration(true);
 
 	return true;

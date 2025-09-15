@@ -31,8 +31,7 @@ public:
 	void SetVersion(int32 v) { Version = v; }
 
 	json::JSON Serialize() const override;
-
-	bool Deserialize(const json::JSON& data) override;
+	bool Deserialize(const json::JSON& DataObject) override;
 
 	const TArray<USceneComponent*>& GetObjects() const { return Objects; }
 	UCamera* GetCamera() { return Camera; }
@@ -44,6 +43,19 @@ public:
 
 	bool IsNameDuplicated(FName Name);
 
+	// 지정된 키가 존재하고, 예상 타입과 일치하는지 검사하는 헬퍼 함수
+	static bool ValidateField(const json::JSON& DataObject, const std::string& Key, json::JSON::Class ExpectedType)
+	{
+		if (!DataObject.hasKey(Key))
+		{
+			return false; // 키가 없음
+		}
+		if (DataObject.at(Key).JSONType() != ExpectedType)
+		{
+			return false; // 타입이 다름
+		}
+		return true; // 유효성 검사 통과
+	}
 protected:
 	virtual void RenderGUI() {}
 	virtual void OnShutdown() {}
