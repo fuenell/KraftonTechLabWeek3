@@ -405,10 +405,7 @@
     <ClInclude Include="UTextMesh.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ShaderW0.ps">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="ShaderW0.vs">
+    <None Include="ShaderW0.hlsl">
       <Filter>Shader</Filter>
     </None>
     <None Include="BillBoard.ps">

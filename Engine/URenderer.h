@@ -12,7 +12,7 @@ struct CBTransform
 	float MVP[16];
 	float MeshColor[4];
 	float IsSelected;
-	float padding[3];
+	float Padding[3];
 };
 
 class URenderer : UEngineSubsystem
@@ -24,7 +24,7 @@ public:
 	~URenderer();
 
 	// Initialization and cleanup
-	bool Initialize(HWND windowHandle);
+	bool Initialize(HWND WindowHandle);
 	bool CreateShader();
 	bool CreateRasterizerState();
 	bool CreateRasterizerStateWire();
@@ -35,145 +35,143 @@ public:
 	void ReleaseConstantBuffer();
 
 	// Buffer creation
-	bool ReleaseVertexBuffer(ID3D11Buffer* buffer);
-	bool ReleaseIndexBuffer(ID3D11Buffer* buffer);
+	bool ReleaseVertexBuffer(ID3D11Buffer* Buffer);
+	bool ReleaseIndexBuffer(ID3D11Buffer* Buffer);
 
 	// Texture creation
-	ID3D11Texture2D* CreateTexture2D(int32 width, int32 height, DXGI_FORMAT format,
-		const void* data = nullptr);
-	ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Texture2D* texture);
-	bool ReleaseTexture(ID3D11Texture2D* texture);
-	bool ReleaseShaderResourceView(ID3D11ShaderResourceView* srv);
+	ID3D11Texture2D* CreateTexture2D(int32 Width, int32 Height, DXGI_FORMAT Format,
+		const void* Data = nullptr);
+	ID3D11ShaderResourceView* CreateShaderResourceView(ID3D11Texture2D* Texture);
+	bool ReleaseTexture(ID3D11Texture2D* Texture);
+	bool ReleaseShaderResourceView(ID3D11ShaderResourceView* Srv);
 
 	// Rendering operations
 	void Prepare();
 	void PrepareShader();
 	void SwapBuffer();
-	void Clear(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
+	void Clear(float R = 0.0f, float G = 0.0f, float B = 0.0f, float A = 1.0f);
 
 	// Drawing operations
-	void DrawIndexed(UINT indexCount, UINT startIndexLocation = 0, INT baseVertexLocation = 0);
-	void Draw(UINT vertexCount, UINT startVertexLocation = 0);
-	void DrawMesh(UMesh* mesh);
-	void DrawTextMesh(UTextMesh* tmesh);
-	void DrawMeshOnTop(UMesh* mesh);
+	void DrawIndexed(UINT IndexCount, UINT StartIndexLocation = 0, INT BaseVertexLocation = 0);
+	void Draw(UINT VertexCount, UINT StartVertexLocation = 0);
+	void DrawMesh(UMesh* Mesh);
+	void DrawTextMesh(UTextMesh* Tmesh);
+	void DrawMeshOnTop(UMesh* Mesh);
 
 	// Resource binding
-	void SetVertexBuffer(ID3D11Buffer* buffer, UINT stride, UINT offset = 0);
-	void SetIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format = DXGI_FORMAT_R32_UINT);
-	void SetConstantBuffer(ID3D11Buffer* buffer, UINT slot = 0);
-	void SetTexture(ID3D11ShaderResourceView* srv, UINT slot = 0);
+	void SetVertexBuffer(ID3D11Buffer* Buffer, UINT Stride, UINT Offset = 0);
+	void SetIndexBuffer(ID3D11Buffer* Buffer, DXGI_FORMAT Format = DXGI_FORMAT_R32_UINT);
+	void SetConstantBuffer(ID3D11Buffer* Buffer, UINT Slot = 0);
+	void SetTexture(ID3D11ShaderResourceView* Srv, UINT Slot = 0);
 	void SetRasterizerState(EViewModeIndex InViewModeIndex);
 
 	// Constant buffer updates
-	bool UpdateConstantBuffer(const void* data, size_t sizeInBytes);
+	bool UpdateConstantBuffer(const void* Data, size_t SizeInBytes);
 
 	// Window resize handling
-	bool ResizeBuffers(int32 width, int32 height);
+	bool ResizeBuffers(int32 Width, int32 Height);
 
 	// Setter
 
 	// Getters
-	ID3D11Device* GetDevice() const { return device; }
-	ID3D11DeviceContext* GetDeviceContext() const { return deviceContext; }
-	IDXGISwapChain* GetSwapChain() const { return swapChain; }
+	ID3D11Device* GetDevice() const { return Device; }
+	ID3D11DeviceContext* GetDeviceContext() const { return DeviceContext; }
+	IDXGISwapChain* GetSwapChain() const { return SwapChain; }
 	EViewModeIndex GetViewModeIndex() const { return ViewModeIndex; }
 	bool IsInitialized() const { return bIsInitialized; }
 
 	// Utility functions
 	bool CheckDeviceState();
-	void GetBackBufferSize(int32& width, int32& height);
+	void GetBackBufferSize(int32& Width, int32& Height);
 
 	void SetViewProj(const FMatrix& V, const FMatrix& P); // 내부에 VP 캐시
-	void SetModel(const FMatrix& M, const FVector4& color, bool IsSelected);                      // M*VP → b0 업로드
-	void SetTargetAspect(float a) { if (a > 0.f) targetAspect = a; }
+	void SetModel(const FMatrix& M, const FVector4& Color, bool IsSelected);               // M*VP → b0 업로드
+	void SetTargetAspect(float A) { if (A > 0.f) TargetAspect = A; }
 	// targetAspect를 내부에서 사용 (카메라에 의존 X)
-	D3D11_VIEWPORT MakeAspectFitViewport(int32 winW, int32 winH) const;
+	D3D11_VIEWPORT MakeAspectFitViewport(int32 WinW, int32 WinH) const;
 	// 드래그 중 호출: currentViewport만 갈아끼움
-	void UseAspectFitViewport(int32 winW, int32 winH)
+	void UseAspectFitViewport(int32 WinW, int32 WinH)
 	{
-		currentViewport = MakeAspectFitViewport(winW, winH);
+		CurrentViewport = MakeAspectFitViewport(WinW, WinH);
 	}
 	// 평소엔 풀 윈도우
 	void UseFullWindowViewport()
 	{
-		currentViewport = viewport;
+		CurrentViewport = Viewport;
 	}
 
 	// Error handling
-	static void LogError(const char* function, HRESULT hr);
-	static bool CheckResult(HRESULT hr, const char* function);
+	static void LogError(const char* Function, HRESULT Hr);
+	static bool CheckResult(HRESULT Hr, const char* Function);
 
-	static ID3DBlob* CompileShader(LPCWSTR pFileName, LPCSTR pEntrypoint, LPCSTR pTarget);
+	static ID3DBlob* CompileShader(LPCWSTR PFileName, LPCSTR PEntrypoint, LPCSTR PTarget);
 
-	static ID3D11VertexShader* CreateVertexShader(ID3D11Device* Device, ID3DBlob* VSBlob);
+	static ID3D11VertexShader* CreateVertexShader(ID3D11Device* InDevice, ID3DBlob* VSBlob);
 
 	static ID3D11InputLayout* CreateInputLayout(
-		ID3D11Device* Device,
+		ID3D11Device* InDevice,
 		D3D11_INPUT_ELEMENT_DESC* InputElements,
 		int64 InputElementsSize,
 		ID3DBlob* VSBlob);
 
-	static ID3D11PixelShader* CreatePixelShader(ID3D11Device* Device, ID3DBlob* PSBlob);
+	static ID3D11PixelShader* CreatePixelShader(ID3D11Device* InDevice, ID3DBlob* PSBlob);
 
 	static ID3D11Buffer* CreateBuffer(
-		ID3D11Device* Device,
+		ID3D11Device* InDevice,
 		D3D11_BUFFER_DESC BufferDesc,
-		const void* data
+		const void* Data
 	);
-
 
 private:
 	// Internal helper functions
-	bool CreateDeviceAndSwapChain(HWND windowHandle);
+	bool CreateDeviceAndSwapChain(HWND WindowHandle);
 	bool CreateRenderTargetView();
-	bool CreateDepthStencilView(int32 width, int32 height);
-	bool SetupViewport(int32 width, int32 height);
+	bool CreateDepthStencilView(int32 Width, int32 Height);
+	bool SetupViewport(int32 Width, int32 Height);
 
 	// 행렬 복사 핼퍼
-	static inline void CopyRowMajor(float dst[16], const FMatrix& src)
+	static inline void CopyRowMajor(float Dst[16], const FMatrix& Src)
 	{
 		for (int32 r = 0; r < 4; ++r)
 			for (int32 c = 0; c < 4; ++c)
-				dst[r * 4 + c] = src.M[r][c];
+				Dst[r * 4 + c] = Src.M[r][c];
 	}
 
 private:
 	// Core D3D11 objects
-	ID3D11Device* device;
-	ID3D11DeviceContext* deviceContext;
-	IDXGISwapChain* swapChain;
-	ID3D11RenderTargetView* renderTargetView;
-	ID3D11DepthStencilView* depthStencilView;
-	ID3D11RasterizerState* rasterizerState;
+	ID3D11Device* Device;
+	ID3D11DeviceContext* DeviceContext;
+	IDXGISwapChain* SwapChain;
+	ID3D11RenderTargetView* RenderTargetView;
+	ID3D11DepthStencilView* DepthStencilView;
+	ID3D11RasterizerState* RasterizerState;
 	ID3D11RasterizerState* RasterizerStateWire;
 
 	// Shader objects
-	ID3D11VertexShader* vertexShader;
-	ID3D11PixelShader* pixelShader;
-	ID3D11InputLayout* inputLayout;
+	ID3D11VertexShader* VertexShader;
+	ID3D11PixelShader* PixelShader;
+	ID3D11InputLayout* InputLayout;
 	ID3D11SamplerState* SamplerState;
 
 	// Constant buffer
-	ID3D11Buffer* constantBuffer;
-
+	ID3D11Buffer* ConstantBuffer;
 
 	// blendstate buffer
 	ID3D11BlendState* BlendState;
 
 	// Viewport
-	D3D11_VIEWPORT viewport;
-	D3D11_VIEWPORT currentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
-	float targetAspect = 16.0f / 9.0f;
+	D3D11_VIEWPORT Viewport;
+	D3D11_VIEWPORT CurrentViewport; // 실제로 사용할 뷰포트(레터박스/필러박스 포함)
+	float TargetAspect = 16.0f / 9.0f;
 
 	// Window handle
-	HWND hWnd;
+	HWND HWnd;
 
 	// Render state
 	bool bIsInitialized;
 
-	FMatrix mVP;                 // 프레임 캐시
-	CBTransform   mCBData;
+	FMatrix MVP;                 // 프레임 캐시
+	CBTransform MCBData;
 
 	EViewModeIndex ViewModeIndex = EViewModeIndex::VMI_Normal;
 };
