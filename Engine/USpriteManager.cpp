@@ -156,7 +156,7 @@ void USpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
 	// Set primitive topology (default to triangle list)
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	ID3D11ShaderResourceView* SRV = TextureManager->SRVMap["DejaVu Sans Mono"];
+	ID3D11ShaderResourceView* SRV = TextureManager->SRVMap["DejaVu"];
 
 	DeviceContext->PSSetShaderResources(0, 1, &SRV);
 	DeviceContext->PSSetSamplers(0, 1, &SamplerState);
