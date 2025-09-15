@@ -12,7 +12,7 @@ bool TestUUIDRenderer::SetUUIDVertices(
 	FMatrix Projection
 )
 {
-	FString UUIDString = FString("UID : ") + std::to_string(UUID);
+	FString UUIDString = FString("ABC : ") + std::to_string(UUID);
 
 	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
 

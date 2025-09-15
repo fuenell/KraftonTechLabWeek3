@@ -36,7 +36,7 @@ SamplerState samp : register(s0); // 샘플러 상태
 
 float4 PSMain(VSOutput input) : SV_Target
 {
-    //float4 texColor = fontTex.Sample(samp, input.texCoord); // VS에서 넘겨준 UV 값을 통해 텍스처에서 텍셀 정보를 가져옴
+    float4 texColor = fontTex.Sample(samp, input.texCoord); // VS에서 넘겨준 UV 값을 통해 텍스처에서 텍셀 정보를 가져옴
     
     //if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
     //    discard;
@@ -44,8 +44,8 @@ float4 PSMain(VSOutput input) : SV_Target
     //return float4(input.texCoord, 0, 1);
     // 알파 채널이 글자 모양 (mask)
     
-    //return texColor;
+    return texColor;
     
-    return float4(1, 1, 1, 1);
+    //return float4(1, 1, 1, 1);
 
 }

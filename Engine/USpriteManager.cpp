@@ -133,7 +133,7 @@ void USpriteManager::SetBufferUV(ID3D11Device* Device, TArray<FVertexPosUV> Vert
 	if (!VertexBuffer)
 		;
 
-	Desc.ByteWidth = VertexStride * IndexBufferSize;
+	Desc.ByteWidth = IndexBufferSize;
 	Desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 	IndexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)IndexArray.data());
