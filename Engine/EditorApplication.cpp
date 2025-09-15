@@ -205,7 +205,7 @@ void EditorApplication::Render()
 				Device,
 				(float)WindowWidth / (float)WindowHeight,
 				PickedPrimitive->UUID,
-				0.5f,
+				0.05f,
 				PickedPrimitive->GetScale().Z,
 				WorldMatrix,
 				View,

@@ -38,8 +38,8 @@ float4 PSMain(VSOutput input) : SV_Target
 {
     float4 texColor = fontTex.Sample(samp, input.texCoord); // VS에서 넘겨준 UV 값을 통해 텍스처에서 텍셀 정보를 가져옴
     
-    //if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
-    //    discard;
+    if (texColor.r < 0.01f && texColor.g < 0.01f && texColor.b < 0.01f)
+        discard;
     
     //return float4(input.texCoord, 0, 1);
     // 알파 채널이 글자 모양 (mask)

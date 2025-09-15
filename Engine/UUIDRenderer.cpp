@@ -71,7 +71,7 @@ bool UUIDRenderer::SetUUIDVertices(
 {
 	Atlas.Initialize();
 
-	FString UUIDString = FString("ABC"); //+ std::to_string(UUID);
+	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
 
 	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -83,6 +83,8 @@ bool UUIDRenderer::SetUUIDVertices(
 	ObjectCenter = Projection.TransformVectorRow(ObjectCenter);
 
 	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
+
+	RenderCenter.Y -= 0.2f;
 
 	uint64 StringLen = UUIDString.size();
 	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSize * 0.5f * (1 / AspectRatio));
@@ -102,7 +104,7 @@ bool UUIDRenderer::SetUUIDVertices(
 
 		FVertexPosUV Vertex1 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u, v + height };
 		FVertexPosUV Vertex2 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u + width, v + height};
-		FVertexPosUV Vertex3 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, u, v };
+		FVertexPosUV Vertex3 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u, v };
 		FVertexPosUV Vertex4 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u + width, v };
 		// 
 		//FVertexPosUV Vertex1 = { -0.5f, -0.5f, 0.0f, 0.0f, 0.5f };
