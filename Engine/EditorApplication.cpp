@@ -196,7 +196,9 @@ void EditorApplication::Render()
 		else
 		{
 			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
-			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
+			Mesh->UpdateAccurateBounds(WorldMatrix);
+			WorldBounds = Mesh->GetAccurateBounds();
+			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 		}
 	}
 

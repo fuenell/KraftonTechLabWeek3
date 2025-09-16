@@ -8,87 +8,42 @@
 class UClass
 {
 public:
-	static UClass* RegisterToFactory(const FName& TypeName,
-		const TFunction<UObject* ()>& CreateFunction, const FName& SuperClassTypeName);
-
+	// 클래스 시스템을 위한 정적 인터페이스 함수들입니다.
+	static UClass* RegisterToFactory(const FName& TypeName, const TFunction<UObject* ()>& CreateFunction, const FName& SuperClassTypeName);
 	static void Init();
+	static UClass* FindClass(const FName& Name);
+	static const TMap<FName, TUniquePtr<UClass>>& GetClassPool();
 
-	static UClass* FindClass(const FName& Name)
-	{
-		FName key(Name);
+	// 생성자입니다.
+	UClass();
 
-		if (ClassList.count(Name))
-			return ClassList[Name].get();
-		else
-			return nullptr;
-	}
+	// 객체 인스턴스를 생성하는 함수입니다.
+	UObject* CreateDefaultObject() const;
 
-	static const TMap<FName, TUniquePtr<UClass>>& GetClassPool()
-	{
-		return ClassList;
-	}
+	// 클래스 계층 구조와 타입을 확인하는 함수들입니다.
+	bool IsChildOf(UClass* BaseClass) const;
+	bool IsChildOrSelfOf(UClass* BaseClass) const;
 
-	UClass() {}
+	// 클래스 정보를 가져오는 Getter 함수입니다.
+	FName GetUClassName() const;
 
-	// 현재 클래스가 BaseClass를 상속받았는지 확인한다 (같은 경우 false 반환)
-	bool IsChildOf(UClass* BaseClass) const
-	{
-		const UClass* CurrentClass = SuperClass; // 자기 자신은 제외하고 부모부터 탐색
-
-		while (CurrentClass != nullptr)
-		{
-			if (CurrentClass->ClassName == BaseClass->ClassName)
-			{
-				return true;
-			}
-
-			CurrentClass = CurrentClass->SuperClass;
-		}
-
-		return false;
-	}
-
-	// 현재 클래스가 BaseClass이거나, BaseClass를 상속받았는지 확인한다
-	bool IsChildOrSelfOf(UClass* BaseClass) const
-	{
-		if (ClassName == BaseClass->ClassName)
-		{
-			return true;
-		}
-
-		return IsChildOf(BaseClass);
-	}
-
-	FName GetUClassName() const { return ClassName; }
-
-	void SetMeta(const FString& Key, const FString& Value)
-	{
-		Metadata[Key] = Value;
-	}
-
-	FName GetMeta(const FString& Key) const
-	{
-		try
-		{
-			return Metadata.at(FName(Key));
-		}
-		catch (const std::out_of_range&)
-		{
-			return FString("");
-		}
-	}
-
-	UObject* CreateDefaultObject() const
-	{
-		return CreateFunction ? CreateFunction() : nullptr;
-	}
+	// 메타데이터를 관리하는 함수들입니다.
+	void SetMeta(const FString& Key, const FString& Value);
+	FName GetMeta(const FString& Key) const;
 
 private:
-	static inline TMap<FName, TUniquePtr<UClass>> ClassList{};
+	// 'Construct on First Use' 관용구를 사용하여 정적 초기화 문제를 해결합니다.
+	static TMap<FName, TUniquePtr<UClass>>& GetClassList();
 
+private:
+	// 클래스 관련 메타데이터를 저장하는 맵입니다.
 	TMap<FName, FName> Metadata{};
+	// 이 클래스의 이름입니다.
 	FName ClassName{};
+	// 부모 클래스의 이름입니다. (초기화 단계에서 사용됩니다)
 	FName SuperClassTypeName{};
+	// 부모 클래스에 대한 포인터입니다.
 	UClass* SuperClass{};
+	// 이 클래스의 인스턴스를 생성하는 팩토리 함수입니다.
 	TFunction<UObject* ()> CreateFunction{};
 };

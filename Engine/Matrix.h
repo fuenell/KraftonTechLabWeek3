@@ -8,7 +8,6 @@
 
 struct FMatrix
 {
-	float M[4][4];
 	// ===== 생성/기본 =====
 	FMatrix() { SetIdentity(); }
 	// 대각 행렬(모든 대각 원소가 동일한 값 v일 때는 스칼라 행렬)로 초기화 (대각선에 값, 나머지는 0)
@@ -529,4 +528,51 @@ struct FMatrix
 		FMatrix T = TranslationRow(t.X, t.Y, t.Z);
 		return S * R * T;                        // row 규약 핵심
 	}
+
+public:
+	// ===== 연산자 오버로딩 =====
+
+	/**
+	 * 두 행렬이 거의 동일한지 비교합니다. (부동 소수점 오차 허용)
+	 * @param Other 비교할 다른 행렬
+	 * @param Epsilon 허용 오차
+	 * @return 모든 요소가 허용 오차 내에 있으면 true, 그렇지 않으면 false
+	 */
+	bool Equals(const FMatrix& Other, float Epsilon = 1.e-5f) const
+	{
+		for (int32 r = 0; r < 4; ++r)
+		{
+			for (int32 c = 0; c < 4; ++c)
+			{
+				if (fabsf(M[r][c] - Other.M[r][c]) > Epsilon)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * 두 행렬이 거의 동일한지 비교하는 동등 연산자입니다.
+	 * @param Other 비교할 다른 행렬
+	 * @return 두 행렬이 동일하면 true, 그렇지 않으면 false
+	 */
+	bool operator==(const FMatrix& Other) const
+	{
+		return Equals(Other);
+	}
+
+	/**
+	 * 두 행렬이 다른지 비교하는 불일치 연산자입니다.
+	 * @param Other 비교할 다른 행렬
+	 * @return 두 행렬이 다르면 true, 그렇지 않으면 false
+	 */
+	bool operator!=(const FMatrix& Other) const
+	{
+		return !Equals(Other);
+	}
+
+public:
+	float M[4][4];
 };

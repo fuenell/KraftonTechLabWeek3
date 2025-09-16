@@ -12,6 +12,7 @@
 #include "UGizmoArrowComp.h"
 #include "UGizmoRotationHandleComp.h"
 #include "UGizmoScaleHandleComp.h"
+#include "UCapsuleComp.h"
 
 IMPLEMENT_UCLASS(UMeshManager, UEngineSubsystem)
 UMesh* UMeshManager::CreateMeshInternal(const TArray<FVertexPosColor>& Vertices, D3D_PRIMITIVE_TOPOLOGY PrimitiveType)
@@ -33,7 +34,7 @@ UMesh* UMeshManager::CreateIndexMeshInternal(const TArray<FVertexPosColor>& Vert
 // 생성자
 UMeshManager::UMeshManager()
 {
-	Meshes["Capsule"] = CreateMeshInternal(CapsuleVertices);
+	Meshes[UCapsuleComp::StaticClass()->GetUClassName()] = CreateIndexMeshInternal(CapsuleVertices, CapsuleIndices);
 	Meshes[USphereComp::StaticClass()->GetUClassName()] = CreateMeshInternal(SphereVertices);
 	Meshes[UPlaneComp::StaticClass()->GetUClassName()] = CreateMeshInternal(PlaneVertices);
 	Meshes[UCubeComp::StaticClass()->GetUClassName()] = CreateIndexMeshInternal(CubeVertices, CubeIndices);

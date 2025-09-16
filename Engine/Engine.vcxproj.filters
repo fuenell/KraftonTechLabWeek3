@@ -81,7 +81,7 @@
     <ClCompile Include="USceneComponent.cpp">
       <Filter>Engine\Core\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Math.cpp">
+    <ClCompile Include="Matrix.cpp">
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="GizmoVertices.cpp">

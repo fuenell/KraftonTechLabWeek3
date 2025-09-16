@@ -1,4 +1,15 @@
 ﻿#include "stdafx.h"
+#include "UClass.h"
+
+//================================================================
+// Static Implementation
+//================================================================
+
+TMap<FName, TUniquePtr<UClass>>& UClass::GetClassList()
+{
+	static TMap<FName, TUniquePtr<UClass>> ClassList;
+	return ClassList;
+}
 
 UClass* UClass::RegisterToFactory(const FName& TypeName, const TFunction<UObject* ()>& CreateFunction, const FName& SuperClassTypeName)
 {
@@ -9,22 +20,105 @@ UClass* UClass::RegisterToFactory(const FName& TypeName, const TFunction<UObject
 	ClassType->CreateFunction = CreateFunction;
 
 	UClass* RawPtr = ClassType.get();
-	ClassList[ClassType->ClassName] = std::move(ClassType);
+	GetClassList().emplace(TypeName, std::move(ClassType));
+
 	return RawPtr;
 }
 
-// 모든 클래스의 SuperClass를 지정한다 
-// RegisterToFactory에서 등록되지 않은 Class를 SuperClass를 설정할 경우를 고려해서 한번에 처리
 void UClass::Init()
 {
-	for (std::pair<const FName, TUniquePtr<UClass>>& ClassEntry : ClassList)
+	for (auto& ClassEntry : GetClassList())
 	{
-		const FName& Name = ClassEntry.first;
 		UClass* Object = ClassEntry.second.get();
 
 		if (Object->SuperClassTypeName != FName(""))
 		{
 			Object->SuperClass = FindClass(Object->SuperClassTypeName);
 		}
+	}
+}
+
+UClass* UClass::FindClass(const FName& Name)
+{
+	if (GetClassList().count(Name))
+	{
+		return GetClassList().at(Name).get();
+	}
+	return nullptr;
+}
+
+const TMap<FName, TUniquePtr<UClass>>& UClass::GetClassPool()
+{
+	return GetClassList();
+}
+
+//================================================================
+// Object Lifetime
+//================================================================
+
+UClass::UClass()
+{
+	// 멤버 변수들은 헤더에서 인-클래스 초기화를 통해 안전하게 초기화됩니다.
+}
+
+UObject* UClass::CreateDefaultObject() const
+{
+	return CreateFunction ? CreateFunction() : nullptr;
+}
+
+//================================================================
+// Class Hierarchy
+//================================================================
+
+// 현재 클래스가 BaseClass를 상속받았는지 확인한다 (같은 경우 false 반환)
+bool UClass::IsChildOf(UClass* BaseClass) const
+{
+	const UClass* CurrentClass = SuperClass;
+
+	while (CurrentClass != nullptr)
+	{
+		if (CurrentClass->ClassName == BaseClass->ClassName)
+		{
+			return true;
+		}
+		CurrentClass = CurrentClass->SuperClass;
+	}
+
+	return false;
+}
+
+// 현재 클래스가 BaseClass이거나, BaseClass를 상속받았는지 확인한다
+bool UClass::IsChildOrSelfOf(UClass* BaseClass) const
+{
+	if (ClassName == BaseClass->ClassName)
+	{
+		return true;
+	}
+	return IsChildOf(BaseClass);
+}
+
+FName UClass::GetUClassName() const
+{
+	return ClassName;
+}
+
+//================================================================
+// Metadata
+//================================================================
+
+void UClass::SetMeta(const FString& Key, const FString& Value)
+{
+	Metadata[Key] = Value;
+}
+
+FName UClass::GetMeta(const FString& Key) const
+{
+	try
+	{
+		return Metadata.at(FName(Key));
+	}
+	catch (const std::out_of_range&)
+	{
+		return FString("");
 	}
 }
