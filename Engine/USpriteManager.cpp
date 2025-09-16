@@ -14,7 +14,7 @@ USpriteManager::USpriteManager() :
 {
 }
 
-bool USpriteManager::Initialize(ID3D11Device* Device)
+bool USpriteManager::Initialize(ID3D11Device* Device, uint32 InDefaultMaxChars)
 {
 	// === 1. Vertex Shader ===
 	ID3DBlob* vsBlob = URenderer::CompileShader(L"ShaderFont.hlsl", "VSMain", "vs_5_0");
@@ -41,6 +41,36 @@ bool USpriteManager::Initialize(ID3D11Device* Device)
 	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sampDesc.AddressU = sampDesc.AddressV = sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	Device->CreateSamplerState(&sampDesc, &SamplerState);
+
+
+	Atlas.Initialize();
+
+	// ===== VB/IB 생성 (Dynamic + CPU_WRITE) =====
+	VertexStride = sizeof(FVertexPosUV);
+	IndexStride = sizeof(uint32);
+
+	VertexCapacityBytes = VertexStride * (InDefaultMaxChars * 4); // 4 verts/char
+	IndexCapacityBytes = IndexStride * (InDefaultMaxChars * 6); // 6 idx/char
+
+	D3D11_BUFFER_DESC VBDesc = {};
+	VBDesc.Usage = D3D11_USAGE_DYNAMIC;
+	VBDesc.ByteWidth = VertexCapacityBytes;
+	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	VBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	HRESULT hr = Device->CreateBuffer(&VBDesc, nullptr, &VertexBuffer);
+	if (FAILED(hr) || !VertexBuffer) { return false; }
+
+	D3D11_BUFFER_DESC IBDesc = {};
+	IBDesc.Usage = D3D11_USAGE_DYNAMIC;
+	IBDesc.ByteWidth = IndexCapacityBytes;
+	IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	IBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	hr = Device->CreateBuffer(&IBDesc, nullptr, &IndexBuffer);
+	if (FAILED(hr) || !IndexBuffer) { return false; }
+
+	CurrentIndexCount = 0;
 
 
 	return true;
@@ -108,6 +138,12 @@ void USpriteManager::SetBufferUV(ID3D11Device* Device)
 		;
 }
 
+void USpriteManager::BeginFrame()
+{
+	VertexArray.clear();
+	IndexArray.clear();
+}
+
 void USpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
 {
 	// Set shaders
@@ -116,9 +152,6 @@ void USpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
 
 	// Set input layout
 	DeviceContext->IASetInputLayout(InputLayout);
-	UINT Offset = 0;
-	DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &VertexStride, &Offset);
-	DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, Offset);
 
 	// Set primitive topology (default to triangle list)
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -137,7 +170,25 @@ void USpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
 
 void USpriteManager::Render(ID3D11DeviceContext* DeviceContext)
 {
-	DeviceContext->DrawIndexed(IndexBufferSize, 0, 0);
+	D3D11_MAPPED_SUBRESOURCE Mapped;
+	DeviceContext->Map(VertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
+	memcpy(Mapped.pData, VertexArray.data(), sizeof(FVertexPosUV) * VertexArray.size());
+	DeviceContext->Unmap(VertexBuffer, 0);
+
+	// 2) IB 업로드
+	DeviceContext->Map(IndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Mapped);
+	memcpy(Mapped.pData, IndexArray.data(), sizeof(uint32_t) * IndexArray.size());
+	DeviceContext->Unmap(IndexBuffer, 0);
+
+	CurrentIndexCount = static_cast<uint32>(IndexArray.size());
+
+	UINT Offset = 0;
+	DeviceContext->IASetVertexBuffers(0, 1, &VertexBuffer, &VertexStride, &Offset);
+	DeviceContext->IASetIndexBuffer(IndexBuffer, DXGI_FORMAT_R32_UINT, Offset);
+
+
+	if (CurrentIndexCount == 0) return;
+	DeviceContext->DrawIndexed(static_cast<UINT>(CurrentIndexCount), 0, 0);
 }
 
 void USpriteManager::Release()
@@ -175,7 +226,7 @@ void USpriteManager::Release()
 
 bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, float ModelScale, FMatrix Modeling, FMatrix View, FMatrix Projection)
 {
-	Atlas.Initialize();
+
 
 	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
 
@@ -225,6 +276,7 @@ bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, ui
 		IndexArray.push_back(3 + 4 * i);
 	}
 
+
 	// 여기서 버텍스버퍼와 인덱스버퍼를 생성
-	SetBufferUV(Device);
+	//SetBufferUV(Device);
 }

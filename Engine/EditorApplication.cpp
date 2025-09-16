@@ -215,6 +215,8 @@ void EditorApplication::Render()
 	// Sprite(BillBoard) Rendering
 	if (PickedPrimitive != nullptr)
 	{
+		SpriteManager.BeginFrame();
+
 		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
