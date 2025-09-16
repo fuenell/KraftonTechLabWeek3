@@ -14,6 +14,17 @@ class ULineBatcherManager : UEngineSubsystem
 {
 	DECLARE_UCLASS(ULineBatcherManager, UEngineSubsystem)
 public:
+    static ULineBatcherManager& GetInstance()
+    {
+        static ULineBatcherManager Instance; // 스택(static storage) 싱글톤
+        return Instance;
+    }
+    ULineBatcherManager()
+    {
+    }
+    ~ULineBatcherManager()
+    {
+    }
     bool Initialize(ID3D11Device* InDevice, size_t InMaxLines);
     void BeginFrame();
 

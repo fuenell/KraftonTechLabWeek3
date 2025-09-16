@@ -20,6 +20,11 @@ class URenderer : UEngineSubsystem
 	DECLARE_UCLASS(URenderer, UEngineSubsystem)
 
 public:
+	static URenderer& GetInstance()
+	{
+		static URenderer Instance; // 스택(static storage) 싱글톤
+		return Instance;
+	}
 	URenderer();
 	~URenderer();
 

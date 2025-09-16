@@ -20,8 +20,13 @@ class URaycastManager : UEngineSubsystem
 {
 	DECLARE_UCLASS(URaycastManager, UEngineSubsystem)
 public:
-	URaycastManager();
+	static URaycastManager& GetInstance()
+	{
+		static URaycastManager Instance; // 스택(static storage) 싱글톤
+		return Instance;
+	}
 	URaycastManager(URenderer* InRenderer, UInputManager* InInputManager);
+	URaycastManager();
 	~URaycastManager();
 
 	bool Initialize(URenderer* InRenderer, UInputManager* InInputManager)

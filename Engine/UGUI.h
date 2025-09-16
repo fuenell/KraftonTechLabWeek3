@@ -13,6 +13,11 @@ private:
 	bool bShowDemoWindow;
 
 public:
+	static UGUI& GetInstance()
+	{
+		static UGUI Instance; // 스택(static storage) 싱글톤
+		return Instance;
+	}
 	UGUI();
 	~UGUI();
 

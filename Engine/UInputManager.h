@@ -24,6 +24,11 @@ private:
     bool mouseLook = false;
     float accumDX = 0.0f, accumDY = 0.0f; // 프레임 누적 델타
 public:
+    static UInputManager& GetInstance()
+    {
+        static UInputManager Instance; // 스택(static storage) 싱글톤
+        return Instance;
+    }
     UInputManager();
     ~UInputManager();
 

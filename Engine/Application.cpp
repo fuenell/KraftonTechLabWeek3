@@ -53,70 +53,80 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 	}
 
 	// Initialize core systems
-	if (!TimeManager.Initialize(60))
-	{
-		MessageBox(HWnd, L"Failed to initialize TimeManager", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	if (!Renderer.Initialize(HWnd))
-	{
-		MessageBox(HWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	if (!Renderer.CreateShader())
-	{
-		MessageBox(HWnd, L"Failed to create shaders", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	if (!Renderer.CreateConstantBuffer())
-	{
-		MessageBox(HWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	if (!MeshManager.Initialize(&Renderer))
-	{
-		MessageBox(HWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	if (!SceneManager.Initialize(g_pApplication))
-	{
-		MessageBox(HWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-	if (!RaycastManager.Initialize(&Renderer, &InputManager))
-	{
-		MessageBox(HWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-	if (!Gui.Initialize(HWnd, Renderer.GetDevice(), Renderer.GetDeviceContext()))
-	{
-		return false;
-	}
+	//if (!TimeManager.Initialize(60))
+	//{
+	//	MessageBox(HWnd, L"Failed to initialize TimeManager", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//
+	//if (!Renderer.Initialize(HWnd))
+	//{
+	//	MessageBox(HWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//
+	//if (!Renderer.CreateShader())
+	//{
+	//	MessageBox(HWnd, L"Failed to create shaders", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//
+	//if (!Renderer.CreateConstantBuffer())
+	//{
+	//	MessageBox(HWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//
+	//if (!MeshManager.Initialize(&Renderer))
+	//{
+	//	MessageBox(HWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//
+	//if (!SceneManager.Initialize(g_pApplication))
+	//{
+	//	MessageBox(HWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//if (!RaycastManager.Initialize(&Renderer, &InputManager))
+	//{
+	//	MessageBox(HWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//if (!Gui.Initialize(HWnd, Renderer.GetDevice(), Renderer.GetDeviceContext()))
+	//{
+	//	return false;
+	//}
 	//if (!UUIDRenderer.Initialize(Renderer.GetDevice(), &TextureManager))
 	//{
 	//	return false;
 	//}
 	// 여기서 일단은 그리드 렌더링에 필요한 vb, ib ,cb, vs, ps, ia 설정
 	// 추후 수정예정 why? => 아직은 그리드만 구현했기 때문 
-	if (!LineBatcherManager.Initialize(Renderer.GetDevice(), 1024))
-	{
-		MessageBox(HWnd, L"Failed to initialize LineBatcherManager", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
+	//if (!LineBatcherManager.Initialize(Renderer.GetDevice(), 1024))
+	//{
+	//	MessageBox(HWnd, L"Failed to initialize LineBatcherManager", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
+	//
+	//
+	//if (!SpriteManager.Initialize(Renderer.GetDevice()))
+	//{
+	//	MessageBox(HWnd, L"Failed to initialize TextureManager", L"Engine Error", MB_OK | MB_ICONERROR);
+	//	return false;
+	//}
 
-
-	if (!SpriteManager.Initialize(Renderer.GetDevice()))
-	{
-		MessageBox(HWnd, L"Failed to initialize TextureManager", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-
-	UTextureManager::GetInstance().Initialize(HWnd, Renderer.GetDevice(), Renderer.GetDeviceContext());
+	UTimeManager::GetInstance().Initialize();
+	URenderer::GetInstance().Initialize(HWnd);
+	URenderer::GetInstance().CreateShader();
+	URenderer::GetInstance().CreateConstantBuffer();
+	UMeshManager::GetInstance().Initialize(&URenderer::GetInstance());
+	USceneManager::GetInstance().Initialize(g_pApplication);
+	URaycastManager::GetInstance().Initialize(&URenderer::GetInstance(), &UInputManager::GetInstance());
+	UGUI::GetInstance().Initialize(HWnd, URenderer::GetInstance().GetDevice(), URenderer::GetInstance().GetDeviceContext());
+	ULineBatcherManager::GetInstance().Initialize(URenderer::GetInstance().GetDevice(), 1024);
+	USpriteManager::GetInstance().Initialize(URenderer::GetInstance().GetDevice());
+	UTextureManager::GetInstance().Initialize(HWnd, URenderer::GetInstance().GetDevice(), URenderer::GetInstance().GetDeviceContext());
 
 
 
@@ -125,7 +135,7 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 	초기화된 이후에 초기화해야 한다.
 	*/
 	ConfigManager& ConfigManager = ConfigManager::Instance();
-	ConfigManager.RegisterConfigTargets(&LineBatcherManager);
+	ConfigManager.RegisterConfigTargets(&ULineBatcherManager::GetInstance());
 	ConfigManager.LoadConfig();
 
 	// Allow derived classes to initialize
@@ -147,7 +157,7 @@ void Application::Run()
 
 	while (bIsRunning)
 	{
-		TimeManager.BeginFrame();
+		UTimeManager::GetInstance().BeginFrame();
 
 
 
@@ -161,7 +171,7 @@ void Application::Run()
 		*/
 
 
-		InputManager.Update();
+		UInputManager::GetInstance().Update();
 		ProcessMessages();
 
 		if (!bIsRunning)
@@ -170,8 +180,8 @@ void Application::Run()
 		InternalUpdate();
 		InternalRender();
 
-		TimeManager.EndFrame();
-		TimeManager.WaitForTargetFrameTime();
+		UTimeManager::GetInstance().EndFrame();
+		UTimeManager::GetInstance().WaitForTargetFrameTime();
 	}
 }
 
@@ -188,10 +198,10 @@ void Application::Shutdown()
 	OnShutdown();
 
 	// Shutdown core systems
-	Gui.Shutdown();
-	Renderer.ReleaseConstantBuffer();
-	Renderer.ReleaseShader();
-	Renderer.Release();
+	UGUI::GetInstance().Shutdown();
+	URenderer::GetInstance().ReleaseConstantBuffer();
+	URenderer::GetInstance().ReleaseShader();
+	URenderer::GetInstance().Release();
 
 	bIsInitialized = false;
 }
@@ -258,7 +268,7 @@ void Application::ProcessMessages()
 
 void Application::InternalUpdate()
 {
-	float DeltaTime = static_cast<float>(TimeManager.GetDeltaTime());
+	float DeltaTime = static_cast<float>(UTimeManager::GetInstance().GetDeltaTime());
 
 
 	// Call derived class update
@@ -268,20 +278,20 @@ void Application::InternalUpdate()
 void Application::InternalRender()
 {
 	// Prepare rendering
-	Renderer.Prepare();
-	Renderer.PrepareShader();
+	URenderer::GetInstance().Prepare();
+	URenderer::GetInstance().PrepareShader();
 
 	// Call derived class render
 	Render();
 
 	// Render GUI
-	Gui.BeginFrame();
-	Gui.Render();
+	UGUI::GetInstance().BeginFrame();
+	UGUI::GetInstance().Render();
 	RenderGUI();
-	Gui.EndFrame();
+	UGUI::GetInstance().EndFrame();
 
 	// Present the frame
-	Renderer.SwapBuffer();
+	URenderer::GetInstance().SwapBuffer();
 }
 
 LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -295,7 +305,8 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 	if (g_pApplication)
 	{
 		// Let input manager process input messages
-		g_pApplication->InputManager.ProcessMessage(hWnd, message, wParam, lParam);
+		UInputManager::GetInstance().ProcessMessage(hWnd, message, wParam, lParam);
+		//g_pApplication->ProcessMessages();
 	}
 
 	switch (message)
@@ -318,13 +329,13 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 				// 드래그 중: 스왑체인 리사이즈 X, 레터/필러박스 뷰포트만 적용
 				g_pApplication->WindowWidth = width;
 				g_pApplication->WindowHeight = height;
-				g_pApplication->GetRenderer().UseAspectFitViewport(width, height);
+				URenderer::GetInstance().UseAspectFitViewport(width, height);
 			}
 			else
 			{
 				// 평소 리사이즈: 실제 리사이즈 + 풀윈도우 뷰포트
-				g_pApplication->GetRenderer().ResizeBuffers(width, height);
-				g_pApplication->GetRenderer().UseFullWindowViewport();
+				URenderer::GetInstance().ResizeBuffers(width, height);
+				URenderer::GetInstance().UseFullWindowViewport();
 				g_pApplication->OnResize(width, height); // 카메라 갱신
 			}
 		}
@@ -337,8 +348,8 @@ LRESULT CALLBACK Application::WndProc(HWND hWnd, UINT message, WPARAM wParam, LP
 			int32 height = g_pApplication->WindowHeight;
 			if (width > 0 && height > 0)
 			{
-				g_pApplication->GetRenderer().ResizeBuffers(width, height);
-				g_pApplication->GetRenderer().UseFullWindowViewport();
+				URenderer::GetInstance().ResizeBuffers(width, height);
+				URenderer::GetInstance().UseFullWindowViewport();
 				g_pApplication->OnResize(width, height);
 			}
 		}

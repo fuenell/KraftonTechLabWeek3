@@ -20,6 +20,11 @@ private:
 	double targetFrameTime;
 
 public:
+	static UTimeManager& GetInstance()
+	{
+		static UTimeManager Instance; // 스택(static storage) 싱글톤
+		return Instance;
+	}
 	UTimeManager();
 	~UTimeManager();
 

@@ -16,7 +16,7 @@
 
 void EditorApplication::Update(float DeltaTime)
 {
-	GetSceneManager().GetScene()->Update(DeltaTime);
+	USceneManager::GetInstance().GetScene()->Update(DeltaTime);
 
 	GizmoManager.Update(DeltaTime);
 
@@ -27,15 +27,15 @@ void EditorApplication::Update(float DeltaTime)
 
 void EditorApplication::ProcessKeyboardInput()
 {
-	if (GetInputManager().IsKeyDown(VK_ESCAPE))
+	if (UInputManager::GetInstance().IsKeyDown(VK_ESCAPE))
 	{
 		RequestExit();
 	}
-	if (GetInputManager().IsKeyPressed(VK_SPACE))
+	if (UInputManager::GetInstance().IsKeyPressed(VK_SPACE))
 	{
 		GizmoManager.NextTranslation();
 	}
-	if (GetInputManager().IsKeyPressed('X'))
+	if (UInputManager::GetInstance().IsKeyPressed('X'))
 	{
 		GizmoManager.ChangeGizmoSpace();
 	}
@@ -49,14 +49,14 @@ void EditorApplication::ProcessMouseInteraction()
 	if (GizmoManager.IsDragging())
 	{
 		// 마우스 왼쪽 버튼을 떼면 드래그를 종료합니다.
-		if (GetInputManager().IsMouseButtonReleased(0))
+		if (UInputManager::GetInstance().IsMouseButtonReleased(0))
 		{
 			GizmoManager.EndDrag();
 		}
 		// 드래그가 계속되고 있다면 마우스 위치에 따라 기즈모를 업데이트합니다.
 		else
 		{
-			FRay Ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
+			FRay Ray = URaycastManager::GetInstance().CreateRayFromScreenPosition(USceneManager::GetInstance().GetScene()->GetCamera());
 			GizmoManager.UpdateDrag(Ray);
 		}
 	}
@@ -72,7 +72,7 @@ void EditorApplication::ProcessMouseInteraction()
 		}
 
 		// 마우스 왼쪽 버튼을 눌렀을 때만 피킹(Picking)을 시도합니다.
-		if (GetInputManager().IsMouseButtonPressed(0))
+		if (UInputManager::GetInstance().IsMouseButtonPressed(0))
 		{
 			FVector OutImpactPoint;
 			UGizmoComponent* HitGizmo = nullptr;
@@ -80,7 +80,7 @@ void EditorApplication::ProcessMouseInteraction()
 
 			// 씬의 모든 PrimitiveComponent와 GizmoComponent를 수집합니다.
 			TArray<UPrimitiveComponent*> Primitives;
-			for (UObject* Obj : GetSceneManager().GetScene()->GetObjects())
+			for (UObject* Obj : USceneManager::GetInstance().GetScene()->GetObjects())
 			{
 				if (UPrimitiveComponent* Primitive = Obj->Cast<UPrimitiveComponent>())
 				{
@@ -101,27 +101,27 @@ void EditorApplication::ProcessMouseInteraction()
 			}
 
 			// 1. 기즈모에 대한 피킹을 먼저 시도합니다.
-			if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), Gizmos, HitGizmo, OutImpactPoint))
+			if (URaycastManager::GetInstance().RayIntersectsMeshes(USceneManager::GetInstance().GetScene()->GetCamera(), Gizmos, HitGizmo, OutImpactPoint))
 			{
 				HitGizmo->bIsSelected = true;
-				FRay Ray = GetRaycastManager().CreateRayFromScreenPosition(GetSceneManager().GetScene()->GetCamera());
+				FRay Ray = URaycastManager::GetInstance().CreateRayFromScreenPosition(USceneManager::GetInstance().GetScene()->GetCamera());
 
 				// 히트된 기즈모의 종류에 따라 적절한 드래그를 시작합니다.
 				if (UGizmoArrowComp* Arrow = HitGizmo->Cast<UGizmoArrowComp>())
 				{
-					GizmoManager.BeginDrag(Ray, Arrow->Axis, OutImpactPoint, GetSceneManager().GetScene());
+					GizmoManager.BeginDrag(Ray, Arrow->Axis, OutImpactPoint, USceneManager::GetInstance().GetScene());
 				}
 				else if (UGizmoRotationHandleComp* rotationHandle = HitGizmo->Cast<UGizmoRotationHandleComp>())
 				{
-					GizmoManager.BeginDrag(Ray, rotationHandle->Axis, OutImpactPoint, GetSceneManager().GetScene());
+					GizmoManager.BeginDrag(Ray, rotationHandle->Axis, OutImpactPoint, USceneManager::GetInstance().GetScene());
 				}
 				else if (UGizmoScaleHandleComp* scaleHandle = HitGizmo->Cast<UGizmoScaleHandleComp>())
 				{
-					GizmoManager.BeginDrag(Ray, scaleHandle->Axis, OutImpactPoint, GetSceneManager().GetScene());
+					GizmoManager.BeginDrag(Ray, scaleHandle->Axis, OutImpactPoint, USceneManager::GetInstance().GetScene());
 				}
 			}
 			// 2. 기즈모가 아니라면, 일반 오브젝트에 대한 피킹을 시도합니다.
-			else if (GetRaycastManager().RayIntersectsMeshes(GetSceneManager().GetScene()->GetCamera(), Primitives, HitPrimitive, OutImpactPoint))
+			else if (URaycastManager::GetInstance().RayIntersectsMeshes(USceneManager::GetInstance().GetScene()->GetCamera(), Primitives, HitPrimitive, OutImpactPoint))
 			{
 				HitPrimitive->bIsSelected = true;
 
@@ -141,25 +141,25 @@ void EditorApplication::ProcessMouseInteraction()
 
 void EditorApplication::Render()
 {
-	ID3D11Device* Device = Renderer.GetDevice();
-	ID3D11DeviceContext* DeviceContext = Renderer.GetDeviceContext();
+	ID3D11Device* Device = URenderer::GetInstance().GetDevice();
+	ID3D11DeviceContext* DeviceContext = URenderer::GetInstance().GetDeviceContext();
 
-	const FMatrix View = SceneManager.GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
-	const FMatrix Proj = SceneManager.GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
+	const FMatrix View = USceneManager::GetInstance().GetScene()->GetCamera()->GetView();   // 네 쪽의 뷰 행렬 getter
+	const FMatrix Proj = USceneManager::GetInstance().GetScene()->GetCamera()->GetProj();   // 네 쪽의 프로젝션 행렬 getter
 
 	if (ShowPrimitives == EEngineShowFlags::SF_Primitives)
 	{
 		// 프리미티브 그리기
-		GetSceneManager().GetScene()->Render();
+		USceneManager::GetInstance().GetScene()->Render();
 
 		// 기즈모 그리기
-		GizmoManager.Draw(GetRenderer());
+		GizmoManager.Draw(URenderer::GetInstance());
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Batch Rendering
 	// 여기서 라인들 초기화
-	LineBatcherManager.BeginFrame();
+	ULineBatcherManager::GetInstance().BeginFrame();
 
 	// 1) aabb 쌓기 : 메쉬에 저장된 기본 bounds를 가져온다
 	UPrimitiveComponent* PickedPrimitive = GizmoManager.GetTarget();
@@ -180,18 +180,18 @@ void EditorApplication::Render()
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
 			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
-			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 		}
 		else if (PickedPrimitive->GetClass() == USpotLightComponent::StaticClass())
 		{
 			USpotLightComponent* SpotLightComponent = dynamic_cast<USpotLightComponent*>(PickedPrimitive);
 			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
-			LineBatcherManager.AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), SpotLightComponent->GetAngle(), SpotLightComponent->GetScale(), SpotLightComponent->GetLightColor());
+			ULineBatcherManager::GetInstance().AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), SpotLightComponent->GetAngle(), SpotLightComponent->GetScale(), SpotLightComponent->GetLightColor());
 		}
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{
 			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
-			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 		}
 		else
 		{
@@ -206,10 +206,10 @@ void EditorApplication::Render()
 	const int GridCount = 100;
 	const uint32_t ColMain = 0xFFFFFF60; // RGBA
 	const uint32_t ColAxis = 0xFFFFFFFF;
-	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
+	ULineBatcherManager::GetInstance().AddGrid(ULineBatcherManager::GetInstance().GridSpacing, GridCount, ColMain, ColAxis);
 
 
-	LineBatcherManager.Render(DeviceContext, View, Proj);
+	ULineBatcherManager::GetInstance().Render(DeviceContext, View, Proj);
 
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +219,7 @@ void EditorApplication::Render()
 	// Sprite(BillBoard) Rendering
 	if (PickedPrimitive != nullptr)
 	{
-		SpriteManager.BeginFrame();
+		USpriteManager::GetInstance().BeginFrame();
 
 		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
 
@@ -231,10 +231,10 @@ void EditorApplication::Render()
 			//	UUIDRenderer.Render(DeviceContext);
 			//}
 
-			if (SpriteManager.SetUUIDVertices(Device, (float)WindowWidth / (float)WindowHeight, PickedPrimitive->UUID, 0.05f, PickedPrimitive->GetScale().Z, WorldMatrix, View, Proj))
+			if (USpriteManager::GetInstance().SetUUIDVertices(Device, (float)WindowWidth / (float)WindowHeight, PickedPrimitive->UUID, 0.05f, PickedPrimitive->GetScale().Z, WorldMatrix, View, Proj))
 			{
-				SpriteManager.Bind(DeviceContext);
-				SpriteManager.Render(DeviceContext);
+				USpriteManager::GetInstance().Bind(DeviceContext);
+				USpriteManager::GetInstance().Render(DeviceContext);
 			}
 		}
 
@@ -277,22 +277,22 @@ bool EditorApplication::OnInitialize()
 {
 	// 리사이즈/초기화
 
-	ControlPanel = new UControlPanel(&GetSceneManager(), &GizmoManager, &GetLineBatcherManager(), &Renderer);
+	ControlPanel = new UControlPanel(&USceneManager::GetInstance(), &GizmoManager, &ULineBatcherManager::GetInstance(), &URenderer::GetInstance());
 	PropertyWindow = new USceneComponentPropertyWindow();
 	SceneManagerWindow = new USceneManagerWindow(
-		&GetSceneManager(),
+		&USceneManager::GetInstance(),
 		[this](UPrimitiveComponent* UTemp)
 		{
 			SetTarget(UTemp);
 		});
 	ToggleWindow = new UToggleWindow();
 
-	if (!GizmoManager.Initialize(&GetMeshManager()))
+	if (!GizmoManager.Initialize(&UMeshManager::GetInstance()))
 	{
 		MessageBox(GetWindowHandle(), L"Failed to initialize gizmo manager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
-	GizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
+	GizmoManager.SetCamera(USceneManager::GetInstance().GetScene()->GetCamera());
 
 	return true;
 }
@@ -300,7 +300,7 @@ bool EditorApplication::OnInitialize()
 
 void EditorApplication::OnResize(int32 Width, int32 Height)
 {
-	UScene* Scene = GetSceneManager().GetScene();
+	UScene* Scene = USceneManager::GetInstance().GetScene();
 	if (Scene == nullptr) return;
 
 	UCamera* Camera = Scene->GetCamera();
@@ -317,7 +317,7 @@ void EditorApplication::OnSceneChange()
 {
 	SetTarget(nullptr);
 
-	GizmoManager.SetCamera(GetSceneManager().GetScene()->GetCamera());
+	GizmoManager.SetCamera(USceneManager::GetInstance().GetScene()->GetCamera());
 }
 
 void EditorApplication::SetTarget(UPrimitiveComponent* Target)

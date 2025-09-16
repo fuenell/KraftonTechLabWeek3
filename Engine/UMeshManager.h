@@ -7,6 +7,11 @@ class UMeshManager : UEngineSubsystem
 {
 	DECLARE_UCLASS(UMeshManager, UEngineSubsystem)
 public:
+	static UMeshManager& GetInstance()
+	{
+		static UMeshManager Instance; // 스택(static storage) 싱글톤
+		return Instance;
+	}
 	UMeshManager();
 	~UMeshManager();
 

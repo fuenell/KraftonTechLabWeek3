@@ -43,9 +43,9 @@ float4 PSMain(VSOutput input) : SV_Target
     
     //return float4(input.texCoord, 0, 1);
     // 알파 채널이 글자 모양 (mask)
-    float4 targetColor = float4(1, 0, 0, 1); // 빨간색
+    //float4 targetColor = float4(1, 0, 0, 1); // 빨간색
     
-    return texColor * targetColor;
+    return texColor;
     
     //return float4(1, 1, 1, 1);
 

@@ -30,14 +30,14 @@ public:
 	virtual void Render() = 0;
 
 	// System access
-	URenderer& GetRenderer() { return Renderer; }
-	UMeshManager& GetMeshManager() { return MeshManager; }
-	USceneManager& GetSceneManager() { return SceneManager; }
-	UInputManager& GetInputManager() { return InputManager; }
-	UGUI& GetGUI() { return Gui; }
-	UTimeManager& GetTimeManager() { return TimeManager; }
-	URaycastManager& GetRaycastManager() { return RaycastManager; }
-	ULineBatcherManager& GetLineBatcherManager() { return LineBatcherManager; }
+	//URenderer& GetRenderer() { return Renderer; }
+	//UMeshManager& GetMeshManager() { return MeshManager; }
+	//USceneManager& GetSceneManager() { return SceneManager; }
+	//UInputManager& GetInputManager() { return InputManager; }
+	//UGUI& GetGUI() { return Gui; }
+	//UTimeManager& GetTimeManager() { return TimeManager; }
+	//URaycastManager& GetRaycastManager() { return RaycastManager; }
+	//ULineBatcherManager& GetLineBatcherManager() { return LineBatcherManager; }
 
 	// Window management
 	HWND GetWindowHandle() const { return HWnd; }
@@ -67,17 +67,17 @@ protected:
 protected:
 	// Core systems
 	HWND HWnd;
-	URenderer Renderer;
-	UInputManager InputManager;
-	UGUI Gui;
-	UTimeManager TimeManager;
-	UMeshManager MeshManager;
-	USceneManager SceneManager;
-	URaycastManager RaycastManager;
-	ULineBatcherManager LineBatcherManager;
-
-
-	USpriteManager SpriteManager;
+	//URenderer Renderer;
+	//UInputManager InputManager;
+	//UGUI Gui;
+	//UTimeManager TimeManager;
+	//UMeshManager MeshManager;
+	//USceneManager SceneManager;
+	//URaycastManager RaycastManager;
+	//ULineBatcherManager LineBatcherManager;
+	//
+	//
+	//USpriteManager SpriteManager;
 
 	// Application state
 	bool bIsRunning;

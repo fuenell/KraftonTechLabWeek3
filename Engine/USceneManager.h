@@ -9,6 +9,16 @@ class USceneManager : UEngineSubsystem
 	DECLARE_UCLASS(USceneManager, UEngineSubsystem)
 
 public:
+	static USceneManager& GetInstance()
+	{
+		static USceneManager Instance; // 스택(static storage) 싱글톤
+		return Instance;
+	}
+
+	USceneManager()
+	{
+
+	}
 	~USceneManager() override;
 	bool Initialize(Application* InApplication);
 

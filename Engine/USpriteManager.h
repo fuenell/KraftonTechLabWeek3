@@ -8,6 +8,11 @@
 class USpriteManager
 {
 public:
+	static USpriteManager& GetInstance()
+{
+	static USpriteManager Instance; // 스택(static storage) 싱글톤
+	return Instance;
+}
 	USpriteManager();
 
 	// BillBoard를 그리기 위해 필요한 자원들을 생성

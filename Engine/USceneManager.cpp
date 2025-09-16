@@ -18,9 +18,9 @@ bool USceneManager::Initialize(Application* InApplication)
 	App = InApplication;
 	CurrentScene = CreateDefaultScene();
 	CurrentScene->Initialize(
-		&App->GetRenderer(),
-		&App->GetMeshManager(),
-		&App->GetInputManager());
+		&URenderer::GetInstance(),
+		&UMeshManager::GetInstance(),
+		&UInputManager::GetInstance());
 	return true;
 }
 
@@ -52,9 +52,9 @@ void USceneManager::SetScene(UScene* Scene)
 	CurrentScene = Scene;
 
 	CurrentScene->Initialize(
-		&App->GetRenderer(),
-		&App->GetMeshManager(),
-		&App->GetInputManager());
+		&URenderer::GetInstance(),
+		&UMeshManager::GetInstance(),
+		&UInputManager::GetInstance());
 
 	App->OnSceneChange();
 }
