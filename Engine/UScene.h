@@ -43,6 +43,9 @@ public:
 
 	bool IsNameDuplicated(FName Name);
 
+	TArray<USceneComponent*>* GetObjects() { return &Objects; }
+
+
 	// 지정된 키가 존재하고, 예상 타입과 일치하는지 검사하는 헬퍼 함수
 	static bool ValidateField(const json::JSON& DataObject, const std::string& Key, json::JSON::Class ExpectedType)
 	{

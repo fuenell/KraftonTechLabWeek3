@@ -13,6 +13,9 @@ private:
 		uint32 CurrentCellIndex;
 	};
 private:
+	FVector ModelTranslation{};
+
+
 	ID3D11Device* Device = URenderer::GetInstance().GetDevice();
 	ID3D11DeviceContext* DeviceContext = URenderer::GetInstance().GetDeviceContext();
 
@@ -34,6 +37,11 @@ private:
 
 	uint32 CellNumInRow = 0;
 	uint32 CellLifeSpawn = 0;
+
+	float   LastTriggerTimeSeconds = -1.0f;
+	float   DurationSeconds = 0.144f; // 144 ms (원하면 바꿔)
+	bool    bActive = false;
+
 private:
 	USubUVManager() = default;
 	~USubUVManager() = default;
@@ -47,12 +55,32 @@ public:
 	);
 
 	bool UpdateConstantBuffer(
-		FVector ModelTranslation,
 		FVector ModelScale,
 		FMatrix CameraRotation,
 		FMatrix View,
 		FMatrix Projection
 	);
+
+
+	void TriggerAt(const FVector& InWorldPos, float InNowSeconds)
+	{
+		ModelTranslation = InWorldPos;
+		LastTriggerTimeSeconds = InNowSeconds;
+		bActive = true;
+	}
+
+	void Deactivate() { bActive = false; }
+	bool  IsActive()               const { return bActive; }
+	float GetLastTriggerTime()     const { return LastTriggerTimeSeconds; }
+	void  SetDurationSeconds(float S) { DurationSeconds = S; }
+	float GetDurationSeconds()     const { return DurationSeconds; }
+
+
+	void SetModelTranslation(FVector InModelTranslation) { ModelTranslation = InModelTranslation; }
+	const FVector& GetModelTranslation() const { return ModelTranslation; }
+
+	void SetCurrentTime(float InCurrentTime) { LastTriggerTimeSeconds = InCurrentTime; }
+	float GetCurrendTime()const { return LastTriggerTimeSeconds; }
 
 	void Bind();
 	void Render();

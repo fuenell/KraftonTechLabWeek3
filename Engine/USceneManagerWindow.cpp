@@ -5,7 +5,7 @@
 
 void USceneManagerWindow::RenderContent()
 {
-	const TArray<USceneComponent*>& SceneObjects = SceneManager->GetScene()->GetObjects();
+	TArray<USceneComponent*>* SceneObjects = SceneManager->GetScene()->GetObjects();
 
 	// 여기서 SceneObjects 목록을 순회하며 모든 USceneComponent Name을 출력하는 리스트를 만들어줘
 
@@ -14,7 +14,7 @@ void USceneManagerWindow::RenderContent()
 	ImGui::BeginChild("SceneObjectsList", ImVec2(0, 200), true);
 
 	// Scene에 있는 모든 USceneComponent를 순회합니다.
-	for (USceneComponent* SceneObject : SceneObjects)
+	for (USceneComponent* SceneObject : *SceneObjects)
 	{
 		if (SceneObject == nullptr)
 		{

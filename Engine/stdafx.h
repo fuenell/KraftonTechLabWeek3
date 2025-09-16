@@ -25,6 +25,11 @@
 #include <stack>
 #include <queue>
 
+// Manager
+//#include "UCollisionManager.h"
+//#include "ULineBatcherManager.h"
+
+
 // DirectX 관련
 #include <d3d11.h>
 #include <d3dcompiler.h>
