@@ -33,10 +33,18 @@ public:
 
 	bool IsManageable() override { return true; }
 
+
+	void SetBoundingBox(FBounds InBoundingBox) { BoundingBox = InBoundingBox; }
+
+	FBounds GetBoundingBox() const { return BoundingBox; }
+
 public:
 	bool bIsSelected = false;
 
 protected:
 	UMesh* Mesh;
 	FVector4 Color = { 1, 1, 1, 1 };
+
+	FBounds BoundingBox;
+
 };

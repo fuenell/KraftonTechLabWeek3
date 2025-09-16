@@ -7,6 +7,9 @@
 #include "UGizmoGridComp.h"
 #include "URaycastManager.h"
 #include "UCamera.h"
+#include "ULineBatcherManager.h"
+#include "USphereComp.h"
+#include "UCubeComp.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -184,9 +187,29 @@ void UScene::Render()
 	{
 		if (UPrimitiveComponent* Primitive = Obj->Cast<UPrimitiveComponent>())
 		{
+			FBounds WorldBounds;
+
+			// 전체 순회하는겸 미리미리 aabb계산
+			FMatrix WorldMatrix = Primitive->GetWorldTransform();
+
+			if (Primitive->GetClass() == USphereComp::StaticClass())
+			{
+				ULineBatcherManager::LocalSphereToWorldAABB(Primitive->GetPosition(), WorldMatrix, WorldBounds);
+				Primitive->SetBoundingBox(WorldBounds);
+			}
+			else if (Primitive->GetClass() == UCubeComp::StaticClass() || Primitive->GetClass() == UPlaneComp::StaticClass())
+			{
+				ULineBatcherManager::LocalAABBtoWorldAABB(Primitive->GetMesh()->GetLocalBounds(), WorldMatrix, WorldBounds);
+				Primitive->SetBoundingBox(WorldBounds);
+			}
+			else
+			{
+				ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+				Primitive->SetBoundingBox(WorldBounds);
+			}
+
 			Primitive->Draw(*Renderer);
 		}
-
 	}
 }
 

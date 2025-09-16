@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Application.h"
 #include "UScene.h"
+#include "UCollisionManager.h"
 
 // Static member definitions
 WCHAR Application::WindowClass[] = L"EngineWindowClass";
@@ -70,6 +71,7 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 	ULineBatcherManager::GetInstance().Initialize(Device, 1024);
 	USpriteManager::GetInstance().Initialize(Device);
 	UTextureManager::GetInstance().Initialize(HWnd, Device, DeviceContext);
+	UCollisionManager::GetInstance().Initialize();
 
 	if (!USubUVManager::GetInstance().Initialize(
 		L"DDS/Explosion_SubUV.dds",
@@ -229,6 +231,9 @@ void Application::InternalUpdate()
 
 	// Call derived class update
 	Update(DeltaTime);
+
+
+
 }
 
 void Application::InternalRender()

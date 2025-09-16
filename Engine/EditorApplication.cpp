@@ -13,6 +13,8 @@
 #include "UCubeComp.h"
 #include "UPlaneComp.h"
 #include "USpotLightComponent.h"
+#include "UCollisionManager.h"
+#include "USubUVManager.h"
 
 void EditorApplication::Update(float DeltaTime)
 {
@@ -23,6 +25,27 @@ void EditorApplication::Update(float DeltaTime)
 	ProcessKeyboardInput();
 
 	ProcessMouseInteraction();
+
+
+	UPrimitiveComponent* PickedPrimitive = GizmoManager.GetTarget();
+	//GizmoManager.GetTarget();
+
+
+	
+	if (PickedPrimitive != nullptr)
+	{
+		UCollisionManager::GetInstance().SetObjects(USceneManager::GetInstance().GetScene()->GetObjects(), PickedPrimitive);
+		//UE_LOG("1");
+		UCollisionManager::GetInstance().Update();
+		if (UCollisionManager::GetInstance().HasOverlap())
+		{
+			//UE_LOG("3");
+			const FVector Center = UCollisionManager::GetInstance().GetLastOverlapCenter();
+			USubUVManager& Sub = USubUVManager::GetInstance();
+			const float Now = UTimeManager::GetInstance().GetTotalTime(); // ★ 절대시간으로
+			Sub.TriggerAt(Center, Now);
+		}
+	}
 }
 
 void EditorApplication::ProcessKeyboardInput()
@@ -80,7 +103,7 @@ void EditorApplication::ProcessMouseInteraction()
 
 			// 씬의 모든 PrimitiveComponent와 GizmoComponent를 수집합니다.
 			TArray<UPrimitiveComponent*> Primitives;
-			for (UObject* Obj : USceneManager::GetInstance().GetScene()->GetObjects())
+			for (UObject* Obj : *(USceneManager::GetInstance().GetScene()->GetObjects()))
 			{
 				if (UPrimitiveComponent* Primitive = Obj->Cast<UPrimitiveComponent>())
 				{
@@ -179,8 +202,9 @@ void EditorApplication::Render()
 
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
-			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
-			ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			
+			//ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
+			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
 		else if (PickedPrimitive->GetClass() == USpotLightComponent::StaticClass())
 		{
@@ -190,8 +214,8 @@ void EditorApplication::Render()
 		}
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{
-			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
-			ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			//ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
+			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
 		else
 		{
@@ -230,24 +254,32 @@ void EditorApplication::Render()
 				USpriteManager::GetInstance().Render(DeviceContext);
 			}
 		}
-
-
-
 	}
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	USubUVManager& SubUVManager = USubUVManager::GetInstance();
 
-	SubUVManager.UpdateConstantBuffer(
-		FVector(1.0f, 1.0f, 1.0f),
-		FVector(1.0f, 1.0f, 1.0f),
-		USceneManager::GetInstance().GetScene()->GetCamera()->GetRotation().ToMatrixRow(),
-		View,
-		Proj
-	);
-	SubUVManager.Bind();
-	SubUVManager.Render();
+
+	const float Now = UTimeManager::GetInstance().GetTotalTime(); 
+	const float Elapsed = Now - SubUVManager.GetLastTriggerTime();
+	//UE_LOG("4444");
+	if (SubUVManager.IsActive()&& Elapsed <= SubUVManager.GetDurationSeconds()&& !SubUVManager.GetModelTranslation().IsNearlyZero(1e-4f))
+	{
+		//UE_LOG("555555");
+		SubUVManager.UpdateConstantBuffer(
+			FVector(3.0f, 3.0f, 3.0f),
+			USceneManager::GetInstance().GetScene()->GetCamera()->GetRotation().ToMatrixRow(),
+			View,
+			Proj
+		);
+		SubUVManager.Bind();
+		SubUVManager.Render();
+	}
+	else if (SubUVManager.IsActive() && Elapsed > SubUVManager.GetDurationSeconds())
+	{
+		SubUVManager.Deactivate(); // 타임아웃으로 종료
+	}
 }
 
 void EditorApplication::RenderGUI()
