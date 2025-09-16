@@ -39,6 +39,7 @@
 
 // --- 엔진 핵심 헤더 (Engine Core Headers) ---
 // 이 헤더들은 변경 빈도가 낮고, 의존성이 높아야 합니다.
+#include "MemoryTracker.h"
 #include "UClass.h"
 #include "RTTI.h"			// RTTI 시스템
 #include "UObject.h"		// 최상위 오브젝트

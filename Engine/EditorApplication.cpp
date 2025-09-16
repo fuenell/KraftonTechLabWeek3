@@ -265,7 +265,7 @@ void EditorApplication::RenderGUI()
 		ImGuiWindowFlags_NoCollapse);                // Prevent resizing, moving, collapsing
 
 	ImGui::Text("Allocated Object Count : %d", UEngineStatics::GetTotalAllocationCount());
-	ImGui::Text("Allocated Object Bytes : %d", UEngineStatics::GetTotalAllocationBytes());
+	ImGui::Text("Allocated Object Size : %.2f KB", static_cast<float>(UEngineStatics::GetTotalAllocationBytes()) / 1024.0f);
 
 	ImGui::End();
 

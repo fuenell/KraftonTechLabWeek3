@@ -205,6 +205,7 @@
     <ClCompile Include="USpriteManager.cpp" />
     <ClCompile Include="UTextComponent.cpp" />
     <ClCompile Include="UTextMesh.cpp" />
+    <ClCompile Include="MemoryTracker.cpp">
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -397,6 +398,7 @@
     <ClInclude Include="USpriteManager.h" />
     <ClInclude Include="UTextComponent.h" />
     <ClInclude Include="UTextMesh.h" />
+    <ClInclude Include="MemoryTracker.h">
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.hlsl">

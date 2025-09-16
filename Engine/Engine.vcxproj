@@ -195,6 +195,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="MemoryTracker.cpp" />
     <ClCompile Include="ShowFlag.cpp" />
     <ClCompile Include="UCapsuleComp.cpp" />
     <ClCompile Include="USpriteManager.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="CapsuleVertices.h" />
     <ClInclude Include="FontAtlas.h" />
     <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="SphereVertices.h" />
     <ClInclude Include="UCapsuleComp.h" />
     <ClInclude Include="USpriteManager.h" />
