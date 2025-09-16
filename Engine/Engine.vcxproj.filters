@@ -419,6 +419,8 @@
     <FxCompile Include="BillBoard.vs">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="ShaderFont.hlsl" />
+    <FxCompile Include="ShaderFont.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

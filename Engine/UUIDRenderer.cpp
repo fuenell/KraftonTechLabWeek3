@@ -71,7 +71,9 @@ bool UUIDRenderer::SetUUIDVertices(
 {
 	Atlas.Initialize();
 
-	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
+	float RenderSizeX = RenderSize * 9 / 16;
+
+	FString UUIDString = FString("UUID:") + std::to_string(UUID);
 
 	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -84,10 +86,10 @@ bool UUIDRenderer::SetUUIDVertices(
 
 	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
 
-	RenderCenter.Y -= 0.2f;
+	//RenderCenter.Y -= 0.2f;
 
 	uint64 StringLen = UUIDString.size();
-	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSize * 0.5f * (1 / AspectRatio));
+	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSizeX * 0.5f * (1 / AspectRatio));
 
 	TArray<FVertexPosUV> VertexArray;
 	TArray<uint32> IndexArray;
@@ -102,10 +104,12 @@ bool UUIDRenderer::SetUUIDVertices(
 		float width = charInfo.width;
 		float height = charInfo.height;
 
-		FVertexPosUV Vertex1 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u, v + height };
-		FVertexPosUV Vertex2 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u + width, v + height};
-		FVertexPosUV Vertex3 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u, v };
-		FVertexPosUV Vertex4 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u + width, v };
+		float CutOffset = 0.015f;
+
+		FVertexPosUV Vertex1 = { StartPosX + i * RenderSizeX * (1 / AspectRatio), RenderCenter.Y, 0.0f, u + CutOffset, v + height };
+		FVertexPosUV Vertex2 = { StartPosX + (i + 1) * RenderSizeX * (1 / AspectRatio), RenderCenter.Y, 0.0f, u + width - CutOffset, v + height};
+		FVertexPosUV Vertex3 = { StartPosX + i * RenderSizeX * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u + CutOffset, v };
+		FVertexPosUV Vertex4 = { StartPosX + (i + 1) * RenderSizeX * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u + width - CutOffset, v };
 		// 
 		//FVertexPosUV Vertex1 = { -0.5f, -0.5f, 0.0f, 0.0f, 0.5f };
 		//FVertexPosUV Vertex2 = { 0.5f, -0.5f, 0.0f, 0.5f, 0.5f };
