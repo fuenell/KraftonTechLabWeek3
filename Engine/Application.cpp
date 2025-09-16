@@ -103,18 +103,16 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 	//}
 	// 여기서 일단은 그리드 렌더링에 필요한 vb, ib ,cb, vs, ps, ia 설정
 	// 추후 수정예정 why? => 아직은 그리드만 구현했기 때문 
-	//if (!LineBatcherManager.Initialize(Renderer.GetDevice(), 1024))
-	//{
-	//	MessageBox(HWnd, L"Failed to initialize LineBatcherManager", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//
-	//
-	//if (!SpriteManager.Initialize(Renderer.GetDevice()))
-	//{
-	//	MessageBox(HWnd, L"Failed to initialize TextureManager", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
+	if (!TextureManager.Initialize(HWnd, Renderer.GetDevice(), Renderer.GetDeviceContext()))
+	{
+		MessageBox(HWnd, L"Failed to initialize TextureManager", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+	if (!SubUVManager.Initialize(Renderer.GetDevice(), Renderer.GetDeviceContext(), L"DDS/Explosion_SubUV.dds", 6, 4))
+	{
+		MessageBox(HWnd, L"Failed to initialize SubUVManager", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
 
 	UTimeManager::GetInstance().Initialize();
 	URenderer::GetInstance().Initialize(HWnd);

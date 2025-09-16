@@ -12,6 +12,7 @@
 #include "UTextureManager.h"
 #include "ConfigManager.h"
 #include "USpriteManager.h"
+#include "USubUVManager.h"
 
 class Application
 {
@@ -78,6 +79,8 @@ protected:
 	//
 	//
 	//USpriteManager SpriteManager;
+
+	USubUVManager SubUVManager;
 
 	// Application state
 	bool bIsRunning;

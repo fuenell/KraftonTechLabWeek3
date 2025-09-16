@@ -214,7 +214,6 @@ void EditorApplication::Render()
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// Sprite(BillBoard) Rendering
 	if (PickedPrimitive != nullptr)
@@ -225,12 +224,6 @@ void EditorApplication::Render()
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
-			//if (UUIDRenderer.SetUUIDVertices(Device, (float)WindowWidth / (float)WindowHeight, PickedPrimitive->UUID, 0.05f, PickedPrimitive->GetScale().Z, WorldMatrix, View, Proj))
-			//{
-			//	UUIDRenderer.Bind(DeviceContext);
-			//	UUIDRenderer.Render(DeviceContext);
-			//}
-
 			if (USpriteManager::GetInstance().SetUUIDVertices(Device, (float)WindowWidth / (float)WindowHeight, PickedPrimitive->UUID, 0.05f, PickedPrimitive->GetScale().Z, WorldMatrix, View, Proj))
 			{
 				USpriteManager::GetInstance().Bind(DeviceContext);
@@ -241,12 +234,19 @@ void EditorApplication::Render()
 
 
 	}
-
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
+	SubUVManager.UpdateConstantBuffer(
+		DeviceContext,
+		FVector(1.0f, 1.0f, 1.0f),
+		FVector(1.0f, 1.0f, 1.0f),
+		SceneManager.GetScene()->GetCamera()->GetRotation().ToMatrixRow(),
+		View,
+		Proj
+	);
+	SubUVManager.Bind(Renderer.GetDeviceContext());
+	SubUVManager.Render(Renderer.GetDeviceContext());
 }
 
 void EditorApplication::RenderGUI()
