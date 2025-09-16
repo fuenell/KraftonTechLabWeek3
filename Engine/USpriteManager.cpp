@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "USpriteManager.h"
+#include "UTextureManager.h"
 
 USpriteManager::USpriteManager() :
 	VertexShader(nullptr),
@@ -13,79 +14,40 @@ USpriteManager::USpriteManager() :
 {
 }
 
-bool USpriteManager::Initialize(ID3D11Device* Device, UTextureManager* InTextureManager)
+bool USpriteManager::Initialize(ID3D11Device* Device)
 {
-
-	// Load vertex shader from file
-	//ID3DBlob* VSBlob = URenderer::CompileShader(L"BillBoard.vs", "main", "vs_5_0");
-	//if (!VSBlob)
-	//	return false;
-	//
-	//// Create vertex shader
-	//VertexShader = URenderer::CreateVertexShader(Device, VSBlob);
-	//if (!VertexShader)
-	//	return false;
-	//
-	//// Create input layout
-	//D3D11_INPUT_ELEMENT_DESC inputElements[] = {
-	//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	//	{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	//};
-	//
-	//InputLayout = URenderer::CreateInputLayout(
-	//	Device,
-	//	inputElements,
-	//	ARRAYSIZE(inputElements),
-	//	VSBlob
-	//);
-	//if (!InputLayout)
-	//	return false;
-	//
-	//ID3DBlob* PSBlob = URenderer::CompileShader(L"BillBoard.ps", "main", "ps_5_0");
-	//if (!PSBlob)
-	//	return false;
-	//
-	//PixelShader = URenderer::CreatePixelShader(Device, PSBlob);
-	//if (!PixelShader)
-	//	return false;
-
-
-
+	// === 1. Vertex Shader ===
 	ID3DBlob* vsBlob = URenderer::CompileShader(L"ShaderFont.hlsl", "VSMain", "vs_5_0");
-
 	VertexShader = URenderer::CreateVertexShader(Device, vsBlob);
 
+	// === 2. Pixel Shader ===
 	ID3DBlob* psBlob = URenderer::CompileShader(L"ShaderFont.hlsl", "PSMain", "ps_5_0");
-
 	PixelShader = URenderer::CreatePixelShader(Device, psBlob);
 
+	// === 3. Input Layout ===
 	D3D11_INPUT_ELEMENT_DESC layout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
 		  D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12,
 		  D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-	Device->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(),
-		vsBlob->GetBufferSize(), &InputLayout);
+	Device->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &InputLayout);
 
 	vsBlob->Release();
 	psBlob->Release();
 
+	// === 4. SamplerState ===
 	D3D11_SAMPLER_DESC sampDesc = {};
 	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sampDesc.AddressU = sampDesc.AddressV = sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	Device->CreateSamplerState(&sampDesc, &SamplerState);
 
-	TextureManager = InTextureManager;
 
 	return true;
 }
 
-
-void USpriteManager::SetBuffer(
-	ID3D11Device* Device,
-	TArray<FVertexPosColor4> VertexArray,
-	TArray<uint32> IndexArray)
+// 버텍스 버퍼와 인덱스 버퍼를 생성
+void USpriteManager::SetBuffer(ID3D11Device* Device)
 {
 	VertexStride = sizeof(FVertexPosColor4);
 	VertexBufferSize = VertexStride * VertexArray.size();
@@ -103,17 +65,22 @@ void USpriteManager::SetBuffer(
 
 	VertexBuffer = URenderer::CreateBuffer(Device, Desc, (const void *)VertexArray.data());
 	if (!VertexBuffer)
-		;
+	{
+
+	}
 
 	Desc.ByteWidth = IndexBufferSize;
 	Desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	
 	IndexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)IndexArray.data());
 	if (!IndexBuffer)
-		;
+	{
+
+	}
+	
 }
 
-void USpriteManager::SetBufferUV(ID3D11Device* Device, TArray<FVertexPosUV> VertexArray, TArray<uint32> IndexArray)
+void USpriteManager::SetBufferUV(ID3D11Device* Device)
 {
 	VertexStride = sizeof(FVertexPosUV);
 	VertexBufferSize = VertexStride * VertexArray.size();
@@ -156,9 +123,15 @@ void USpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
 	// Set primitive topology (default to triangle list)
 	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	ID3D11ShaderResourceView* SRV = TextureManager->SRVMap["DejaVu"];
 
-	DeviceContext->PSSetShaderResources(0, 1, &SRV);
+	auto& SRVMap = UTextureManager::GetInstance().GetSRVMap();
+	auto It = SRVMap.find("DejaVu");
+	if (It != SRVMap.end() && It->second)
+	{
+		ID3D11ShaderResourceView* SRV = It->second;
+		DeviceContext->PSSetShaderResources(0, 1, &SRV);
+	}
+
 	DeviceContext->PSSetSamplers(0, 1, &SamplerState);
 }
 
@@ -198,4 +171,60 @@ void USpriteManager::Release()
 		IndexBuffer->Release();
 		IndexBuffer = nullptr;
 	}
+}
+
+bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, float ModelScale, FMatrix Modeling, FMatrix View, FMatrix Projection)
+{
+	Atlas.Initialize();
+
+	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
+
+	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	ObjectCenter = (Modeling * View).TransformVectorRow(ObjectCenter);
+
+	if (ObjectCenter.Z < 0.0f)
+	{
+		return false;
+	}
+		
+	ObjectCenter = Projection.TransformVectorRow(ObjectCenter);
+
+	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
+
+	RenderCenter.Y -= 0.2f;
+
+	uint64 StringLen = UUIDString.size();
+	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSize * 0.5f * (1 / AspectRatio));
+
+
+	for (uint64 i = 0, s = StringLen; i < s; i++)
+	{
+		CharacterInfo charInfo = Atlas.GetCharInfo(UUIDString[i]);
+
+		float u = charInfo.u;
+		float v = charInfo.v;
+		float width = charInfo.width;
+		float height = charInfo.height;
+
+		FVertexPosUV Vertex1 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u, v + height };
+		FVertexPosUV Vertex2 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u + width, v + height };
+		FVertexPosUV Vertex3 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u, v };
+		FVertexPosUV Vertex4 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u + width, v };
+
+		VertexArray.push_back(Vertex1);
+		VertexArray.push_back(Vertex2);
+		VertexArray.push_back(Vertex3);
+		VertexArray.push_back(Vertex4);
+
+		IndexArray.push_back(0 + 4 * i);
+		IndexArray.push_back(1 + 4 * i);
+		IndexArray.push_back(2 + 4 * i);
+		IndexArray.push_back(2 + 4 * i);
+		IndexArray.push_back(1 + 4 * i);
+		IndexArray.push_back(3 + 4 * i);
+	}
+
+	// 여기서 버텍스버퍼와 인덱스버퍼를 생성
+	SetBufferUV(Device);
 }

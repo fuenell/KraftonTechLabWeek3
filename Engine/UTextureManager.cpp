@@ -4,13 +4,6 @@
 
 #pragma comment(lib, "Lib/DirectXTK.lib")
 
-UTextureManager::UTextureManager()
-{
-}
-
-UTextureManager::~UTextureManager()
-{
-}
 
 bool UTextureManager::Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 {
@@ -24,14 +17,7 @@ bool UTextureManager::RegisterSRVWithDDS(const std::string nameKey, const wchar_
 {
 	ID3D11ShaderResourceView* gTexture = nullptr;
 
-	HRESULT hr = DirectX::CreateDDSTextureFromFile
-	(
-		device,
-		deviceContext,
-		filePath,
-		nullptr,
-		&gTexture
-	);
+	HRESULT hr = DirectX::CreateDDSTextureFromFile (device, deviceContext, filePath, nullptr, &gTexture);
 
 	if (FAILED(hr))
 	{

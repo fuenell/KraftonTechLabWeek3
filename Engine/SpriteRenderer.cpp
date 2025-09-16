@@ -3,7 +3,7 @@
 
 bool USpriteRenderer::Initialize(ID3D11Device* Device, UTextureManager* InTextureManager)
 {
-	return SpriteManager.Initialize(Device, InTextureManager);
+	return SpriteManager.Initialize(Device);
 }
 
 void USpriteRenderer::Bind(ID3D11DeviceContext* DeviceContext)

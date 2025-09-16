@@ -120,7 +120,8 @@ bool UUIDRenderer::SetUUIDVertices(
 		IndexArray.push_back(3 + 4 * i);
 	}
 
-	SpriteManager.SetBufferUV(Device, VertexArray, IndexArray);
+	// 여기서 버텍스버퍼와 인덱스버퍼를 생성
+	SpriteManager.SetBufferUV(Device);
 
 	return true;
 }

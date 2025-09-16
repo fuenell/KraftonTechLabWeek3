@@ -219,21 +219,21 @@ void EditorApplication::Render()
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
-			if (UUIDRenderer.SetUUIDVertices(
-				Device,
-				(float)WindowWidth / (float)WindowHeight,
-				PickedPrimitive->UUID,
-				0.05f,
-				PickedPrimitive->GetScale().Z,
-				WorldMatrix,
-				View,
-				Proj)
-				)
+			//if (UUIDRenderer.SetUUIDVertices(Device, (float)WindowWidth / (float)WindowHeight, PickedPrimitive->UUID, 0.05f, PickedPrimitive->GetScale().Z, WorldMatrix, View, Proj))
+			//{
+			//	UUIDRenderer.Bind(DeviceContext);
+			//	UUIDRenderer.Render(DeviceContext);
+			//}
+
+			if (SpriteManager.SetUUIDVertices(Device, (float)WindowWidth / (float)WindowHeight, PickedPrimitive->UUID, 0.05f, PickedPrimitive->GetScale().Z, WorldMatrix, View, Proj))
 			{
-				UUIDRenderer.Bind(DeviceContext);
-				UUIDRenderer.Render(DeviceContext);
+				SpriteManager.Bind(DeviceContext);
+				SpriteManager.Render(DeviceContext);
 			}
 		}
+
+
+
 	}
 
 	//

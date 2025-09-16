@@ -3,6 +3,7 @@
 #include "URenderer.h"
 #include "FVertexPosUV.h"
 #include "UTextureManager.h"
+#include "FontAtlas.h"
 
 class USpriteManager
 {
@@ -10,20 +11,19 @@ public:
 	USpriteManager();
 
 	// BillBoard를 그리기 위해 필요한 자원들을 생성
-	bool Initialize(ID3D11Device* Device, UTextureManager* InTextureManager);
+	bool Initialize(ID3D11Device* Device);
 	// 버퍼 생성
-	void SetBuffer(
-		ID3D11Device* Device,
-		TArray<FVertexPosColor4> VertexArray,
-		TArray<uint32> IndexArray);
-	void SetBufferUV( 
-		ID3D11Device* Device,
-		TArray<FVertexPosUV> VertexArray,
-		TArray<uint32> IndexArray);
+	void SetBuffer(ID3D11Device* Device);
+	void SetBufferUV(ID3D11Device* Device);
+
 	// 파이프라인 설정
 	void Bind(ID3D11DeviceContext* DeviceContext);
 	void Render(ID3D11DeviceContext* DeviceContext);
 	void Release();
+
+
+	bool SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, float ModelScale, FMatrix Modeling, FMatrix View, FMatrix Projection);
+
 private:
 	ID3D11VertexShader* VertexShader;
 	ID3D11PixelShader* PixelShader;
@@ -36,6 +36,8 @@ private:
 	UINT IndexBufferSize;
 	UINT VertexStride;
 	UINT IndexStride;
-private:
-	UTextureManager* TextureManager;
+
+	FontAtlas Atlas;
+	TArray<FVertexPosUV> VertexArray;
+	TArray<uint32> IndexArray;
 };

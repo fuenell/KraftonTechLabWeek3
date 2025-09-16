@@ -58,7 +58,7 @@ bool TestUUIDRenderer::SetUUIDVertices(
 		IndexArray.push_back(3 + 4 * i);
 	}
 
-	SpriteManager.SetBufferUV(Device, VertexArray, IndexArray);
+	SpriteManager.SetBufferUV(Device);
 
 	return true;
 }

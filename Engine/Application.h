@@ -41,7 +41,6 @@ public:
 	UTimeManager& GetTimeManager() { return TimeManager; }
 	URaycastManager& GetRaycastManager() { return RaycastManager; }
 	ULineBatcherManager& GetLineBatcherManager() { return LineBatcherManager; }
-	UTextureManager& GetTextManager() { return TextureManager; }
 
 	// Window management
 	HWND GetWindowHandle() const { return HWnd; }
@@ -82,7 +81,6 @@ protected:
 
 
 	UUIDRenderer UUIDRenderer;
-	UTextureManager TextureManager;
 	USpriteManager SpriteManager;
 
 	// Application state
