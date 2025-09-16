@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	app.Run();
 
 	app.Shutdown();
-	_CrtDumpMemoryLeaks();
+
 	// Cleanup handled automatically by destructor
 	return 0;
 }
