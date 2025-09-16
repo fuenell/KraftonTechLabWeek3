@@ -41,9 +41,8 @@ void EditorApplication::Update(float DeltaTime)
 		{
 			//UE_LOG("3");
 			const FVector Center = UCollisionManager::GetInstance().GetLastOverlapCenter();
-			USubUVManager& Sub = USubUVManager::GetInstance();
-			const float Now = UTimeManager::GetInstance().GetTotalTime(); // ★ 절대시간으로
-			Sub.TriggerAt(Center, Now);
+			const float Now = UTimeManager::GetInstance().GetTotalTime(); 
+			USubUVManager::GetInstance().TriggerAt(Center, Now);
 		}
 	}
 }
