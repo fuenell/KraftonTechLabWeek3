@@ -237,16 +237,17 @@ void EditorApplication::Render()
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
+	USubUVManager& SubUVManager = USubUVManager::GetInstance();
+
 	SubUVManager.UpdateConstantBuffer(
-		DeviceContext,
 		FVector(1.0f, 1.0f, 1.0f),
 		FVector(1.0f, 1.0f, 1.0f),
-		SceneManager.GetScene()->GetCamera()->GetRotation().ToMatrixRow(),
+		USceneManager::GetInstance().GetScene()->GetCamera()->GetRotation().ToMatrixRow(),
 		View,
 		Proj
 	);
-	SubUVManager.Bind(Renderer.GetDeviceContext());
-	SubUVManager.Render(Renderer.GetDeviceContext());
+	SubUVManager.Bind();
+	SubUVManager.Render();
 }
 
 void EditorApplication::RenderGUI()

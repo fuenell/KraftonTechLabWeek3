@@ -52,80 +52,34 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 		return false;
 	}
 
-	// Initialize core systems
-	//if (!TimeManager.Initialize(60))
-	//{
-	//	MessageBox(HWnd, L"Failed to initialize TimeManager", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//
-	//if (!Renderer.Initialize(HWnd))
-	//{
-	//	MessageBox(HWnd, L"Failed to create D3D11 device and swap chain", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//
-	//if (!Renderer.CreateShader())
-	//{
-	//	MessageBox(HWnd, L"Failed to create shaders", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//
-	//if (!Renderer.CreateConstantBuffer())
-	//{
-	//	MessageBox(HWnd, L"Failed to create constant buffer", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//
-	//if (!MeshManager.Initialize(&Renderer))
-	//{
-	//	MessageBox(HWnd, L"Failed to initialize mesh manager", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//
-	//if (!SceneManager.Initialize(g_pApplication))
-	//{
-	//	MessageBox(HWnd, L"Failed to initialize scene manager", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//if (!RaycastManager.Initialize(&Renderer, &InputManager))
-	//{
-	//	MessageBox(HWnd, L"Failed to initialize raycast manager", L"Engine Error", MB_OK | MB_ICONERROR);
-	//	return false;
-	//}
-	//if (!Gui.Initialize(HWnd, Renderer.GetDevice(), Renderer.GetDeviceContext()))
-	//{
-	//	return false;
-	//}
-	//if (!UUIDRenderer.Initialize(Renderer.GetDevice(), &TextureManager))
-	//{
-	//	return false;
-	//}
-	// 여기서 일단은 그리드 렌더링에 필요한 vb, ib ,cb, vs, ps, ia 설정
-	// 추후 수정예정 why? => 아직은 그리드만 구현했기 때문 
-	if (!TextureManager.Initialize(HWnd, Renderer.GetDevice(), Renderer.GetDeviceContext()))
-	{
-		MessageBox(HWnd, L"Failed to initialize TextureManager", L"Engine Error", MB_OK | MB_ICONERROR);
-		return false;
-	}
-	if (!SubUVManager.Initialize(Renderer.GetDevice(), Renderer.GetDeviceContext(), L"DDS/Explosion_SubUV.dds", 6, 4))
+	/*
+	URenderer는 Device 및 DeviceContext를 요구하는 객체들보다 무조건 무조건 먼저 Initialize 되어야 한다.
+	*/
+	URenderer::GetInstance().Initialize(HWnd);
+	URenderer::GetInstance().CreateShader();
+	URenderer::GetInstance().CreateConstantBuffer();
+	
+	ID3D11Device* Device = URenderer::GetInstance().GetDevice();
+	ID3D11DeviceContext* DeviceContext = URenderer::GetInstance().GetDeviceContext();
+
+	UTimeManager::GetInstance().Initialize();
+	UMeshManager::GetInstance().Initialize(&URenderer::GetInstance());
+	USceneManager::GetInstance().Initialize(g_pApplication);
+	URaycastManager::GetInstance().Initialize(&URenderer::GetInstance(), &UInputManager::GetInstance());
+	UGUI::GetInstance().Initialize(HWnd, Device, DeviceContext);
+	ULineBatcherManager::GetInstance().Initialize(Device, 1024);
+	USpriteManager::GetInstance().Initialize(Device);
+	UTextureManager::GetInstance().Initialize(HWnd, Device, DeviceContext);
+
+	if (!USubUVManager::GetInstance().Initialize(
+		L"DDS/Explosion_SubUV.dds",
+		6,
+		4)
+		)
 	{
 		MessageBox(HWnd, L"Failed to initialize SubUVManager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
-
-	UTimeManager::GetInstance().Initialize();
-	URenderer::GetInstance().Initialize(HWnd);
-	URenderer::GetInstance().CreateShader();
-	URenderer::GetInstance().CreateConstantBuffer();
-	UMeshManager::GetInstance().Initialize(&URenderer::GetInstance());
-	USceneManager::GetInstance().Initialize(g_pApplication);
-	URaycastManager::GetInstance().Initialize(&URenderer::GetInstance(), &UInputManager::GetInstance());
-	UGUI::GetInstance().Initialize(HWnd, URenderer::GetInstance().GetDevice(), URenderer::GetInstance().GetDeviceContext());
-	ULineBatcherManager::GetInstance().Initialize(URenderer::GetInstance().GetDevice(), 1024);
-	USpriteManager::GetInstance().Initialize(URenderer::GetInstance().GetDevice());
-	UTextureManager::GetInstance().Initialize(HWnd, URenderer::GetInstance().GetDevice(), URenderer::GetInstance().GetDeviceContext());
-
 
 
 	/*
@@ -200,6 +154,10 @@ void Application::Shutdown()
 	URenderer::GetInstance().ReleaseConstantBuffer();
 	URenderer::GetInstance().ReleaseShader();
 	URenderer::GetInstance().Release();
+	ULineBatcherManager::GetInstance().Release();
+	UTextureManager::GetInstance().Release();
+	USpriteManager::GetInstance().Release();
+	USubUVManager::GetInstance().Release();
 
 	bIsInitialized = false;
 }

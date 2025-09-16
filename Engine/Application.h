@@ -68,19 +68,6 @@ protected:
 protected:
 	// Core systems
 	HWND HWnd;
-	//URenderer Renderer;
-	//UInputManager InputManager;
-	//UGUI Gui;
-	//UTimeManager TimeManager;
-	//UMeshManager MeshManager;
-	//USceneManager SceneManager;
-	//URaycastManager RaycastManager;
-	//ULineBatcherManager LineBatcherManager;
-	//
-	//
-	//USpriteManager SpriteManager;
-
-	USubUVManager SubUVManager;
 
 	// Application state
 	bool bIsRunning;
