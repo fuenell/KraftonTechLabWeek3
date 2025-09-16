@@ -42,7 +42,7 @@ bool USpriteManager::Initialize(ID3D11Device* Device, uint32 InDefaultMaxChars)
 	sampDesc.AddressU = sampDesc.AddressV = sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	Device->CreateSamplerState(&sampDesc, &SamplerState);
 
-
+	// 어디를 읽을지를 정하는 지도
 	Atlas.Initialize();
 
 	// ===== VB/IB 생성 (Dynamic + CPU_WRITE) =====

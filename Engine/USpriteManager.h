@@ -42,7 +42,6 @@ private:
 	TArray<FVertexPosUV> VertexArray;
 	TArray<uint32> IndexArray;
 
-
 	uint32 VertexCapacityBytes = 0;
 	uint32 IndexCapacityBytes = 0;
 	uint32 CurrentIndexCount = 0; // DrawIndexed용

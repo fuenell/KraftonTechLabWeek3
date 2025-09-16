@@ -149,7 +149,9 @@ void EditorApplication::Render()
 
 	if (ShowPrimitives == EEngineShowFlags::SF_Primitives)
 	{
+		// 프리미티브 그리기
 		GetSceneManager().GetScene()->Render();
+
 		// 기즈모 그리기
 		GizmoManager.Draw(GetRenderer());
 	}

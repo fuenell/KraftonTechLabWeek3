@@ -181,7 +181,6 @@
     <ClCompile Include="USceneManagerWindow.cpp">
       <Filter>Engine\UI</Filter>
     </ClCompile>
-    <ClCompile Include="UUIDRenderer.cpp" />
     <ClCompile Include="USpotLightComponent.cpp" />
     <ClCompile Include="UToggleWindow.cpp" />
     <ClCompile Include="ShowFlag.cpp" />
@@ -195,8 +194,6 @@
       <Filter>Engine\Core\Scene</Filter>
     </ClCompile>
     <ClCompile Include="USubUVComponent.cpp" />
-    <ClCompile Include="SpriteRenderer.h" />
-    <ClCompile Include="SpriteRenderer.cpp" />
     <ClCompile Include="SubUVVertices.h">
       <Filter>Engine\Core\Mesh</Filter>
     </ClCompile>
@@ -206,7 +203,6 @@
     <ClCompile Include="FontAtlas.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="USpriteManager.cpp" />
-    <ClCompile Include="TestUUIDRenderer.cpp" />
     <ClCompile Include="UTextComponent.cpp" />
     <ClCompile Include="UTextMesh.cpp" />
   </ItemGroup>
@@ -371,7 +367,6 @@
     <ClInclude Include="USceneManagerWindow.h">
       <Filter>Engine\UI</Filter>
     </ClInclude>
-    <ClInclude Include="UUIDRenderer.h" />
     <ClInclude Include="USpotLightComponent.h" />
     <ClInclude Include="UToggleWindow.h" />
     <ClInclude Include="ShowFlag.h" />
@@ -400,7 +395,6 @@
     <ClInclude Include="FontAtlas.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="USpriteManager.h" />
-    <ClInclude Include="TestUUIDRenderer.h" />
     <ClInclude Include="UTextComponent.h" />
     <ClInclude Include="UTextMesh.h" />
   </ItemGroup>

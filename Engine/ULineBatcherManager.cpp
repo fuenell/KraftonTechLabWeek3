@@ -15,8 +15,8 @@ D3D11_USAGE_DYNAMIC 버퍼를 만들어서 매 프레임 CPU에서 갱신할 수
 */
 bool ULineBatcherManager::Initialize(ID3D11Device* InDevice, size_t MaxLines)
 {
-    MaxVertices = MaxLines * 2; // ★ 누락되어 있던 줄. 한 라인=2정점
-    MaxIndices = MaxLines * 2;   // 라인당 2 인덱스(양 끝점)
+    MaxVertices = MaxLines * 3; // ★ 누락되어 있던 줄. 한 라인=2정점
+    MaxIndices = MaxLines * 3;   // 라인당 2 인덱스(양 끝점)
 
 
     // === 1. Vertex Buffer ===
