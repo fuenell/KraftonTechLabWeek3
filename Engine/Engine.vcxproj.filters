@@ -194,12 +194,8 @@
     <ClCompile Include="UDefaultScene.cpp">
       <Filter>Engine\Core\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="USubUVComponent.cpp" />
     <ClCompile Include="SpriteRenderer.h" />
     <ClCompile Include="SpriteRenderer.cpp" />
-    <ClCompile Include="SubUVVertices.h">
-      <Filter>Engine\Core\Mesh</Filter>
-    </ClCompile>
     <ClCompile Include="UTextureManager.cpp">
       <Filter>Engine\Subsystem</Filter>
     </ClCompile>
@@ -209,6 +205,7 @@
     <ClCompile Include="TestUUIDRenderer.cpp" />
     <ClCompile Include="UTextComponent.cpp" />
     <ClCompile Include="UTextMesh.cpp" />
+    <ClCompile Include="USubUVManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -387,7 +384,6 @@
     <ClInclude Include="UDefaultScene.h">
       <Filter>Engine\Core\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="USubUVComponent.h" />
     <ClInclude Include="UTextureManager.h">
       <Filter>Engine\Subsystem</Filter>
     </ClInclude>
@@ -403,6 +399,7 @@
     <ClInclude Include="TestUUIDRenderer.h" />
     <ClInclude Include="UTextComponent.h" />
     <ClInclude Include="UTextMesh.h" />
+    <ClInclude Include="USubUVManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.hlsl">
@@ -420,5 +417,6 @@
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="ShaderFont.hlsl" />
+    <FxCompile Include="ShaderSubUV.hlsl" />
   </ItemGroup>
 </Project>

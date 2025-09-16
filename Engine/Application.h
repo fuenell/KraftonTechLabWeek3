@@ -15,6 +15,7 @@
 #include "TestUUIDRenderer.h"
 #include "USpriteManager.h"
 #include "SpriteRenderer.h"
+#include "USubUVManager.h"
 
 class Application
 {
@@ -84,6 +85,8 @@ protected:
 	USpriteManager SpriteManager;
 
 	USpriteRenderer SpriteRenderer;
+
+	USubUVManager SubUVManager;
 
 	// Application state
 	bool bIsRunning;

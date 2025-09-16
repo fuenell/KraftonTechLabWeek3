@@ -4,6 +4,7 @@
 #include "UTextMesh.h"
 #include "Matrix.h"
 #include "UEngineSubsystem.h"
+#include "Inc/DDSTextureLoader.h"
 
 // URenderer.h or cpp 상단
 struct CBTransform
@@ -122,12 +123,13 @@ public:
 		const void* Data
 	);
 
-private:
-	// Internal helper functions
-	bool CreateDeviceAndSwapChain(HWND WindowHandle);
-	bool CreateRenderTargetView();
-	bool CreateDepthStencilView(int32 Width, int32 Height);
-	bool SetupViewport(int32 Width, int32 Height);
+	static ID3D11ShaderResourceView* CreateDDSTextureFromFile(
+		ID3D11Device* Device,
+		ID3D11DeviceContext* DeviceContext,
+		const wchar_t* FilePath
+	);
+
+	static ID3D11Buffer* CreateConstantBuffer(ID3D11Device* InDevice);
 
 	// 행렬 복사 핼퍼
 	static inline void CopyRowMajor(float Dst[16], const FMatrix& Src)
@@ -136,6 +138,13 @@ private:
 			for (int32 c = 0; c < 4; ++c)
 				Dst[r * 4 + c] = Src.M[r][c];
 	}
+private:
+	// Internal helper functions
+	bool CreateDeviceAndSwapChain(HWND WindowHandle);
+	bool CreateRenderTargetView();
+	bool CreateDepthStencilView(int32 Width, int32 Height);
+	bool SetupViewport(int32 Width, int32 Height);
+
 
 private:
 	// Core D3D11 objects

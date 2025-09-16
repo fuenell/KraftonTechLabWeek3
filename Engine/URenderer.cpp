@@ -891,9 +891,60 @@ ID3D11Buffer* URenderer::CreateBuffer(
 
 	if (FAILED(Hr))
 	{
-		LogError("CreateVertexBuffer", Hr);
+		LogError("CreateBuffer", Hr);
 		return nullptr;
 	}
 
 	return Buffer;
+}
+
+ID3D11Buffer* URenderer::CreateConstantBuffer(
+	ID3D11Device* InDevice
+)
+{
+	if (!InDevice)
+		return nullptr;
+
+	D3D11_BUFFER_DESC Desc = {};
+	Desc.ByteWidth = sizeof(CBTransform);   // ← 변경
+	Desc.Usage = D3D11_USAGE_DYNAMIC;
+	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+	ID3D11Buffer* Buffer = nullptr;
+	HRESULT Hr = InDevice->CreateBuffer(&Desc, nullptr, &Buffer);
+
+	if (FAILED(Hr))
+	{
+		LogError("CreateBuffer", Hr);
+		return nullptr;
+	}
+
+	return Buffer;
+}
+
+ID3D11ShaderResourceView* URenderer::CreateDDSTextureFromFile(
+	ID3D11Device* Device,
+	ID3D11DeviceContext* DeviceContext,
+	const wchar_t* FilePath
+)
+{
+	ID3D11ShaderResourceView* TextureResourceView = nullptr;
+
+	HRESULT Hr = DirectX::CreateDDSTextureFromFile
+	(
+		Device,
+		DeviceContext,
+		FilePath,
+		nullptr,
+		&TextureResourceView
+	);
+
+	if (FAILED(Hr))
+	{
+		LogError("CreateDDSTextureFromFile", Hr);
+		return nullptr;
+	}
+
+	return TextureResourceView;
 }

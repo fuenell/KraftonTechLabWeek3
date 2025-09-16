@@ -113,6 +113,12 @@ bool Application::Initialize(HINSTANCE HInstance, const std::wstring& Title, int
 		MessageBox(HWnd, L"Failed to initialize TextureManager", L"Engine Error", MB_OK | MB_ICONERROR);
 		return false;
 	}
+	if (!SubUVManager.Initialize(Renderer.GetDevice(), Renderer.GetDeviceContext(), L"DDS/Explosion_SubUV.dds", 6, 4))
+	{
+		MessageBox(HWnd, L"Failed to initialize SubUVManager", L"Engine Error", MB_OK | MB_ICONERROR);
+		return false;
+	}
+
 	//if (!SpriteRenderer.Initialize(Renderer.GetDevice() , &TextureManager))
 	//{
 	//	MessageBox(HWnd, L"Failed to initialize LineBatcherManager", L"Engine Error", MB_OK | MB_ICONERROR);
