@@ -106,16 +106,6 @@ bool UUIDRenderer::SetUUIDVertices(
 		FVertexPosUV Vertex2 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u + width, v + height};
 		FVertexPosUV Vertex3 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u, v };
 		FVertexPosUV Vertex4 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u + width, v };
-		// 
-		//FVertexPosUV Vertex1 = { -0.5f, -0.5f, 0.0f, 0.0f, 0.5f };
-		//FVertexPosUV Vertex2 = { 0.5f, -0.5f, 0.0f, 0.5f, 0.5f };
-		//FVertexPosUV Vertex3 = { -0.5f, 0.5f, 0.0f, 0.0f, 0.0f };
-		//FVertexPosUV Vertex4 = { 0.5f, 0.5f, 0.0f, 0.5f, 0.0f};
-
-		//FVertexPosUV Vertex1 = { -0.5f, -0.5f, 0.0f, u, v + height };
-		//FVertexPosUV Vertex2 = { 0.5f, -0.5f, 0.0f, u + width, v + height };
-		//FVertexPosUV Vertex3 = { -0.5f, 0.5f, 0.0f, u, v };
-		//FVertexPosUV Vertex4 = { 0.5f, 0.5f, 0.0f, u + width, v};
 
 		VertexArray.push_back(Vertex1);
 		VertexArray.push_back(Vertex2);

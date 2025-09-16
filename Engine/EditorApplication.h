@@ -14,7 +14,7 @@ class USceneManagerWindow;
 class EditorApplication : public Application
 {
 public:
-	EditorApplication() = default;
+	EditorApplication() {};
 	~EditorApplication()
 	{
 		delete ControlPanel;
@@ -44,8 +44,8 @@ private:
 private:
 	UGizmoManager GizmoManager;
 
-	UControlPanel* ControlPanel;
-	USceneComponentPropertyWindow* PropertyWindow;
-	USceneManagerWindow* SceneManagerWindow;
-	UToggleWindow* ToggleWindow;
+	UControlPanel* ControlPanel{};
+	USceneComponentPropertyWindow* PropertyWindow{};
+	USceneManagerWindow* SceneManagerWindow{};
+	UToggleWindow* ToggleWindow{};
 };

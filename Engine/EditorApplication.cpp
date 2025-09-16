@@ -172,13 +172,13 @@ void EditorApplication::Render()
 		}
 
 		FBounds WorldBounds;
+		
 		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
 
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
 			ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
 			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
-			//LineBatcherManager.AddBoundingBox(WorldBounds, 0x00FFFFFF);
 		}
 		else if (PickedPrimitive->GetClass() == USpotLightComponent::StaticClass())
 		{
@@ -196,8 +196,26 @@ void EditorApplication::Render()
 			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
 			WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
 		}
-		//WorldBounds = Mesh->CalculateAccurateWorldBounds(Mesh, WorldMatrix);
-		//LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+	}
+
+	// 2) 그리드 쌓기 (원하는 색/간격/개수)
+	const int GridCount = 100;
+	const uint32_t ColMain = 0xFFFFFF60; // RGBA
+	const uint32_t ColAxis = 0xFFFFFFFF;
+	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
+
+
+	LineBatcherManager.Render(DeviceContext, View, Proj);
+
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// Sprite(BillBoard) Rendering
+	if (PickedPrimitive != nullptr)
+	{
+		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
@@ -218,17 +236,10 @@ void EditorApplication::Render()
 		}
 	}
 
-	// 2) 그리드 쌓기 (원하는 색/간격/개수)
-	const int GridCount = 100;
-	const uint32_t ColMain = 0xFFFFFF60; // RGBA
-	const uint32_t ColAxis = 0xFFFFFFFF;
-	LineBatcherManager.AddGrid(LineBatcherManager.GridSpacing, GridCount, ColMain, ColAxis);
-
-	//LineBatcherManager.AddSpotLight({0,0,0}, FMatrix::Identity, 15, 3);
-	LineBatcherManager.Render(DeviceContext, View, Proj);
+	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	SpriteManager.Render(DeviceContext);
+ 
 
 }
 

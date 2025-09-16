@@ -165,17 +165,6 @@ void USpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
 void USpriteManager::Render(ID3D11DeviceContext* DeviceContext)
 {
 	DeviceContext->DrawIndexed(IndexBufferSize, 0, 0);
-	if (VertexBuffer)
-	{
-		VertexBuffer->Release();
-		VertexBuffer = nullptr;
-	}
-
-	if (IndexBuffer)
-	{
-		IndexBuffer->Release();
-		IndexBuffer = nullptr;
-	}
 }
 
 void USpriteManager::Release()

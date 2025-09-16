@@ -79,11 +79,11 @@ protected:
 	USceneManager SceneManager;
 	URaycastManager RaycastManager;
 	ULineBatcherManager LineBatcherManager;
+
+
 	UUIDRenderer UUIDRenderer;
 	UTextureManager TextureManager;
 	USpriteManager SpriteManager;
-
-	USpriteRenderer SpriteRenderer;
 
 	// Application state
 	bool bIsRunning;
