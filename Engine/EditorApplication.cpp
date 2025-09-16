@@ -174,7 +174,7 @@ void EditorApplication::Render()
 		}
 
 		FBounds WorldBounds;
-		
+
 		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
 
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
@@ -198,7 +198,7 @@ void EditorApplication::Render()
 			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
 			Mesh->UpdateAccurateBounds(WorldMatrix);
 			WorldBounds = Mesh->GetAccurateBounds();
-			LineBatcherManager.AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
 		}
 	}
 
@@ -245,7 +245,7 @@ void EditorApplication::Render()
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
- 
+
 
 }
 
