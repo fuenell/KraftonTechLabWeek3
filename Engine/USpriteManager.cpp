@@ -168,7 +168,7 @@ void USpriteManager::Release()
 bool USpriteManager::SetUUIDVertices(ID3D11Device* InDevice, float InAspectRatio, uint32 InUUID, float InRenderSize, FBounds InWorldBound, FMatrix InModeling, FMatrix InView, FMatrix InProjection)
 {
 	// 모델을 둘러싸고 있는 Bounding Box의 8개의 점 중 가장 높이가 높은 점을 찾는다.
-	FString UUIDString = FString("UUID : ") + std::to_string(InUUID);
+	FString UUIDString = FString("UUID:") + std::to_string(InUUID);
 
 	FVector4 BoundEdges[8];
 	BoundEdges[0] = { InWorldBound.Min.X, InWorldBound.Min.Y, InWorldBound.Min.Z, 1.0f };
