@@ -61,5 +61,5 @@ bool IsValidCharInfo(CharacterInfo& InCharInfo)
 
 void FontAtlas::Release()
 {
-    charInfoMap.clear();
+    CharInfoMap.clear();
 }

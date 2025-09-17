@@ -165,24 +165,24 @@ void USpriteManager::Release()
 	}
 }
 
-bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, FBounds WorldBound, FMatrix Modeling, FMatrix View, FMatrix Projection)
+bool USpriteManager::SetUUIDVertices(ID3D11Device* InDevice, float InAspectRatio, uint32 InUUID, float InRenderSize, FBounds InWorldBound, FMatrix InModeling, FMatrix InView, FMatrix InProjection)
 {
 	// 모델을 둘러싸고 있는 Bounding Box의 8개의 점 중 가장 높이가 높은 점을 찾는다.
-	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
+	FString UUIDString = FString("UUID : ") + std::to_string(InUUID);
 
 	FVector4 BoundEdges[8];
-	BoundEdges[0] = { WorldBound.Min.X, WorldBound.Min.Y, WorldBound.Min.Z, 1.0f };
-	BoundEdges[1] = { WorldBound.Max.X, WorldBound.Min.Y, WorldBound.Min.Z, 1.0f };
-	BoundEdges[2] = { WorldBound.Min.X, WorldBound.Max.Y, WorldBound.Min.Z, 1.0f };
-	BoundEdges[3] = { WorldBound.Max.X, WorldBound.Max.Y, WorldBound.Min.Z, 1.0f };
-	BoundEdges[4] = { WorldBound.Min.X, WorldBound.Min.Y, WorldBound.Max.Z, 1.0f };
-	BoundEdges[5] = { WorldBound.Max.X, WorldBound.Min.Y, WorldBound.Max.Z, 1.0f };
-	BoundEdges[6] = { WorldBound.Min.X, WorldBound.Max.Y, WorldBound.Max.Z, 1.0f };
-	BoundEdges[7] = { WorldBound.Max.X, WorldBound.Max.Y, WorldBound.Max.Z, 1.0f };
+	BoundEdges[0] = { InWorldBound.Min.X, InWorldBound.Min.Y, InWorldBound.Min.Z, 1.0f };
+	BoundEdges[1] = { InWorldBound.Max.X, InWorldBound.Min.Y, InWorldBound.Min.Z, 1.0f };
+	BoundEdges[2] = { InWorldBound.Min.X, InWorldBound.Max.Y, InWorldBound.Min.Z, 1.0f };
+	BoundEdges[3] = { InWorldBound.Max.X, InWorldBound.Max.Y, InWorldBound.Min.Z, 1.0f };
+	BoundEdges[4] = { InWorldBound.Min.X, InWorldBound.Min.Y, InWorldBound.Max.Z, 1.0f };
+	BoundEdges[5] = { InWorldBound.Max.X, InWorldBound.Min.Y, InWorldBound.Max.Z, 1.0f };
+	BoundEdges[6] = { InWorldBound.Min.X, InWorldBound.Max.Y, InWorldBound.Max.Z, 1.0f };
+	BoundEdges[7] = { InWorldBound.Max.X, InWorldBound.Max.Y, InWorldBound.Max.Z, 1.0f };
 
 	for (int i = 0, s = ARRAYSIZE(BoundEdges); i < s; i++)
 	{
-		BoundEdges[i] = (View * Projection).TransformVectorRow(BoundEdges[i]);
+		BoundEdges[i] = (InView * InProjection).TransformVectorRow(BoundEdges[i]);
 		BoundEdges[i] = BoundEdges[i] / BoundEdges[i].W;
 	}
 
@@ -205,12 +205,12 @@ bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, ui
 	// UUID를 렌더할 NDC의 기준점 위치
 	FVector4 RenderCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	RenderCenter = (Modeling * View).TransformVectorRow(RenderCenter);
+	RenderCenter = (InModeling * InView).TransformVectorRow(RenderCenter);
 
 	if (RenderCenter.Z < 0.0f)
 		return false;
 	
-	RenderCenter = Projection.TransformVectorRow(RenderCenter);
+	RenderCenter = InProjection.TransformVectorRow(RenderCenter);
 	RenderCenter = RenderCenter / RenderCenter.W;
 
 	// Bounding Box 중 NDC 범위 안 유효한 점이 있다면

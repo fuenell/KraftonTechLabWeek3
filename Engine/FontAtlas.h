@@ -31,7 +31,7 @@ public:
 public:
     bool Initialize();
     CharacterInfo GetCharInfo(char c);
-
+    void Release();
 private:
     void InitCharInfoMap();
 
