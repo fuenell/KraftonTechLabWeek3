@@ -12,39 +12,9 @@ private:
 		uint32 CellNumInRow;
 		uint32 CurrentCellIndex;
 	};
-private:
-	FVector ModelTranslation{};
 
 
-	ID3D11Device* Device = URenderer::GetInstance().GetDevice();
-	ID3D11DeviceContext* DeviceContext = URenderer::GetInstance().GetDeviceContext();
 
-	ID3D11VertexShader* VertexShader = nullptr;
-	ID3D11PixelShader* PixelShader = nullptr;
-	ID3D11InputLayout* InputLayout = nullptr;
-	
-	ID3D11SamplerState* SamplerState = nullptr;
-	ID3D11ShaderResourceView* ShaderResourceView = nullptr;
-
-	ID3D11Buffer* VertexBuffer = nullptr;
-	ID3D11Buffer* IndexBuffer = nullptr;
-	ID3D11Buffer* ConstantBuffer = nullptr;
-
-	UINT VertexStride = 0;
-	UINT IndexStride = 0;
-	UINT VertexBufferSize = 0;
-	UINT IndexBufferSize = 0;
-
-	uint32 CellNumInRow = 0;
-	uint32 CellLifeSpawn = 0;
-
-	float   LastTriggerTimeSeconds = -1.0f;
-	float   DurationSeconds = 0.144f; // 144 ms (원하면 바꿔)
-	bool    bActive = false;
-
-private:
-	USubUVManager() = default;
-	~USubUVManager() = default;
 public:
 	static USubUVManager& GetInstance();
 
@@ -85,4 +55,39 @@ public:
 	void Bind();
 	void Render();
 	void Release();
+
+private:
+	USubUVManager() = default;
+	~USubUVManager() = default;
+
+
+private:
+	FVector ModelTranslation{};
+
+
+	ID3D11Device* Device = URenderer::GetInstance().GetDevice();
+	ID3D11DeviceContext* DeviceContext = URenderer::GetInstance().GetDeviceContext();
+
+	ID3D11VertexShader* VertexShader = nullptr;
+	ID3D11PixelShader* PixelShader = nullptr;
+	ID3D11InputLayout* InputLayout = nullptr;
+	
+	ID3D11SamplerState* SamplerState = nullptr;
+	ID3D11ShaderResourceView* ShaderResourceView = nullptr;
+
+	ID3D11Buffer* VertexBuffer = nullptr;
+	ID3D11Buffer* IndexBuffer = nullptr;
+	ID3D11Buffer* ConstantBuffer = nullptr;
+
+	UINT VertexStride = 0;
+	UINT IndexStride = 0;
+	UINT VertexBufferSize = 0;
+	UINT IndexBufferSize = 0;
+
+	uint32 CellNumInRow = 0;
+	uint32 CellLifeSpawn = 0;
+
+	float   LastTriggerTimeSeconds = -1.0f;
+	float   DurationSeconds = 2.4f;
+	bool    bActive = false;
 };

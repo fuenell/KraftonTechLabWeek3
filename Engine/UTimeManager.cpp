@@ -60,8 +60,10 @@ void UTimeManager::BeginFrame()
 	}
 
 	// Update total time
+	// 진행된 시간
 	totalTime += deltaTime;
 
+	// 마지막 기록된 시간
 	lastFrameTime = currentTime;
 }
 

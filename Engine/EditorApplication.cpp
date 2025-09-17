@@ -32,17 +32,27 @@ void EditorApplication::Update(float DeltaTime)
 
 
 	
+	// 피킹된 primitive가 있으면 동작한다
 	if (PickedPrimitive != nullptr)
 	{
+		// 검사할 오브젝트와 피킹 오브젝트를 collision manager에 set
 		UCollisionManager::GetInstance().SetObjects(USceneManager::GetInstance().GetScene()->GetObjects(), PickedPrimitive);
-		//UE_LOG("1");
 		UCollisionManager::GetInstance().Update();
+
 		if (UCollisionManager::GetInstance().HasOverlap())
 		{
-			//UE_LOG("3");
 			const FVector Center = UCollisionManager::GetInstance().GetLastOverlapCenter();
-			const float Now = UTimeManager::GetInstance().GetTotalTime(); 
-			USubUVManager::GetInstance().TriggerAt(Center, Now);
+
+			USubUVManager& Sub = USubUVManager::GetInstance();
+			const float Now = UTimeManager::GetInstance().GetTotalTime();
+			const float Elapsed = Now - Sub.GetLastTriggerTime();
+
+			// ⬇️ 재생 중이면 무시, 끝났으면 새로 트리거
+			if (!Sub.IsActive() || Elapsed >= Sub.GetDurationSeconds())
+			{
+				Sub.TriggerAt(Center, Now);
+			}
+			// 재생 중일 때 들어오는 충돌은 그냥 버린다(큐잉 없이).
 		}
 	}
 }
@@ -257,14 +267,22 @@ void EditorApplication::Render()
 	//
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// subUV Rendering & Collision System 
 	USubUVManager& SubUVManager = USubUVManager::GetInstance();
 
 
 	const float Now = UTimeManager::GetInstance().GetTotalTime(); 
 	const float Elapsed = Now - SubUVManager.GetLastTriggerTime();
 	//UE_LOG("4444");
-	if (SubUVManager.IsActive()&& Elapsed <= SubUVManager.GetDurationSeconds()&& !SubUVManager.GetModelTranslation().IsNearlyZero(1e-4f))
+		
+		UE_LOG("submanager active? : %d      %f        %f", SubUVManager.IsActive(), Elapsed, SubUVManager.GetDurationSeconds());
+
+	if (SubUVManager.IsActive() && Elapsed <= SubUVManager.GetDurationSeconds())
 	{
+		UE_LOG("submanager active? : %d      %f        %f", SubUVManager.IsActive(), Elapsed, SubUVManager.GetDurationSeconds());
 		//UE_LOG("555555");
 		SubUVManager.UpdateConstantBuffer(
 			FVector(3.0f, 3.0f, 3.0f),
@@ -274,11 +292,16 @@ void EditorApplication::Render()
 		);
 		SubUVManager.Bind();
 		SubUVManager.Render();
+		if (SubUVManager.IsActive() && Elapsed > SubUVManager.GetDurationSeconds())
+		{
+			SubUVManager.Deactivate(); // 타임아웃으로 종료
+		}
 	}
-	else if (SubUVManager.IsActive() && Elapsed > SubUVManager.GetDurationSeconds())
-	{
-		SubUVManager.Deactivate(); // 타임아웃으로 종료
-	}
+
+
+
+	//
+	///////////////////////////////////////////////////////////////////////////////////////////////
 }
 
 void EditorApplication::RenderGUI()

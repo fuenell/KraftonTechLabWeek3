@@ -27,19 +27,19 @@ bool UCollisionManager::Initialize()
 
 void UCollisionManager::Update()
 {
-	UE_LOG("2");
 	if (!CollisionObjects || !PickedPrimitive)
 	{
 		bHasOverlap = false;
 		LastHit = nullptr;
 		return;
 	}
-	UE_LOG("update");
+
 	FVector Center;
 	UPrimitiveComponent* Hit = nullptr;
+
+	//겹친애 있으면 중점과 primitivecomponent를 가져옴
 	if (GetFirstOverlapCenter(CollisionObjects, PickedPrimitive, Center, Hit))
 	{
-		UE_LOG("collide!");
 		bHasOverlap = true;
 		LastOverlapCenter = Center;
 		LastHit = Hit;
