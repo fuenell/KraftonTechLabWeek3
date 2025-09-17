@@ -8,8 +8,8 @@
 bool UTextureManager::Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 {
 	bool bSuccess = true;
-	bSuccess |= RegisterSRVWithDDS("DejaVu", L"DDS/DejaVu Sans Mono.dds", hWnd, device, deviceContext);
-	bSuccess |= RegisterSRVWithDDS("Roboto", L"DDS/Roboto-Bold.dds", hWnd, device, deviceContext);
+	bSuccess &= RegisterSRVWithDDS("DejaVu", L"DDS/DejaVu Sans Mono.dds", hWnd, device, deviceContext);
+	bSuccess &= RegisterSRVWithDDS("Roboto", L"DDS/Roboto-Bold.dds", hWnd, device, deviceContext);
 
 	return bSuccess;
 }

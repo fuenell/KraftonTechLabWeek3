@@ -193,6 +193,8 @@ void USpriteManager::Render(ID3D11DeviceContext* DeviceContext)
 
 void USpriteManager::Release()
 {
+	Atlas.Release();
+
 	if (VertexShader)
 	{
 		VertexShader->Release();
@@ -221,6 +223,12 @@ void USpriteManager::Release()
 	{
 		IndexBuffer->Release();
 		IndexBuffer = nullptr;
+	}
+
+	if (SamplerState)
+	{
+		SamplerState->Release();
+		SamplerState = nullptr;
 	}
 }
 

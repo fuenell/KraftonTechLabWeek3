@@ -29,6 +29,7 @@ public:
     virtual ~FontAtlas();
 
     bool Initialize();
+    void Release();
     void InitCharInfoMap();
     CharacterInfo GetCharInfo(char c);
     static bool IsValidCharInfo(CharacterInfo& charInfo);
