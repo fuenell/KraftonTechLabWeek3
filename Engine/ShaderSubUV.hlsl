@@ -7,7 +7,7 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
-    float2 texCoord;
+    float2 texCoord : TEXCOORD;
 };
 
 cbuffer ViewProjCB : register(b0)

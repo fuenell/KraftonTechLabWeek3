@@ -66,6 +66,9 @@ bool USubUVManager::Initialize(
 		FilePath
 	);
 
+	if (!ShaderResourceView)
+		return false;
+
 	// vertex, index, constant 버퍼 생성
 
 	TArray<FVertexPosUV> VertexArray = {
