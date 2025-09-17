@@ -248,22 +248,26 @@ bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, ui
 	BoundEdges[7] = { WorldBound.Max.X, WorldBound.Max.Y, WorldBound.Max.Z, 1.0f };
 
 	for (int i = 0, s = ARRAYSIZE(BoundEdges); i < s; i++)
-		BoundEdges[i] = View.TransformVectorRow(BoundEdges[i]);
+	{
+		BoundEdges[i] = (View * Projection).TransformVectorRow(BoundEdges[i]);
+		BoundEdges[i] = BoundEdges[i] / BoundEdges[i].W;
+	}
 
 	FVector4 Highest = {0.0f, std::numeric_limits<float>::lowest(), 0.0f, 1.0f};
     
 	for (int i = 0, s = ARRAYSIZE(BoundEdges); i < s; i++)
 	{
-		// 카메라 뒤에 있는 점은 후보에서 제외
-		if (BoundEdges[i].Z < 0.0f)
+		// NDC 범위를 벗어나면 투영에서 제외
+		if (
+			BoundEdges[i].X < -1.0f || BoundEdges[i].X > 1.0f ||
+			BoundEdges[i].Y < -1.0f || BoundEdges[i].Y > 1.0f ||
+			BoundEdges[i].Z < 0.0f || BoundEdges[i].Z > 1.0f
+			)
 			continue;
 		if (BoundEdges[i].Y > Highest.Y)
 			Highest = BoundEdges[i];
 	}
 
-	// 모든 점이 카메라 뒤에만 있는 경우
-	if (Highest.Y == FLT_MIN)
-		return false;
 
 	// UUID를 렌더할 NDC의 기준점 위치
 	FVector4 RenderCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -273,10 +277,12 @@ bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, ui
 	if (RenderCenter.Z < 0.0f)
 		return false;
 	
-	RenderCenter.Y = Highest.Y;
 	RenderCenter = Projection.TransformVectorRow(RenderCenter);
-
 	RenderCenter = RenderCenter / RenderCenter.W;
+
+	// Bounding Box 중 NDC 범위 안 유효한 점이 있다면
+	if (!(Highest.Y == std::numeric_limits<float>::lowest()))
+		RenderCenter.Y = Highest.Y;
 
 	uint64 StringLen = UUIDString.size();
 	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSize * 0.5f * (1 / AspectRatio));
