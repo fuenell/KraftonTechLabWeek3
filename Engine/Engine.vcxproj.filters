@@ -412,6 +412,9 @@
     <None Include="BillBoard.ps">
       <Filter>Shader</Filter>
     </None>
+    <None Include="ShaderSubUV.hlsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ShaderLine.hlsl">
