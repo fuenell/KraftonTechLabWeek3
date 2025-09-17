@@ -4,7 +4,7 @@
 #include "USceneManager.h"
 #include "UPrimitiveComponent.h"
 
-using FOnComponentSelected = std::function<void(UPrimitiveComponent*)>;
+using FOnComponentSelected = TFunction<void(UPrimitiveComponent*)>;
 
 class USceneManagerWindow : public ImGuiWindowWrapper
 {
