@@ -290,24 +290,22 @@ void UControlPanel::CameraManagementSection()
 
 	// 카메라 회전 감도 조작
 	ImGui::Text("Rotation Sensitivity");
-
 	const float RotationSensitivityMin = 0.1f;
 	const float RotationSensitivityMax = 2.0f;
-	// DragFloat로 교체
-	if (ImGui::DragFloat("##RotationSensitivity",
-		&RotationSensitivity, 0.1f, RotationSensitivityMin, RotationSensitivityMax, "%.3f"))
+	// SliderFloat로 교체
+	if (ImGui::SliderFloat("##RotationSensitivity",
+		&RotationSensitivity, RotationSensitivityMin, RotationSensitivityMax, "%.3f"))
 	{
 		RotSensCommitted = true; // 값이 바뀐 순간 바로 commit
 	}
 
 	// 카메라 이동 감도 조작
 	ImGui::Text("Translation Sensitivity");
-
 	const float TranslationSensitivityMin = 0.1f;
 	const float TranslationSensitivityMax = 10.0f;
-	// DragFloat로 교체
-	if (ImGui::DragFloat("##TranslationSensitivity",
-		&TranslationSensitivity, 0.1f, TranslationSensitivityMin, TranslationSensitivityMax, "%.3f"))
+	// SliderFloat로 교체
+	if (ImGui::SliderFloat("##TranslationSensitivity",
+		&TranslationSensitivity, TranslationSensitivityMin, TranslationSensitivityMax, "%.3f"))
 	{
 		TransSensCommitted = true; // 값이 바뀐 순간 바로 commit
 	}
