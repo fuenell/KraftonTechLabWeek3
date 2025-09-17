@@ -43,7 +43,7 @@ float4 PS_Main(VS_OUTPUT input) : SV_Target
 {
     float4 texColor = fontTex.Sample(samp, input.texCoord); // VS에서 넘겨준 UV 값을 통해 텍스처에서 텍셀 정보를 가져옴
     
-    if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
+    if (texColor.r < 0.3f && texColor.g < 0.3f && texColor.b < 0.3f)
         discard;
     
      return texColor;

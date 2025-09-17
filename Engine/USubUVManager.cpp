@@ -115,7 +115,6 @@ bool USubUVManager::Initialize(
 }
 
 bool USubUVManager::UpdateConstantBuffer(
-	FVector ModelTranslation,
 	FVector ModelScale,
 	FMatrix CameraRotation,
 	FMatrix View,

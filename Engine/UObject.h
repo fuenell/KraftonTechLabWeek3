@@ -74,29 +74,6 @@ public:
 	{
 		return IsA<T>() ? static_cast<const T*>(this) : nullptr;
 	}
-	// Override new/delete for tracking
-	void* operator new(size_t size)
-	{
-		UEngineStatics::AddAllocation(size);
-		return ::operator new(size);
-	}
-
-	void operator delete(void* ptr, size_t size)
-	{
-		UEngineStatics::RemoveAllocation(size);
-		::operator delete(ptr);
-	}
-
-	// 배치 new/delete도 오버라이드 (필요한 경우)
-	void* operator new(size_t size, void* ptr)
-	{
-		return ptr;  // placement new는 메모리 추적 안함
-	}
-
-	void operator delete(void* ptr, void* place)
-	{
-		// placement delete는 아무것도 안함
-	}
 
 	json::JSON Serialize() const override
 	{

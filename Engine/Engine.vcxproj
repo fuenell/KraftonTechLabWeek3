@@ -195,8 +195,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="MemoryTracker.cpp" />
     <ClCompile Include="ShowFlag.cpp" />
     <ClCompile Include="UCapsuleComp.cpp" />
+    <ClCompile Include="UCollisionManager.cpp" />
     <ClCompile Include="USpriteManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -248,8 +250,10 @@
     <ClInclude Include="CapsuleVertices.h" />
     <ClInclude Include="FontAtlas.h" />
     <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="MemoryTracker.h" />
     <ClInclude Include="SphereVertices.h" />
     <ClInclude Include="UCapsuleComp.h" />
+    <ClInclude Include="UCollisionManager.h" />
     <ClInclude Include="USpriteManager.h" />
     <ClInclude Include="CubeVertices.h" />
     <ClInclude Include="FName.h" />

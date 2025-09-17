@@ -65,4 +65,20 @@ struct FVector
         // return v * s; 로 멤버 연산자 재사용해도 됨
         return FVector(s * v.X, s * v.Y, s * v.Z);
     }
+
+    static FORCEINLINE FVector Zero() { return FVector(0.f, 0.f, 0.f); }
+
+    FORCEINLINE bool Equals(const FVector& V, float Tolerance = 1e-6f) const
+    {
+        return fabsf(X - V.X) <= Tolerance
+            && fabsf(Y - V.Y) <= Tolerance
+            && fabsf(Z - V.Z) <= Tolerance;
+    }
+
+    FORCEINLINE bool IsNearlyZero(float Tolerance = 1e-6f) const
+    {
+        return fabsf(X) <= Tolerance
+            && fabsf(Y) <= Tolerance
+            && fabsf(Z) <= Tolerance;
+    }
 };

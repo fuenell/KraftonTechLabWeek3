@@ -193,10 +193,6 @@
     <ClCompile Include="UDefaultScene.cpp">
       <Filter>Engine\Core\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="USubUVComponent.cpp" />
-    <ClCompile Include="SubUVVertices.h">
-      <Filter>Engine\Core\Mesh</Filter>
-    </ClCompile>
     <ClCompile Include="UTextureManager.cpp">
       <Filter>Engine\Subsystem</Filter>
     </ClCompile>
@@ -205,6 +201,12 @@
     <ClCompile Include="USpriteManager.cpp" />
     <ClCompile Include="UTextComponent.cpp" />
     <ClCompile Include="UTextMesh.cpp" />
+    <ClCompile Include="UCapsuleComp.cpp" />
+    <ClCompile Include="UCollisionManager.cpp" />
+    <ClCompile Include="USubUVManager.cpp" />
+    <ClCompile Include="MemoryTracker.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImGui\imconfig.h">
@@ -382,7 +384,6 @@
     <ClInclude Include="UDefaultScene.h">
       <Filter>Engine\Core\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="USubUVComponent.h" />
     <ClInclude Include="UTextureManager.h">
       <Filter>Engine\Subsystem</Filter>
     </ClInclude>
@@ -397,6 +398,12 @@
     <ClInclude Include="USpriteManager.h" />
     <ClInclude Include="UTextComponent.h" />
     <ClInclude Include="UTextMesh.h" />
+    <ClInclude Include="UCapsuleComp.h" />
+    <ClInclude Include="UCollisionManager.h" />
+    <ClInclude Include="USubUVManager.h" />
+    <ClInclude Include="MemoryTracker.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ShaderW0.hlsl">
