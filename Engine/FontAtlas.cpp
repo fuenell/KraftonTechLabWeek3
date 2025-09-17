@@ -58,3 +58,8 @@ bool IsValidCharInfo(CharacterInfo& InCharInfo)
     }
     return true;
 }
+
+void FontAtlas::Release()
+{
+    charInfoMap.clear();
+}

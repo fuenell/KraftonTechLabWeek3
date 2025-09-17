@@ -126,6 +126,8 @@ void USpriteManager::Render(ID3D11DeviceContext* DeviceContext)
 
 void USpriteManager::Release()
 {
+	Atlas.Release();
+
 	if (VertexShader)
 	{
 		VertexShader->Release();
@@ -163,30 +165,62 @@ void USpriteManager::Release()
 	}
 }
 
-bool USpriteManager::SetUUIDVertices(ID3D11Device* InDevice, float InAspectRatio, uint32 InUUID, float InRenderSize, float InModelScale, FMatrix InModeling, FMatrix InView, FMatrix InProjection)
+bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, FBounds WorldBound, FMatrix Modeling, FMatrix View, FMatrix Projection)
 {
-	FString UUIDString = FString("UUID : ") + std::to_string(InUUID);
+	// 모델을 둘러싸고 있는 Bounding Box의 8개의 점 중 가장 높이가 높은 점을 찾는다.
+	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
 
-	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
+	FVector4 BoundEdges[8];
+	BoundEdges[0] = { WorldBound.Min.X, WorldBound.Min.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[1] = { WorldBound.Max.X, WorldBound.Min.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[2] = { WorldBound.Min.X, WorldBound.Max.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[3] = { WorldBound.Max.X, WorldBound.Max.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[4] = { WorldBound.Min.X, WorldBound.Min.Y, WorldBound.Max.Z, 1.0f };
+	BoundEdges[5] = { WorldBound.Max.X, WorldBound.Min.Y, WorldBound.Max.Z, 1.0f };
+	BoundEdges[6] = { WorldBound.Min.X, WorldBound.Max.Y, WorldBound.Max.Z, 1.0f };
+	BoundEdges[7] = { WorldBound.Max.X, WorldBound.Max.Y, WorldBound.Max.Z, 1.0f };
 
-	ObjectCenter = (InModeling * InView).TransformVectorRow(ObjectCenter);
-
-	if (ObjectCenter.Z < 0.0f)
+	for (int i = 0, s = ARRAYSIZE(BoundEdges); i < s; i++)
 	{
-		return false;
+		BoundEdges[i] = (View * Projection).TransformVectorRow(BoundEdges[i]);
+		BoundEdges[i] = BoundEdges[i] / BoundEdges[i].W;
 	}
-		
-	ObjectCenter = InProjection.TransformVectorRow(ObjectCenter);
 
-	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
+	FVector4 Highest = {0.0f, std::numeric_limits<float>::lowest(), 0.0f, 1.0f};
+    
+	for (int i = 0, s = ARRAYSIZE(BoundEdges); i < s; i++)
+	{
+		// NDC 범위를 벗어나면 투영에서 제외
+		if (
+			BoundEdges[i].X < -1.0f || BoundEdges[i].X > 1.0f ||
+			BoundEdges[i].Y < -1.0f || BoundEdges[i].Y > 1.0f ||
+			BoundEdges[i].Z < 0.0f || BoundEdges[i].Z > 1.0f
+			)
+			continue;
+		if (BoundEdges[i].Y > Highest.Y)
+			Highest = BoundEdges[i];
+	}
 
-	RenderCenter.Y -= 0.2f;
+
+	// UUID를 렌더할 NDC의 기준점 위치
+	FVector4 RenderCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	RenderCenter = (Modeling * View).TransformVectorRow(RenderCenter);
+
+	if (RenderCenter.Z < 0.0f)
+		return false;
+	
+	RenderCenter = Projection.TransformVectorRow(RenderCenter);
+	RenderCenter = RenderCenter / RenderCenter.W;
+
+	// Bounding Box 중 NDC 범위 안 유효한 점이 있다면
+	if (!(Highest.Y == std::numeric_limits<float>::lowest()))
+		RenderCenter.Y = Highest.Y;
 
 	uint64 StringLen = UUIDString.size();
 	float StartPosX = RenderCenter.X - ((float)StringLen * InRenderSize * 0.5f * (1 / InAspectRatio));
 
-
-	for (uint64 i = 0; i < StringLen; i++)
+	for (uint64 i = 0, s = StringLen; i < s; i++)
 	{
 		CharacterInfo CharInfo = Atlas.GetCharInfo(UUIDString[i]);
 
@@ -212,4 +246,6 @@ bool USpriteManager::SetUUIDVertices(ID3D11Device* InDevice, float InAspectRatio
 		IndexArray.push_back(1 + 4 * i);
 		IndexArray.push_back(3 + 4 * i);
 	}
+
+	return true;
 }

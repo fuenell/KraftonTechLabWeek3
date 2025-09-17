@@ -257,7 +257,16 @@ void EditorApplication::Render()
 
 		if (ShowBillboard == EEngineShowFlags::SF_BillboardText)
 		{
-			if (USpriteManager::GetInstance().SetUUIDVertices(Device, (float)WindowWidth / (float)WindowHeight, PickedPrimitive->UUID, 0.05f, PickedPrimitive->GetScale().Z, WorldMatrix, View, Proj))
+			if (USpriteManager::GetInstance().SetUUIDVertices(
+				Device,
+				(float)WindowWidth / (float)WindowHeight,
+				PickedPrimitive->UUID,
+				0.05f,
+				PickedPrimitive->GetBoundingBox(),
+				WorldMatrix,
+				View,
+				Proj)
+				)
 			{
 				USpriteManager::GetInstance().Bind(DeviceContext);
 				USpriteManager::GetInstance().Render(DeviceContext);

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <limits>
+
 #include "URenderer.h"
 #include "FVertexPosUV.h"
 #include "UTextureManager.h"
@@ -31,8 +33,8 @@ public:
 	void Render(ID3D11DeviceContext* InDeviceContext);
 	void Release();
 
-public:
-	bool SetUUIDVertices(ID3D11Device* InDevice, float InAspectRatio, uint32 InUUID, float InRenderSize, float InModelScale, FMatrix InModeling, FMatrix InView, FMatrix InProjection);
+
+	bool SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, FBounds WorldBound, FMatrix Modeling, FMatrix View, FMatrix Projection);
 
 private:
 	FontAtlas				Atlas;
