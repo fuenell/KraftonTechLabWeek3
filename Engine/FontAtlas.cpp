@@ -19,6 +19,7 @@ bool FontAtlas::Initialize()
 void FontAtlas::InitCharInfoMap()
 {
     float CellSize = 1.0f / 16.0f; // 0.0625
+    float CutOffset = 0.02f;
 
     for (int Ascii = 0; Ascii < 256; ++Ascii)
     {
@@ -27,9 +28,9 @@ void FontAtlas::InitCharInfoMap()
 
         CharacterInfo info
         {
-            Col * CellSize,
+            Col * CellSize + CutOffset,
             Row * CellSize,
-            CellSize,
+            CellSize - CutOffset,
             CellSize
         };
         CharInfoMap[(char)Ascii] = info;
