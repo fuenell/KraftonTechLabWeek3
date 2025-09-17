@@ -278,11 +278,11 @@ void EditorApplication::Render()
 	const float Elapsed = Now - SubUVManager.GetLastTriggerTime();
 	//UE_LOG("4444");
 		
-		UE_LOG("submanager active? : %d      %f        %f", SubUVManager.IsActive(), Elapsed, SubUVManager.GetDurationSeconds());
+	//UE_LOG("submanager active? : %d      %f        %f", SubUVManager.IsActive(), Elapsed, SubUVManager.GetDurationSeconds());
 
 	if (SubUVManager.IsActive() && Elapsed <= SubUVManager.GetDurationSeconds())
 	{
-		UE_LOG("submanager active? : %d      %f        %f", SubUVManager.IsActive(), Elapsed, SubUVManager.GetDurationSeconds());
+		//UE_LOG("submanager active? : %d      %f        %f", SubUVManager.IsActive(), Elapsed, SubUVManager.GetDurationSeconds());
 		//UE_LOG("555555");
 		SubUVManager.UpdateConstantBuffer(
 			FVector(3.0f, 3.0f, 3.0f),

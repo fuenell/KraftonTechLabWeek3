@@ -3,7 +3,6 @@
 
 FontAtlas::FontAtlas()
 {
-    Initialize();
 }
 
 FontAtlas::~FontAtlas()
@@ -19,45 +18,43 @@ bool FontAtlas::Initialize()
 
 void FontAtlas::InitCharInfoMap()
 {
-    float cellSize = 1.0f / 16.0f; // 0.0625
+    float CellSize = 1.0f / 16.0f; // 0.0625
 
-    for (int ascii = 0; ascii < 256; ++ascii)
+    for (int Ascii = 0; Ascii < 256; ++Ascii)
     {
-        int row = ascii / 16;
-        int col = ascii % 16;
+        int Row = Ascii / 16;
+        int Col = Ascii % 16;
 
         CharacterInfo info
         {
-            col * cellSize,
-            row * cellSize,
-            cellSize,
-            cellSize
+            Col * CellSize,
+            Row * CellSize,
+            CellSize,
+            CellSize
         };
-
-        charInfoMap[(char)ascii] = info;
+        CharInfoMap[(char)Ascii] = info;
     }
 }
 
 CharacterInfo FontAtlas::GetCharInfo(char c)
 {
-    auto charInfoIt = charInfoMap.find(c);
+    auto CharInfoIt = CharInfoMap.find(c);
 
-    if (charInfoIt != charInfoMap.end())
+    if (CharInfoIt != CharInfoMap.end())
     {
-        CharacterInfo charInfo = charInfoIt->second;
-        
-        return charInfo;
-    }
+        CharacterInfo CharInfo = CharInfoIt->second;
 
+        return CharInfo;
+    }
     return CharacterInfo(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-bool IsValidCharInfo(CharacterInfo& charInfo)
+
+bool IsValidCharInfo(CharacterInfo& InCharInfo)
 {
-    if (charInfo.width == 0 || charInfo.height == 0)
+    if (InCharInfo.Width == 0 || InCharInfo.Height == 0)
     {
         return false;
     }
-
     return true;
 }

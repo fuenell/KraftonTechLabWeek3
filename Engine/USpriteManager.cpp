@@ -2,27 +2,23 @@
 #include "USpriteManager.h"
 #include "UTextureManager.h"
 
-USpriteManager::USpriteManager() :
-	VertexShader(nullptr),
-	PixelShader(nullptr),
-	InputLayout(nullptr),
-	VertexBuffer(nullptr),
-	VertexBufferSize(0),
-	IndexBufferSize(0),
-	VertexStride(0),
-	IndexStride(0)
+USpriteManager::USpriteManager()
 {
 }
 
-bool USpriteManager::Initialize(ID3D11Device* Device, uint32 InDefaultMaxChars)
+USpriteManager::~USpriteManager()
+{
+}
+
+bool USpriteManager::Initialize(ID3D11Device* InDevice, uint32 InDefaultMaxChars)
 {
 	// === 1. Vertex Shader ===
 	ID3DBlob* vsBlob = URenderer::CompileShader(L"ShaderFont.hlsl", "VSMain", "vs_5_0");
-	VertexShader = URenderer::CreateVertexShader(Device, vsBlob);
+	VertexShader = URenderer::CreateVertexShader(InDevice, vsBlob);
 
 	// === 2. Pixel Shader ===
 	ID3DBlob* psBlob = URenderer::CompileShader(L"ShaderFont.hlsl", "PSMain", "ps_5_0");
-	PixelShader = URenderer::CreatePixelShader(Device, psBlob);
+	PixelShader = URenderer::CreatePixelShader(InDevice, psBlob);
 
 	// === 3. Input Layout ===
 	D3D11_INPUT_ELEMENT_DESC layout[] = {
@@ -31,7 +27,7 @@ bool USpriteManager::Initialize(ID3D11Device* Device, uint32 InDefaultMaxChars)
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12,
 		  D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-	Device->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &InputLayout);
+	InDevice->CreateInputLayout(layout, 2, vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), &InputLayout);
 
 	vsBlob->Release();
 	psBlob->Release();
@@ -40,7 +36,7 @@ bool USpriteManager::Initialize(ID3D11Device* Device, uint32 InDefaultMaxChars)
 	D3D11_SAMPLER_DESC sampDesc = {};
 	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sampDesc.AddressU = sampDesc.AddressV = sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	Device->CreateSamplerState(&sampDesc, &SamplerState);
+	InDevice->CreateSamplerState(&sampDesc, &SamplerState);
 
 	// 어디를 읽을지를 정하는 지도
 	Atlas.Initialize();
@@ -58,7 +54,7 @@ bool USpriteManager::Initialize(ID3D11Device* Device, uint32 InDefaultMaxChars)
 	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	VBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	HRESULT hr = Device->CreateBuffer(&VBDesc, nullptr, &VertexBuffer);
+	HRESULT hr = InDevice->CreateBuffer(&VBDesc, nullptr, &VertexBuffer);
 	if (FAILED(hr) || !VertexBuffer) { return false; }
 
 	D3D11_BUFFER_DESC IBDesc = {};
@@ -67,75 +63,12 @@ bool USpriteManager::Initialize(ID3D11Device* Device, uint32 InDefaultMaxChars)
 	IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	IBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	hr = Device->CreateBuffer(&IBDesc, nullptr, &IndexBuffer);
+	hr = InDevice->CreateBuffer(&IBDesc, nullptr, &IndexBuffer);
 	if (FAILED(hr) || !IndexBuffer) { return false; }
 
 	CurrentIndexCount = 0;
 
-
 	return true;
-}
-
-// 버텍스 버퍼와 인덱스 버퍼를 생성
-void USpriteManager::SetBuffer(ID3D11Device* Device)
-{
-	VertexStride = sizeof(FVertexPosColor4);
-	VertexBufferSize = VertexStride * VertexArray.size();
-
-	IndexStride = sizeof(uint32);
-	IndexBufferSize = IndexStride * IndexArray.size();
-
-	D3D11_BUFFER_DESC Desc = {};
-	Desc.Usage = D3D11_USAGE_IMMUTABLE;
-	Desc.ByteWidth = VertexBufferSize;
-	Desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	Desc.CPUAccessFlags = 0;
-	Desc.MiscFlags = 0;
-	Desc.StructureByteStride = 0;
-
-	VertexBuffer = URenderer::CreateBuffer(Device, Desc, (const void *)VertexArray.data());
-	if (!VertexBuffer)
-	{
-
-	}
-
-	Desc.ByteWidth = IndexBufferSize;
-	Desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	
-	IndexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)IndexArray.data());
-	if (!IndexBuffer)
-	{
-
-	}
-	
-}
-
-void USpriteManager::SetBufferUV(ID3D11Device* Device)
-{
-	VertexStride = sizeof(FVertexPosUV);
-	VertexBufferSize = VertexStride * VertexArray.size();
-
-	IndexStride = sizeof(uint32);
-	IndexBufferSize = IndexStride * IndexArray.size();
-
-	D3D11_BUFFER_DESC Desc = {};
-	Desc.Usage = D3D11_USAGE_IMMUTABLE;
-	Desc.ByteWidth = VertexBufferSize;
-	Desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	Desc.CPUAccessFlags = 0;
-	Desc.MiscFlags = 0;
-	Desc.StructureByteStride = 0;
-
-	VertexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)VertexArray.data());
-	if (!VertexBuffer)
-		;
-
-	Desc.ByteWidth = IndexBufferSize;
-	Desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-	IndexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)IndexArray.data());
-	if (!IndexBuffer)
-		;
 }
 
 void USpriteManager::BeginFrame()
@@ -144,28 +77,28 @@ void USpriteManager::BeginFrame()
 	IndexArray.clear();
 }
 
-void USpriteManager::Bind(ID3D11DeviceContext* DeviceContext)
+void USpriteManager::Bind(ID3D11DeviceContext* InDeviceContext)
 {
 	// Set shaders
-	DeviceContext->VSSetShader(VertexShader, nullptr, 0);
-	DeviceContext->PSSetShader(PixelShader, nullptr, 0);
+	InDeviceContext->VSSetShader(VertexShader, nullptr, 0);
+	InDeviceContext->PSSetShader(PixelShader, nullptr, 0);
 
 	// Set input layout
-	DeviceContext->IASetInputLayout(InputLayout);
+	InDeviceContext->IASetInputLayout(InputLayout);
 
 	// Set primitive topology (default to triangle list)
-	DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	InDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	auto& SRVMap = UTextureManager::GetInstance().GetSRVMap();
-	auto It = SRVMap.find("DejaVu");
+	//auto It = SRVMap.find("DejaVu");
+	auto It = SRVMap.find("Roboto");
 	if (It != SRVMap.end() && It->second)
 	{
 		ID3D11ShaderResourceView* SRV = It->second;
-		DeviceContext->PSSetShaderResources(0, 1, &SRV);
+		InDeviceContext->PSSetShaderResources(0, 1, &SRV);
 	}
 
-	DeviceContext->PSSetSamplers(0, 1, &SamplerState);
+	InDeviceContext->PSSetSamplers(0, 1, &SamplerState);
 }
 
 void USpriteManager::Render(ID3D11DeviceContext* DeviceContext)
@@ -222,46 +155,50 @@ void USpriteManager::Release()
 		IndexBuffer->Release();
 		IndexBuffer = nullptr;
 	}
+
+	if (SamplerState)
+	{
+		SamplerState->Release();
+		SamplerState = nullptr;
+	}
 }
 
-bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, float ModelScale, FMatrix Modeling, FMatrix View, FMatrix Projection)
+bool USpriteManager::SetUUIDVertices(ID3D11Device* InDevice, float InAspectRatio, uint32 InUUID, float InRenderSize, float InModelScale, FMatrix InModeling, FMatrix InView, FMatrix InProjection)
 {
-
-
-	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
+	FString UUIDString = FString("UUID : ") + std::to_string(InUUID);
 
 	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	ObjectCenter = (Modeling * View).TransformVectorRow(ObjectCenter);
+	ObjectCenter = (InModeling * InView).TransformVectorRow(ObjectCenter);
 
 	if (ObjectCenter.Z < 0.0f)
 	{
 		return false;
 	}
 		
-	ObjectCenter = Projection.TransformVectorRow(ObjectCenter);
+	ObjectCenter = InProjection.TransformVectorRow(ObjectCenter);
 
 	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
 
 	RenderCenter.Y -= 0.2f;
 
 	uint64 StringLen = UUIDString.size();
-	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSize * 0.5f * (1 / AspectRatio));
+	float StartPosX = RenderCenter.X - ((float)StringLen * InRenderSize * 0.5f * (1 / InAspectRatio));
 
 
-	for (uint64 i = 0, s = StringLen; i < s; i++)
+	for (uint64 i = 0; i < StringLen; i++)
 	{
-		CharacterInfo charInfo = Atlas.GetCharInfo(UUIDString[i]);
+		CharacterInfo CharInfo = Atlas.GetCharInfo(UUIDString[i]);
 
-		float u = charInfo.u;
-		float v = charInfo.v;
-		float width = charInfo.width;
-		float height = charInfo.height;
+		float U = CharInfo.U;
+		float V = CharInfo.V;
+		float Width = CharInfo.Width;
+		float Height = CharInfo.Height;
 
-		FVertexPosUV Vertex1 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u, v + height };
-		FVertexPosUV Vertex2 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y, 0.0f, u + width, v + height };
-		FVertexPosUV Vertex3 = { StartPosX + i * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u, v };
-		FVertexPosUV Vertex4 = { StartPosX + (i + 1) * RenderSize * (1 / AspectRatio), RenderCenter.Y + (float)RenderSize, 0.0f, u + width, v };
+		FVertexPosUV Vertex1 = { StartPosX + i * InRenderSize * (1 / InAspectRatio), RenderCenter.Y, 0.0f, U, V + Height };
+		FVertexPosUV Vertex2 = { StartPosX + (i + 1) * InRenderSize * (1 / InAspectRatio), RenderCenter.Y, 0.0f, U + Width, V + Height };
+		FVertexPosUV Vertex3 = { StartPosX + i * InRenderSize * (1 / InAspectRatio), RenderCenter.Y + (float)InRenderSize, 0.0f, U, V };
+		FVertexPosUV Vertex4 = { StartPosX + (i + 1) * InRenderSize * (1 / InAspectRatio), RenderCenter.Y + (float)InRenderSize, 0.0f, U + Width, V };
 
 		VertexArray.push_back(Vertex1);
 		VertexArray.push_back(Vertex2);
@@ -275,8 +212,4 @@ bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, ui
 		IndexArray.push_back(1 + 4 * i);
 		IndexArray.push_back(3 + 4 * i);
 	}
-
-
-	// 여기서 버텍스버퍼와 인덱스버퍼를 생성
-	//SetBufferUV(Device);
 }

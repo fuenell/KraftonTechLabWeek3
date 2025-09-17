@@ -4,36 +4,38 @@
 
 struct CharacterInfo
 {
-    float u;
-    float v;
-    float width;
-    float height;
-
     CharacterInfo()
     {
 
     }
-    CharacterInfo(float U, float V, float Width, float Height)
+    CharacterInfo(float InU, float InV, float InWidth, float InHeight)
     {
-        u = U;
-        v = V;
-        width = Width;
-        height = Height;
+        U = InU;
+        V = InV;
+        Width = InWidth;
+        Height = InHeight;
     }
+
+    float U = 0.0f;
+    float V = 0.0f;
+    float Width = 0.0f;
+    float Height = 0.0f;
 };
 
 class FontAtlas
 {
 public:
     FontAtlas();
-    virtual ~FontAtlas();
+    ~FontAtlas();
 
+public:
     bool Initialize();
-    void InitCharInfoMap();
     CharacterInfo GetCharInfo(char c);
-    static bool IsValidCharInfo(CharacterInfo& charInfo);
 
 private:
-    TMap<char, CharacterInfo> charInfoMap;
+    void InitCharInfoMap();
+
+private:
+    TMap<char, CharacterInfo> CharInfoMap;
 };
 

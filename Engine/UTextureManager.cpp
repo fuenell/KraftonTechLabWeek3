@@ -5,33 +5,32 @@
 #pragma comment(lib, "Lib/DirectXTK.lib")
 
 
-bool UTextureManager::Initialize(HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+bool UTextureManager::Initialize(HWND hWnd, ID3D11Device* InDevice, ID3D11DeviceContext* InDeviceContext)
 {
 	bool bSuccess = true;
-	bSuccess |= RegisterSRVWithDDS("DejaVu", L"DDS/DejaVu Sans Mono.dds", hWnd, device, deviceContext);
-	bSuccess |= RegisterSRVWithDDS("Roboto", L"DDS/Roboto-Bold.dds", hWnd, device, deviceContext);
+	bSuccess |= RegisterSRVWithDDS("DejaVu", L"DDS/DejaVu Sans Mono.dds", hWnd, InDevice, InDeviceContext);
+	bSuccess |= RegisterSRVWithDDS("Roboto", L"DDS/Roboto-Bold.dds", hWnd, InDevice, InDeviceContext);
 
 	return bSuccess;
 }
 
-bool UTextureManager::RegisterSRVWithDDS(const std::string nameKey, const wchar_t* filePath, HWND hWnd, ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+bool UTextureManager::RegisterSRVWithDDS(const std::string InNameKey, const wchar_t* InFilePath, HWND hWnd, ID3D11Device* InDevice, ID3D11DeviceContext* InDeviceContext)
 {
 	ID3D11ShaderResourceView* gTexture = nullptr;
 
-	HRESULT hr = DirectX::CreateDDSTextureFromFile (device, deviceContext, filePath, nullptr, &gTexture);
+	HRESULT hr = DirectX::CreateDDSTextureFromFile (InDevice, InDeviceContext, InFilePath, nullptr, &gTexture);
 
 	if (FAILED(hr))
 	{
-		std::wstring errMsg = filePath;
+		std::wstring ErrMsg = InFilePath;
 
-		errMsg += L" 텍스처 로드 실패";
+		ErrMsg += L" 텍스처 로드 실패";
 
-		MessageBox(hWnd, errMsg.c_str(), L"Error", MB_OK);
+		MessageBox(hWnd, ErrMsg.c_str(), L"Error", MB_OK);
 
 		return false;
 	}
-
-	SRVMap[nameKey] = gTexture;
+	SRVMap[InNameKey] = gTexture;
 
 	return true;
 }
@@ -46,6 +45,5 @@ void UTextureManager::Release()
 			pair.second = nullptr;
 		}
 	}
-
 	SRVMap.clear();
 }

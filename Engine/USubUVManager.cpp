@@ -7,34 +7,25 @@ USubUVManager& USubUVManager::GetInstance()
 	return Instance;
 }
 
-bool USubUVManager::Initialize(
-	const wchar_t* FilePath,
-	uint32 CellNumInRow,
-	uint32 CellLifeSpawn
-)
+bool USubUVManager::Initialize(const wchar_t* InFilePath, uint32 InCellNumInRow, uint32 InCellLifeSpawn)
 {
-	ID3D11Device* Device = URenderer::GetInstance().GetDevice();
-	ID3D11DeviceContext* DeviceContext = URenderer::GetInstance().GetDeviceContext();
+	Device = URenderer::GetInstance().GetDevice();
+	DeviceContext = URenderer::GetInstance().GetDeviceContext();
 
 	// Vertex, Pixel Shader, Input Layout 생성
-	ID3DBlob* VSBlob = URenderer::CompileShader(
-		L"ShaderSubUV.hlsl",
-		"VS_Main",
-		"vs_5_0"
-	);
+	ID3DBlob* VSBlob = URenderer::CompileShader(L"ShaderSubUV.hlsl", "VS_Main", "vs_5_0");
 	if (!VSBlob)
+	{
 		return false;
-
+	}
 	VertexShader = URenderer::CreateVertexShader(Device, VSBlob);
 
-	ID3DBlob* PSBlob = URenderer::CompileShader(
-		L"ShaderSubUV.hlsl",
-		"PS_Main",
-		"ps_5_0"
-	);
-	if (!PSBlob)
-		return false;
 
+	ID3DBlob* PSBlob = URenderer::CompileShader(L"ShaderSubUV.hlsl", "PS_Main", "ps_5_0");
+	if (!PSBlob)
+	{
+		return false;
+	}
 	PixelShader = URenderer::CreatePixelShader(Device, PSBlob);
 
 	D3D11_INPUT_ELEMENT_DESC Layout[] = {
@@ -43,37 +34,27 @@ bool USubUVManager::Initialize(
 	  { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12,
 	  D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
-	InputLayout = URenderer::CreateInputLayout(
-		Device,
-		Layout,
-		ARRAYSIZE(Layout),
-		VSBlob
-	);
+	InputLayout = URenderer::CreateInputLayout(Device, Layout, ARRAYSIZE(Layout), VSBlob);
 
 	VSBlob->Release();
 	PSBlob->Release();
 
 	// 샘플러 및 셰이더 리소스 뷰 생성
-
 	D3D11_SAMPLER_DESC sampDesc = {};
 	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sampDesc.AddressU = sampDesc.AddressV = sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	Device->CreateSamplerState(&sampDesc, &SamplerState);
 
-	ShaderResourceView = URenderer::CreateDDSTextureFromFile(
-		Device,
-		DeviceContext,
-		FilePath
-	);
+	ShaderResourceView = URenderer::CreateDDSTextureFromFile(Device, DeviceContext, InFilePath);
 
 	if (!ShaderResourceView)
+	{
 		return false;
+	}
 
 	// vertex, index, constant 버퍼 생성
-
-	TArray<FVertexPosUV> VertexArray = {
-		// 첫 번째 삼각형 (CCW: 좌하 -> 우하 -> 좌상
-		// )
+	// 첫 번째 삼각형 (CCW: 좌하 -> 우하 -> 좌상)
+	TArray<FVertexPosUV> VertexArray = {	
 		{ 0, -0.5f, -0.5f, 0.0f, 1.0f}, // 좌하
 		{ 0,  0.5f, -0.5f, 0.0f, 0.0f}, // 좌상
 		{  0, -0.5f, 0.5f, 1.0f, 1.0f}, // 우하
@@ -98,34 +79,38 @@ bool USubUVManager::Initialize(
 
 	VertexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)VertexArray.data());
 	if (!VertexBuffer)
+	{
 		return false;
+	}
 
 	Desc.ByteWidth = IndexBufferSize;
 	Desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
 	IndexBuffer = URenderer::CreateBuffer(Device, Desc, (const void*)IndexArray.data());
 	if (!IndexBuffer)
+	{
 		return false;
+	}
 
 	ConstantBuffer = URenderer::CreateConstantBuffer(Device);
 	if (!ConstantBuffer)
+	{
 		return false;
 
-	this->CellLifeSpawn = CellLifeSpawn;
-	this->CellNumInRow = CellNumInRow;
+	}
+
+	this->CellLifeSpawn = InCellLifeSpawn;
+	this->CellNumInRow = InCellNumInRow;
 
 	return true;
 }
 
-bool USubUVManager::UpdateConstantBuffer(
-	FVector ModelScale,
-	FMatrix CameraRotation,
-	FMatrix View,
-	FMatrix Projection
-)
+bool USubUVManager::UpdateConstantBuffer(FVector InModelScale, FMatrix InCameraRotation, FMatrix InView, FMatrix InProjection)
 {
 	if (!ConstantBuffer)
+	{
 		return false;
+	}
 
 	D3D11_MAPPED_SUBRESOURCE MappedResource;
 	HRESULT Hr = DeviceContext->Map(ConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &MappedResource);
@@ -140,13 +125,13 @@ bool USubUVManager::UpdateConstantBuffer(
 	CBTransform CBT = {};
 
 	// SubUV의 MVP 행렬을 계산한다.
-	FMatrix S = FMatrix::Scale(ModelScale.X, ModelScale.Y, ModelScale.Z);
+	FMatrix S = FMatrix::Scale(InModelScale.X, InModelScale.Y, InModelScale.Z);
 	// 항상 카메라를 마주 보도록 한다.
-	FMatrix R = FMatrix::Inverse(CameraRotation);
+	FMatrix R = FMatrix::Inverse(InCameraRotation);
 	FMatrix T = FMatrix::TranslationRow(ModelTranslation.X, ModelTranslation.Y, ModelTranslation.Z);
 
 	FMatrix ModelTransform = S * R * T;
-	FMatrix MVP = ModelTransform * View * Projection;
+	FMatrix MVP = ModelTransform * InView * InProjection;
 
 	URenderer::CopyRowMajor(CBT.MVP, MVP);
 
@@ -194,51 +179,51 @@ void USubUVManager::Render()
 
 void USubUVManager::Release()
 {
-	if (VertexShader)
-	{
-		VertexShader->Release();
-		VertexShader = nullptr;
-	}
-
-	if (PixelShader)
-	{
-		PixelShader->Release();
-		PixelShader = nullptr;
-	}
-
-	if (InputLayout)
-	{
-		InputLayout->Release();
-		InputLayout = nullptr;
-	}
-
-	if (SamplerState)
-	{
-		SamplerState->Release();
-		SamplerState = nullptr;
-	}
-
-	if (ShaderResourceView)
-	{
-		ShaderResourceView->Release();
-		ShaderResourceView = nullptr;
-	}
-
-	if (VertexBuffer)
-	{
-		VertexBuffer->Release();
-		VertexBuffer = nullptr;
-	}
-
-	if (IndexBuffer)
-	{
-		IndexBuffer->Release();
-		IndexBuffer = nullptr;
-	}
-
 	if (ConstantBuffer)
 	{
 		ConstantBuffer->Release();
 		ConstantBuffer = nullptr;
 	}
+	if (IndexBuffer)
+	{
+		IndexBuffer->Release();
+		IndexBuffer = nullptr;
+	}
+	if (VertexBuffer)
+	{
+		VertexBuffer->Release();
+		VertexBuffer = nullptr;
+	}
+	if (ShaderResourceView)
+	{
+		ShaderResourceView->Release();
+		ShaderResourceView = nullptr;
+	}
+	if (SamplerState)
+	{
+		SamplerState->Release();
+		SamplerState = nullptr;
+	}
+	if (InputLayout)
+	{
+		InputLayout->Release();
+		InputLayout = nullptr;
+	}
+	if (PixelShader)
+	{
+		PixelShader->Release();
+		PixelShader = nullptr;
+	}
+	if (VertexShader)
+	{
+		VertexShader->Release();
+		VertexShader = nullptr;
+	}
+}
+
+void USubUVManager::TriggerAt(const FVector& InWorldPos, float InNowSeconds)
+{
+	ModelTranslation = InWorldPos;
+	LastTriggerTimeSeconds = InNowSeconds;
+	bActive = true;
 }

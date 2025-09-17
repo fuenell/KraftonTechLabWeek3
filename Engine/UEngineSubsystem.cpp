@@ -3,6 +3,3 @@
 
 IMPLEMENT_UCLASS(UEngineSubsystem, UObject)
 
-UEngineSubsystem::UEngineSubsystem()
-{
-}

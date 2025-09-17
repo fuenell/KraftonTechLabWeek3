@@ -5,7 +5,7 @@
 
 class USubUVManager
 {
-private:
+public:
 	struct CBTransform
 	{
 		float MVP[16];
@@ -13,48 +13,32 @@ private:
 		uint32 CurrentCellIndex;
 	};
 
-
-
 public:
 	static USubUVManager& GetInstance();
 
-	bool Initialize(
-		const wchar_t* FilePath,
-		uint32 CellNumInRow,
-		uint32 CellLifeSpawn
-	);
-
-	bool UpdateConstantBuffer(
-		FVector ModelScale,
-		FMatrix CameraRotation,
-		FMatrix View,
-		FMatrix Projection
-	);
-
-
-	void TriggerAt(const FVector& InWorldPos, float InNowSeconds)
-	{
-		ModelTranslation = InWorldPos;
-		LastTriggerTimeSeconds = InNowSeconds;
-		bActive = true;
-	}
-
-	void Deactivate() { bActive = false; }
-	bool  IsActive()               const { return bActive; }
-	float GetLastTriggerTime()     const { return LastTriggerTimeSeconds; }
-	void  SetDurationSeconds(float S) { DurationSeconds = S; }
-	float GetDurationSeconds()     const { return DurationSeconds; }
-
-
-	void SetModelTranslation(FVector InModelTranslation) { ModelTranslation = InModelTranslation; }
-	const FVector& GetModelTranslation() const { return ModelTranslation; }
-
-	void SetCurrentTime(float InCurrentTime) { LastTriggerTimeSeconds = InCurrentTime; }
-	float GetCurrendTime()const { return LastTriggerTimeSeconds; }
-
+public:
+	bool Initialize(const wchar_t* InFilePath,uint32 InCellNumInRow,uint32 InCellLifeSpawn);
+	bool UpdateConstantBuffer(FVector InModelScale,FMatrix InCameraRotation,FMatrix InView,FMatrix InProjection);
 	void Bind();
 	void Render();
 	void Release();
+
+public:
+	void TriggerAt(const FVector& InWorldPos, float InNowSeconds);
+	void Deactivate()							  { bActive = false; }
+	bool  IsActive()						const { return bActive; }
+
+	//getter
+	float GetDurationSeconds()				const { return DurationSeconds; }
+	float GetLastTriggerTime()				const { return LastTriggerTimeSeconds; }
+	float GetCurrendTime()					const { return LastTriggerTimeSeconds; }
+	const FVector& GetModelTranslation()	const { return ModelTranslation; }
+
+
+	//setter
+	void  SetDurationSeconds(float S)						{ DurationSeconds = S; }
+	void SetModelTranslation(FVector InModelTranslation)	{ ModelTranslation = InModelTranslation; }
+	void SetCurrentTime(float InCurrentTime)				{ LastTriggerTimeSeconds = InCurrentTime; }
 
 private:
 	USubUVManager() = default;
@@ -62,32 +46,31 @@ private:
 
 
 private:
-	FVector ModelTranslation{};
+	FVector						ModelTranslation{};
 
+	ID3D11Device*				Device{};
+	ID3D11DeviceContext*		DeviceContext{};
 
-	ID3D11Device* Device = URenderer::GetInstance().GetDevice();
-	ID3D11DeviceContext* DeviceContext = URenderer::GetInstance().GetDeviceContext();
-
-	ID3D11VertexShader* VertexShader = nullptr;
-	ID3D11PixelShader* PixelShader = nullptr;
-	ID3D11InputLayout* InputLayout = nullptr;
+	ID3D11VertexShader*			VertexShader{};
+	ID3D11PixelShader*			PixelShader{};
+	ID3D11InputLayout*			InputLayout{};
 	
-	ID3D11SamplerState* SamplerState = nullptr;
-	ID3D11ShaderResourceView* ShaderResourceView = nullptr;
+	ID3D11SamplerState*			SamplerState{};
+	ID3D11ShaderResourceView*	ShaderResourceView{};
 
-	ID3D11Buffer* VertexBuffer = nullptr;
-	ID3D11Buffer* IndexBuffer = nullptr;
-	ID3D11Buffer* ConstantBuffer = nullptr;
+	ID3D11Buffer*				VertexBuffer{};
+	ID3D11Buffer*				IndexBuffer{};
+	ID3D11Buffer*				ConstantBuffer{};
 
-	UINT VertexStride = 0;
-	UINT IndexStride = 0;
-	UINT VertexBufferSize = 0;
-	UINT IndexBufferSize = 0;
+	UINT						VertexStride{};
+	UINT						IndexStride{};
+	UINT						VertexBufferSize{};
+	UINT						IndexBufferSize{};
 
-	uint32 CellNumInRow = 0;
-	uint32 CellLifeSpawn = 0;
+	uint32						CellNumInRow{};
+	uint32						CellLifeSpawn{};
 
-	float   LastTriggerTimeSeconds = -1.0f;
-	float   DurationSeconds = 2.4f;
-	bool    bActive = false;
+	float						LastTriggerTimeSeconds = -1.0f;
+	float						DurationSeconds = 2.4f;
+	bool						bActive = false;
 };
