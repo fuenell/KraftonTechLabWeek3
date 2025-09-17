@@ -31,7 +31,7 @@ void EditorApplication::Update(float DeltaTime)
 	//GizmoManager.GetTarget();
 
 
-	
+
 	// 피킹된 primitive가 있으면 동작한다
 	if (PickedPrimitive != nullptr)
 	{
@@ -211,7 +211,7 @@ void EditorApplication::Render()
 
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
-			
+
 			//ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
 			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
@@ -228,10 +228,9 @@ void EditorApplication::Render()
 		}
 		else
 		{
-			// 모든 버텍스에 정확한 AABB 박스 생성 (매 프레임 모든 버텍스 순회)
-			Mesh->UpdateAccurateBounds(WorldMatrix);
-			WorldBounds = Mesh->GetAccurateBounds();
-			ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
+			// 모든 버텍스에 정확한 AABB 박스 생성 (모든 버텍스 순회 방식)
+			PickedPrimitive->UpdateAccurateBounds(WorldMatrix);
+			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
 	}
 
@@ -283,10 +282,10 @@ void EditorApplication::Render()
 	USubUVManager& SubUVManager = USubUVManager::GetInstance();
 
 
-	const float Now = UTimeManager::GetInstance().GetTotalTime(); 
+	const float Now = UTimeManager::GetInstance().GetTotalTime();
 	const float Elapsed = Now - SubUVManager.GetLastTriggerTime();
 	//UE_LOG("4444");
-		
+
 	//UE_LOG("submanager active? : %d      %f        %f", SubUVManager.IsActive(), Elapsed, SubUVManager.GetDurationSeconds());
 
 	if (SubUVManager.IsActive() && Elapsed <= SubUVManager.GetDurationSeconds())

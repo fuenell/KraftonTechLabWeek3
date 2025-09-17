@@ -204,8 +204,9 @@ void UScene::Render()
 			}
 			else
 			{
+				Primitive->UpdateAccurateBounds(WorldMatrix);	// 여기서 SetBoundingBox도 같이 됨
+				WorldBounds = Primitive->GetBoundingBox();
 				ULineBatcherManager::GetInstance().AddBoundingBox(WorldBounds, 0xFFFFFFFF);
-				Primitive->SetBoundingBox(WorldBounds);
 			}
 
 			Primitive->Draw(*Renderer);

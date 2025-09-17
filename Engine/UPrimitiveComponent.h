@@ -38,6 +38,9 @@ public:
 
 	FBounds GetBoundingBox() const { return BoundingBox; }
 
+	// 실제 딱 맞는 Bounds를 계산하는 함수 (고비용)
+	void UpdateAccurateBounds(const FMatrix& WorldTransform);
+
 public:
 	bool bIsSelected = false;
 
@@ -47,4 +50,5 @@ protected:
 
 	FBounds BoundingBox;
 
+	FMatrix LastAccurateBoundsTransform{};	// 기본 행렬로 초기화
 };
