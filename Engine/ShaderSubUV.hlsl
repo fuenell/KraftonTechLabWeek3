@@ -7,13 +7,15 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
-    float2 texCoord : TEXCOORD;
+    float2 texCoord;
 };
 
 cbuffer ViewProjCB : register(b0)
 {
     row_major float4x4 MVP;
+    // 텍스처의 한 변에 이미지가 몇 장이나 있는가
     uint CellNumInRow;
+    // 몇 번째 이미지를 그려야 하는가
     uint CurrentCellIndex;
 }
 
@@ -21,7 +23,6 @@ VS_OUTPUT VS_Main(VS_INPUT input)
 {
     VS_OUTPUT output;
     output.Position = mul(float4(input.Position, 1.0f), MVP);
-    //output.Position = float4(input.Position, 1.0f);
     
     float cellSize = 1.0f / (float) CellNumInRow;
     uint col = CurrentCellIndex % CellNumInRow;

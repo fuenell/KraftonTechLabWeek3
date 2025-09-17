@@ -137,6 +137,7 @@ bool USubUVManager::UpdateConstantBuffer(
 	// ConstantBuffer에 들어갈 데이터를 계산
 	CBTransform CBT = {};
 
+	// SubUV의 MVP 행렬을 계산한다.
 	FMatrix S = FMatrix::Scale(ModelScale.X, ModelScale.Y, ModelScale.Z);
 	// 항상 카메라를 마주 보도록 한다.
 	FMatrix R = FMatrix::Inverse(CameraRotation);
@@ -147,15 +148,18 @@ bool USubUVManager::UpdateConstantBuffer(
 
 	URenderer::CopyRowMajor(CBT.MVP, MVP);
 
-	CBT.CellNumInRow = CellNumInRow;
 	// 현재 몇번째 셀을 가리키는지 정의한다.
 	// CellNumInRow를 통해 텍스처에 셀이 몇 개 존재하는지 정의한다.
 	// CellLifeSpawn을 통해 셀이 몇 프레임 동안 지속되는지 정의한다. 
+	CBT.CellNumInRow = CellNumInRow;
+	// 오버플로우 방지
 	static uint32 CurrentCellIndex;
+	// 하나의 셀은 CellLifeSpawn 변수만큼의 프레임 동안 지속된다.
 	CurrentCellIndex %= (CellNumInRow * CellNumInRow * CellLifeSpawn);
 	CBT.CurrentCellIndex = CurrentCellIndex / CellLifeSpawn;
 	CurrentCellIndex++;
 
+	// 계산한 데이터를 constant buffer에 전달한다.
 	memcpy(MappedResource.pData, &CBT, sizeof(CBTransform));
 	DeviceContext->Unmap(ConstantBuffer, 0);
 
