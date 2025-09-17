@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <limits>
+
 #include "URenderer.h"
 #include "FVertexPosUV.h"
 #include "UTextureManager.h"
@@ -28,7 +30,7 @@ public:
 	void Release();
 
 
-	bool SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, float ModelScale, FMatrix Modeling, FMatrix View, FMatrix Projection);
+	bool SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, FBounds WorldBound, FMatrix Modeling, FMatrix View, FMatrix Projection);
 
 private:
 	ID3D11VertexShader* VertexShader;

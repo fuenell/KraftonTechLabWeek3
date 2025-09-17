@@ -224,30 +224,54 @@ void USpriteManager::Release()
 	}
 }
 
-bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, float ModelScale, FMatrix Modeling, FMatrix View, FMatrix Projection)
+bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, uint32 UUID, float RenderSize, FBounds WorldBound, FMatrix Modeling, FMatrix View, FMatrix Projection)
 {
-
-
+	// 모델을 둘러싸고 있는 Bounding Box의 8개의 점 중 가장 높이가 높은 점을 찾는다.
 	FString UUIDString = FString("UUID : ") + std::to_string(UUID);
 
-	FVector4 ObjectCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
+	FVector4 BoundEdges[8];
+	BoundEdges[0] = { WorldBound.Min.X, WorldBound.Min.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[1] = { WorldBound.Max.X, WorldBound.Min.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[2] = { WorldBound.Min.X, WorldBound.Max.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[3] = { WorldBound.Max.X, WorldBound.Max.Y, WorldBound.Min.Z, 1.0f };
+	BoundEdges[4] = { WorldBound.Min.X, WorldBound.Min.Y, WorldBound.Max.Z, 1.0f };
+	BoundEdges[5] = { WorldBound.Max.X, WorldBound.Min.Y, WorldBound.Max.Z, 1.0f };
+	BoundEdges[6] = { WorldBound.Min.X, WorldBound.Max.Y, WorldBound.Max.Z, 1.0f };
+	BoundEdges[7] = { WorldBound.Max.X, WorldBound.Max.Y, WorldBound.Max.Z, 1.0f };
 
-	ObjectCenter = (Modeling * View).TransformVectorRow(ObjectCenter);
+	for (int i = 0, s = ARRAYSIZE(BoundEdges); i < s; i++)
+		BoundEdges[i] = View.TransformVectorRow(BoundEdges[i]);
 
-	if (ObjectCenter.Z < 0.0f)
+	FVector4 Highest = {0.0f, std::numeric_limits<float>::lowest(), 0.0f, 1.0f};
+    
+	for (int i = 0, s = ARRAYSIZE(BoundEdges); i < s; i++)
 	{
-		return false;
+		// 카메라 뒤에 있는 점은 후보에서 제외
+		if (BoundEdges[i].Z < 0.0f)
+			continue;
+		if (BoundEdges[i].Y > Highest.Y)
+			Highest = BoundEdges[i];
 	}
-		
-	ObjectCenter = Projection.TransformVectorRow(ObjectCenter);
 
-	FVector4 RenderCenter = ObjectCenter / ObjectCenter.W;
+	// 모든 점이 카메라 뒤에만 있는 경우
+	if (Highest.Y == FLT_MIN)
+		return false;
 
-	RenderCenter.Y -= 0.2f;
+	// UUID를 렌더할 NDC의 기준점 위치
+	FVector4 RenderCenter = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	RenderCenter = (Modeling * View).TransformVectorRow(RenderCenter);
+
+	if (RenderCenter.Z < 0.0f)
+		return false;
+	
+	RenderCenter.Y = Highest.Y;
+	RenderCenter = Projection.TransformVectorRow(RenderCenter);
+
+	RenderCenter = RenderCenter / RenderCenter.W;
 
 	uint64 StringLen = UUIDString.size();
 	float StartPosX = RenderCenter.X - ((float)StringLen * RenderSize * 0.5f * (1 / AspectRatio));
-
 
 	for (uint64 i = 0, s = StringLen; i < s; i++)
 	{
@@ -276,7 +300,5 @@ bool USpriteManager::SetUUIDVertices(ID3D11Device* Device, float AspectRatio, ui
 		IndexArray.push_back(3 + 4 * i);
 	}
 
-
-	// 여기서 버텍스버퍼와 인덱스버퍼를 생성
-	//SetBufferUV(Device);
+	return true;
 }
