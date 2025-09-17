@@ -19,7 +19,7 @@ bool FontAtlas::Initialize()
 void FontAtlas::InitCharInfoMap()
 {
     float CellSize = 1.0f / 16.0f; // 0.0625
-    float CutOffset = 0.02f;
+    float CutOffset = 0.015f;
 
     for (int Ascii = 0; Ascii < 256; ++Ascii)
     {
