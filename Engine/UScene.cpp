@@ -10,6 +10,7 @@
 #include "ULineBatcherManager.h"
 #include "USphereComp.h"
 #include "UCubeComp.h"
+#include "USpotLightComponent.h"
 
 IMPLEMENT_UCLASS(UScene, UObject)
 UScene::UScene()
@@ -197,7 +198,7 @@ void UScene::Render()
 				ULineBatcherManager::LocalSphereToWorldAABB(Primitive->GetPosition(), WorldMatrix, WorldBounds);
 				Primitive->SetBoundingBox(WorldBounds);
 			}
-			else if (Primitive->GetClass() == UCubeComp::StaticClass() || Primitive->GetClass() == UPlaneComp::StaticClass())
+			else if (Primitive->GetClass() == UCubeComp::StaticClass() || Primitive->GetClass() == UPlaneComp::StaticClass() || Primitive->GetClass() == USpotLightComponent::StaticClass())
 			{
 				ULineBatcherManager::LocalAABBtoWorldAABB(Primitive->GetMesh()->GetLocalBounds(), WorldMatrix, WorldBounds);
 				Primitive->SetBoundingBox(WorldBounds);

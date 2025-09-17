@@ -31,7 +31,7 @@ void USceneManagerWindow::RenderContent()
 		if (ImGui::Selectable(SceneObject->Name.ToString().c_str(), SceneObject == Target))
 		{
 			UPrimitiveComponent* TargetSceneObject = SceneObject->Cast<UPrimitiveComponent>();
-			OnComponentSelected(TargetSceneObject);;
+			OnComponentSelected(TargetSceneObject);
 		}
 
 		// 현재 ScenObject에 대한 UI 처리가 끝났으므로 스택에서 ID를 POP합니다.

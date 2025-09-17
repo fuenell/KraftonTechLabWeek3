@@ -209,27 +209,23 @@ void EditorApplication::Render()
 
 		FMatrix WorldMatrix = PickedPrimitive->GetWorldTransform();
 
+		// UScene::Render() 에서 미리 AABB 박스를 계산하기 때문에 여기서 바로 사용함
 		if (PickedPrimitive->GetClass() == USphereComp::StaticClass())
 		{
-
-			//ULineBatcherManager::LocalSphereToWorldAABB(PickedPrimitive->GetPosition(), WorldMatrix, WorldBounds);
 			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
 		else if (PickedPrimitive->GetClass() == USpotLightComponent::StaticClass())
 		{
 			USpotLightComponent* SpotLightComponent = dynamic_cast<USpotLightComponent*>(PickedPrimitive);
-			ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
 			ULineBatcherManager::GetInstance().AddSpotLight(PickedPrimitive->GetPosition(), PickedPrimitive->GetWorldTransform(), SpotLightComponent->GetAngle(), SpotLightComponent->GetScale(), SpotLightComponent->GetLightColor());
+			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
 		else if (PickedPrimitive->GetClass() == UCubeComp::StaticClass() || PickedPrimitive->GetClass() == UPlaneComp::StaticClass())
 		{
-			//ULineBatcherManager::LocalAABBtoWorldAABB(Mesh->GetLocalBounds(), WorldMatrix, WorldBounds);
 			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
 		else
 		{
-			// 모든 버텍스에 정확한 AABB 박스 생성 (모든 버텍스 순회 방식)
-			PickedPrimitive->UpdateAccurateBounds(WorldMatrix);
 			ULineBatcherManager::GetInstance().AddBoundingBox(PickedPrimitive->GetBoundingBox(), 0xFFFFFFFF);
 		}
 	}
